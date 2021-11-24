@@ -7,10 +7,11 @@ package com.example.services.impl;
 
 import com.example.dto.UserDTO;
 import com.example.entities.User;
+import com.example.exceptions.NoUserFoundException;
 import com.example.repository.UserRepository;
 import com.example.services.UserService;
 import java.util.List;
-import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +27,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUser(Long id) {
-        return userRepository.findById(id).get();
-        //.orElseThrow(() -> new UserNotFoundException(id));
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NoUserFoundException("No user found with this id =>" + id));
     }
 
     @Override
@@ -46,7 +47,9 @@ public class UserServiceImpl implements UserService {
     public UserDTO update(UserDTO userFront) {
         User user = userRepository.findByName(userFront.getName());
         user.setName(userFront.getName());
-        user.setLastName(userFront.getLastName());
+        if (userFront.getLastName() != null) {
+            user.setLastName(userFront.getLastName());
+        }
         if (userFront.getEmail() != null) {
             user.setEmail(userFront.getEmail());
         }
@@ -57,10 +60,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getAllUser() {
         List<User> users = (List<User>) userRepository.findAll();
-        /*
         if (users.isEmpty()) {
-            throw new NoDataFoundException();
-        }*/
+            throw new NoUserFoundException("No user found");
+        }
         return users;
     }
 
