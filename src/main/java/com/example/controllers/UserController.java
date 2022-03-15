@@ -8,8 +8,10 @@ package com.example.controllers;
 import com.example.dto.UserDTO;
 import com.example.entities.User;
 import com.example.services.UserService;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- *
  * @author frup73532
  */
 @RestController

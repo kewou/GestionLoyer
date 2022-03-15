@@ -9,7 +9,6 @@ import com.example.entities.User;
 import lombok.Data;
 
 /**
- *
  * @author frup73532
  */
 @Data

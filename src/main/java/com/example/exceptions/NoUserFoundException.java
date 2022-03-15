@@ -6,7 +6,6 @@
 package com.example.exceptions;
 
 /**
- *
  * @author frup73532
  */
 public class NoUserFoundException extends RuntimeException {
