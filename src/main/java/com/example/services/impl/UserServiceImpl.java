@@ -10,13 +10,13 @@ import com.example.entities.User;
 import com.example.exceptions.NoUserFoundException;
 import com.example.repository.UserRepository;
 import com.example.services.UserService;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- *
  * @author frup73532
  */
 @Service
@@ -27,8 +27,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUser(Long id) {
-        return userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoUserFoundException("No user found with this id =>" + id));
+        return user;
     }
 
     @Override
@@ -44,15 +45,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO update(UserDTO userFront) {
-        User user = userRepository.findByName(userFront.getName());
+    public UserDTO update(UserDTO userFront, Long id) {
+        User user = getUser(id);
         user.setName(userFront.getName());
-        if (userFront.getLastName() != null) {
-            user.setLastName(userFront.getLastName());
-        }
-        if (userFront.getEmail() != null) {
-            user.setEmail(userFront.getEmail());
-        }
+        user.setLastName(userFront.getLastName());
+        user.setEmail(userFront.getEmail());
         userRepository.save(user);
         return user.convertToDTO();
     }

@@ -35,9 +35,7 @@ public class UserController {
     @GetMapping(path = "")
     public List<UserDTO> getAllUsers() throws Exception {
         List<UserDTO> listUserDTO = new ArrayList<>();
-        for (User user : userService.getAllUser()) {
-            listUserDTO.add(user.convertToDTO());
-        }
+        userService.getAllUser().forEach(user->listUserDTO.add(user.convertToDTO()));
         return listUserDTO;
     }
 
@@ -57,8 +55,8 @@ public class UserController {
     }
 
     @PutMapping(path = "/{id}")
-    public void updateUser(@RequestBody UserDTO userDtoFront) {
-        userService.update(userDtoFront);
+    public void updateUser(@RequestBody UserDTO userDtoFront, @PathVariable("id") long id) {
+        userService.update(userDtoFront, id);
     }
 
 }
