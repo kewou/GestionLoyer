@@ -5,7 +5,6 @@
  */
 package com.example.controllers;
 
-import com.example.dto.UserDTO;
 import com.example.entities.User;
 import com.example.services.UserService;
 
@@ -33,20 +32,19 @@ public class UserController {
     private UserService userService;
 
     @GetMapping(path = "")
-    public List<UserDTO> getAllUsers() throws Exception {
-        List<UserDTO> listUserDTO = new ArrayList<>();
-        userService.getAllUser().forEach(user->listUserDTO.add(user.convertToDTO()));
-        return listUserDTO;
+    public List<User> getAllUsers() throws Exception {
+        return userService.getAllUser();
     }
 
     @GetMapping("/{id}")
-    public UserDTO getUser(@PathVariable("id") long id) {
-        return userService.getUser(id).convertToDTO();
+    public User getUser(@PathVariable("id") long id) {
+        return userService.getUser(id);
     }
 
     @PostMapping(path = "/add")
-    public UserDTO addNewUser(@RequestBody UserDTO userDto) {
-        return userService.add(userDto);
+    public long addNewUser(@RequestBody User user) {
+        userService.addOrUpdate(user);
+        return user.getId();
     }
 
     @DeleteMapping(path = "/{id}")
@@ -54,9 +52,10 @@ public class UserController {
         userService.delete(id);
     }
 
-    @PutMapping(path = "/{id}")
-    public void updateUser(@RequestBody UserDTO userDtoFront, @PathVariable("id") long id) {
-        userService.update(userDtoFront, id);
+    @PutMapping(path = "/update")
+    public User updateUser(@RequestBody User user) {
+        userService.addOrUpdate(user);
+        return user;
     }
 
 }

@@ -5,30 +5,42 @@
  */
 package com.example.services.impl;
 
-import com.example.dto.UserDTO;
 import com.example.entities.User;
 import com.example.exceptions.NoUserFoundException;
 import com.example.repository.UserRepository;
 import com.example.services.UserService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author frup73532
  */
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
 
     @Override
+    public List<User> getAllUser() {
+        List<User> users = new ArrayList<User>();
+        userRepository.findAll().forEach(user -> users.add(user));
+        if (users.isEmpty()) {
+            throw new NoUserFoundException("No user found");
+        }
+        return users;
+    }
+
+    @Override
     public User getUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NoUserFoundException("No user found with this id =>" + id));
+                .orElseThrow(() -> new NoUserFoundException("No user found with this id => " + id));
         return user;
     }
 
@@ -39,28 +51,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO add(UserDTO userFront) {
-        userRepository.save(userFront.convertToEntity());
-        return userFront;
-    }
-
-    @Override
-    public UserDTO update(UserDTO userFront, Long id) {
-        User user = getUser(id);
-        user.setName(userFront.getName());
-        user.setLastName(userFront.getLastName());
-        user.setEmail(userFront.getEmail());
+    public void addOrUpdate(User user) {
         userRepository.save(user);
-        return user.convertToDTO();
     }
-
-    @Override
-    public List<User> getAllUser() {
-        List<User> users = (List<User>) userRepository.findAll();
-        if (users.isEmpty()) {
-            throw new NoUserFoundException("No user found");
-        }
-        return users;
-    }
-
 }

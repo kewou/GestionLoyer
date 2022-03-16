@@ -5,7 +5,6 @@
  */
 package com.example.services;
 
-import com.example.dto.UserDTO;
 import com.example.entities.User;
 
 import java.util.List;
@@ -21,7 +20,6 @@ public interface UserService {
 
     void delete(Long id);
 
-    UserDTO add(UserDTO userDto);
+    void addOrUpdate(User user);
 
-    UserDTO update(UserDTO userDto,Long id);
 }

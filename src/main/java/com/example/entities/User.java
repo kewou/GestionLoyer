@@ -5,7 +5,6 @@
  */
 package com.example.entities;
 
-import com.example.dto.UserDTO;
 
 import java.io.Serializable;
 import javax.persistence.Column;
@@ -39,11 +38,4 @@ public class User implements Serializable {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    public UserDTO convertToDTO() {
-        UserDTO userDto = new UserDTO();
-        userDto.setName(name);
-        userDto.setLastName(lastName);
-        userDto.setEmail(email);
-        return userDto;
-    }
 }
