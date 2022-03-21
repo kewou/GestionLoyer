@@ -7,14 +7,14 @@ package com.example.entities;
 
 
 import java.io.Serializable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Table;
+import java.util.Date;
+import java.util.Set;
+
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+
+import javax.persistence.*;
 
 /**
  * @author frup73532
@@ -37,5 +37,23 @@ public class User implements Serializable {
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
+
+    @Column(name = "role", nullable = false)
+    private String role;
+
+    @Column(name = "entryDate")
+    private Date entryDate;
+
+    @Column(name = "getOutDate")
+    private Date getOutDate;
+
+    @Column(name = "solde")
+    private int solde;
+
+    @Column(name = "ancienneteEnMois")
+    private int ancienneteEnMois;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Logement> logements;
 
 }
