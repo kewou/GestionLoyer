@@ -10,16 +10,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class BasicApplication {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext configurableApplicationContext = SpringApplication.run(BasicApplication.class, args);
-        UserRepository userRepository = configurableApplicationContext.getBean(UserRepository.class);
-
-        User admin = new User();
-        admin.setName("Joel");
-        admin.setLastName("beezy");
-        admin.setEmail("kewou.noumia@gmail.com");
-        admin.setRole("Admin");
-        userRepository.save(admin);
-
+        SpringApplication.run(BasicApplication.class, args);
     }
 
 }

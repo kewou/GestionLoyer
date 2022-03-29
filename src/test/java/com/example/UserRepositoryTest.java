@@ -5,6 +5,7 @@ import com.example.services.UserService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
 
@@ -12,10 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserRepositoryTest {
 
-    public static int nbUserDatabase=3;
+    public static int nbUserDatabase=1;
 
     @Autowired
     private UserService userService;
@@ -35,7 +37,7 @@ public class UserRepositoryTest {
     @Test
     @Order(3)
     public void testGetUser(){
-        Long id= 2L;
+        Long id= 1L;
         Optional<User> resOp = Optional.ofNullable(userService.getUser(id));
         assertEquals(id,resOp.get().getId());
     }
@@ -43,7 +45,7 @@ public class UserRepositoryTest {
     @Test
     @Order(4)
     public void testUpdateUser(){
-        Long id= 2L;
+        Long id= 1L;
         User user=userService.getUser(id);
         user.setName("Tintamare");
         userService.addOrUpdate(user);
@@ -54,10 +56,10 @@ public class UserRepositoryTest {
     @Order(5)
     public void testAddUser(){
         User user = new User();
-        user.setId(Long.valueOf(4));
         user.setEmail("test@test.fr");
         user.setName("test");
         user.setLastName("test");
+        user.setRole("client");
         userService.addOrUpdate(user);
         assertEquals(userService.getAllUser().size(),nbUserDatabase+1);
     }
