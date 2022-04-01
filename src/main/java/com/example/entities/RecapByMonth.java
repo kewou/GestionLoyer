@@ -4,12 +4,13 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "recapByMonth")
 @Data
-public class RecapByMonth {
+public class RecapByMonth implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

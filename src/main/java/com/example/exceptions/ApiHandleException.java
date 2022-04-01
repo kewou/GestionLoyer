@@ -28,8 +28,8 @@ public class ApiHandleException {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @ExceptionHandler(value = {NoUserFoundException.class})
-    public ResponseEntity<Object> handleNoUserFound(NoUserFoundException e) {
+    @ExceptionHandler(value = {NoInstanceFoundException.class})
+    public ResponseEntity<Object> handleNoUserFound(NoInstanceFoundException e) {
         logger.error(e.getMessage());
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());

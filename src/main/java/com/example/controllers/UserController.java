@@ -5,11 +5,13 @@
  */
 package com.example.controllers;
 
+import com.example.entities.Logement;
 import com.example.entities.User;
 import com.example.services.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -56,6 +58,11 @@ public class UserController {
     public User updateUser(@RequestBody User user) {
         userService.addOrUpdate(user);
         return user;
+    }
+
+    @GetMapping("/{id}/logements")
+    public Set<Logement> getAllLogement(@PathVariable("id") long id) {
+        return userService.getUser(id).getLogements();
     }
 
 }

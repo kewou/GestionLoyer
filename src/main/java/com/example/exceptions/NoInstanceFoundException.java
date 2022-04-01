@@ -8,13 +8,13 @@ package com.example.exceptions;
 /**
  * @author frup73532
  */
-public class NoUserFoundException extends RuntimeException {
+public class NoInstanceFoundException extends RuntimeException {
 
-    public NoUserFoundException(String message) {
+    public NoInstanceFoundException(String message) {
         super(message);
     }
 
-    public NoUserFoundException(String message, Throwable cause) {
+    public NoInstanceFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 

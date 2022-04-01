@@ -6,7 +6,7 @@
 package com.example.services.impl;
 
 import com.example.entities.User;
-import com.example.exceptions.NoUserFoundException;
+import com.example.exceptions.NoInstanceFoundException;
 import com.example.repository.UserRepository;
 import com.example.services.UserService;
 
@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
         List<User> users = new ArrayList<User>();
         userRepository.findAll().forEach(user -> users.add(user));
         if (users.isEmpty()) {
-            throw new NoUserFoundException("No user found");
+            throw new NoInstanceFoundException("No user found");
         }
         return users;
     }
@@ -40,9 +40,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NoUserFoundException("No user found with this id => " + id));
+                .orElseThrow(() -> new NoInstanceFoundException("No user found with this id => " + id));
         return user;
     }
+
+    @Override
+    public User getUserByName(String name) {
+        return userRepository.findByName(name);
+    }
+
 
     @Override
     public void delete(Long id) {
@@ -54,4 +60,5 @@ public class UserServiceImpl implements UserService {
     public void addOrUpdate(User user) {
         userRepository.save(user);
     }
+
 }

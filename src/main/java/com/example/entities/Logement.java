@@ -1,15 +1,21 @@
 package com.example.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Set;
 
 @Entity
 @Table(name = "logement")
-@Data
-public class Logement {
+@Getter
+@Setter
+public class Logement implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -31,5 +37,21 @@ public class Logement {
 
     @OneToMany(mappedBy = "logement")
     private Set<RecapByMonth> recapByMonths;
+
+    public Logement() {
+    }
+
+    public Logement(int montantLoyer, String address, String description, User user) {
+        this.montantLoyer = montantLoyer;
+        this.address = address;
+        this.description = description;
+        this.user = user;
+    }
+
+    @JsonIgnore
+    public User getUser() {
+        return this.user;
+    }
+
 
 }

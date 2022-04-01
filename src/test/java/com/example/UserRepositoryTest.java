@@ -1,73 +1,92 @@
 package com.example;
 
 import com.example.entities.User;
+import com.example.repository.UserRepository;
 import com.example.services.UserService;
+
+
+import com.example.services.impl.StartUpService;
+import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Propagation;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserRepositoryTest {
-
-    public static int nbUserDatabase=1;
 
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private StartUpService startUpService;
+
+    // Methode appelée avant tous les tests
+    @BeforeEach
+    public void setUp() throws Exception{
+        userRepository.deleteAll();
+        startUpService.run(new String[0]);
+    }
+
+
     @Test
-    @Order(1)
     void contextLoads() {
     }
 
     @Test
-    @Order(2)
     public void testGetAllUser() {
-        int res = userService.getAllUser().size();
-        assertEquals(nbUserDatabase, res);
+        assertEquals(userService.getAllUser().size(), userRepository.count());
     }
 
     @Test
-    @Order(3)
     public void testGetUser(){
-        Long id= 1L;
-        Optional<User> resOp = Optional.ofNullable(userService.getUser(id));
-        assertEquals(id,resOp.get().getId());
+        String name="Joel";
+        Optional<User> resOp = Optional.ofNullable(userService.getUserByName(name));
+        assertEquals(name,resOp.get().getName());
     }
 
     @Test
-    @Order(4)
     public void testUpdateUser(){
-        Long id= 1L;
-        User user=userService.getUser(id);
+        String name="Joel";
+        User user=userService.getUserByName(name);
         user.setName("Tintamare");
         userService.addOrUpdate(user);
-        assertEquals("Tintamare",userService.getUser(id).getName());
+        assertEquals("Tintamare",userService.getUserByName("Tintamare").getName());
     }
 
     @Test
-    @Order(5)
     public void testAddUser(){
+        int nbUser= (int) userRepository.count();
         User user = new User();
         user.setEmail("test@test.fr");
         user.setName("test");
         user.setLastName("test");
         user.setRole("client");
         userService.addOrUpdate(user);
-        assertEquals(userService.getAllUser().size(),nbUserDatabase+1);
+        assertEquals(userService.getAllUser().size(),nbUser+1);
     }
 
     @Test
-    @Order(6)
     public void testDelete(){
-        userService.delete(Long.valueOf(2));
-        assertEquals(userService.getAllUser().size(),nbUserDatabase);
+        int nbUser= (int) userRepository.count();
+        userService.delete(userService.getAllUser().get(0).getId());
+        assertEquals(userService.getAllUser().size(),nbUser-1);
+    }
+
+    @Test
+    public void testLogement(){
+        String name="Kidou";
+        User user=userService.getUserByName(name);
+        assertEquals(user.getLogements().size(),1);
     }
 }

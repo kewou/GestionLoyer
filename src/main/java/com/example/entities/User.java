@@ -8,10 +8,15 @@ package com.example.entities;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
@@ -21,7 +26,8 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 public class User implements Serializable {
 
     @Id
@@ -53,7 +59,10 @@ public class User implements Serializable {
     @Column(name = "ancienneteEnMois")
     private int ancienneteEnMois;
 
-    @OneToMany(mappedBy = "user")
-    private Set<Logement> logements;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user", orphanRemoval = true)
+    private Set<Logement> logements = new HashSet<>();
+
+    public User() {
+    }
 
 }
