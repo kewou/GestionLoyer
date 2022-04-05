@@ -35,11 +35,10 @@ public class Logement implements Serializable {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "logement")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER,mappedBy = "logement",orphanRemoval = true)
     private Set<RecapByMonth> recapByMonths;
 
-    public Logement() {
-    }
+    public Logement(){}
 
     public Logement(int montantLoyer, String address, String description, User user) {
         this.montantLoyer = montantLoyer;

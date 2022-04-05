@@ -1,6 +1,9 @@
 package com.example.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
@@ -9,7 +12,8 @@ import java.util.Date;
 
 @Entity
 @Table(name = "recapByMonth")
-@Data
+@Setter
+@Getter
 public class RecapByMonth implements Serializable {
 
     @Id
@@ -30,6 +34,23 @@ public class RecapByMonth implements Serializable {
     private int solde;
 
     @ManyToOne
-    @JoinColumn(name = "logement_id", nullable = false)
+    @JoinColumn(name = "logement_id",nullable = false)
     private Logement logement;
+
+    @JsonIgnore
+    public Logement getLogement() {
+        return this.logement;
+    }
+
+    public RecapByMonth(){
+
+    }
+
+    public RecapByMonth(Date dateVersement, int montantLoyer, int montantVerser, int solde, Logement logement) {
+        this.dateVersement = dateVersement;
+        this.montantLoyer = montantLoyer;
+        this.montantVerser = montantVerser;
+        this.solde = solde;
+        this.logement = logement;
+    }
 }
