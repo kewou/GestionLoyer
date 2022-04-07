@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -25,6 +26,7 @@ public class Logement implements Serializable {
     @Column(name = "montantLoyer")
     private int montantLoyer;
 
+    @Pattern(regexp = "^*$")
     @Column(name = "address")
     private String address;
 

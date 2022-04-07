@@ -47,7 +47,7 @@ public class StartUpService implements CommandLineRunner {
         nkomkana.setUser(proprio);
         Set<Logement> lgts = new HashSet<Logement>();
         lgts.add(nkomkana);
-        
+
         // Un recap de Nkomkana
         RecapByMonth recapNkomkana = new RecapByMonth(new Date(),150000,100000,50000,nkomkana);
         Set<RecapByMonth> recaps = new HashSet<RecapByMonth>();

@@ -6,20 +6,19 @@
 package com.example.entities;
 
 
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.annotation.Id;
+
+import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
-
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.springframework.data.annotation.Id;
-
-import javax.persistence.*;
 
 /**
  * @author frup73532
@@ -35,12 +34,18 @@ public class User implements Serializable {
     @javax.persistence.Id
     private Long id;
 
+    @NotBlank(message = "Entrer un nom svp")
+    @Size(min=2,max=10)
     @Column(name = "name", nullable = false)
     private String name;
 
+    @NotBlank(message = "Entrer un prénom svp")
+    @Size(min=2,max=10)
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    @NotBlank(message="Entrer une adresse email svp")
+    @Email
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
@@ -54,13 +59,13 @@ public class User implements Serializable {
     private Date getOutDate;
 
     @Column(name = "solde")
-    private int solde;
+    private int solde=0;
 
     @Column(name = "ancienneteEnMois")
-    private int ancienneteEnMois;
+    private int ancienneteEnMois=0;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user", orphanRemoval = true)
-    private Set<Logement> logements = new HashSet<>();
+    private Set<Logement> logements;
 
     public User() {
     }

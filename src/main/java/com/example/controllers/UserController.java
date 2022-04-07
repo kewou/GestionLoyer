@@ -8,20 +8,13 @@ package com.example.controllers;
 import com.example.entities.Logement;
 import com.example.entities.User;
 import com.example.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author frup73532
@@ -44,9 +37,9 @@ public class UserController {
     }
 
     @PostMapping(path = "/add")
-    public long addNewUser(@RequestBody User user) {
+    public ResponseEntity<String> addNewUser(@Valid @RequestBody User user) {
         userService.addOrUpdate(user);
-        return user.getId();
+        return ResponseEntity.ok("User is valid");
     }
 
     @DeleteMapping(path = "/{id}")
