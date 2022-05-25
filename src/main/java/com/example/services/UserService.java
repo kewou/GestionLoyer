@@ -18,10 +18,15 @@ public interface UserService {
 
     User getUserByName(String name);
 
+    User getByEmail(String email);
+
     List<User> getAllUser();
 
     void delete(Long id);
 
-    void addOrUpdate(User user);
+    void update(User user);
 
+    void register(User user) throws Exception;
+
+    boolean checkIfUserExist(String email);
 }
