@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -53,23 +54,32 @@ public class UserRepositoryTest {
     }
 
     @Test
+    public void testGetUserByEmail(){
+        String name = "Joel";
+        String email="kewou.noumia@gmail.com";
+        User user =userService.getByEmail(email);
+        assertNotNull(user);
+        assertEquals(name, user.getName());
+    }
+
+    @Test
     public void testUpdateUser() {
         String name = "Joel";
         User user = userService.getUserByName(name);
         user.setName("Tintamare");
-        userService.addOrUpdate(user);
+        userService.update(user);
         assertEquals("Tintamare", userService.getUserByName("Tintamare").getName());
     }
 
     @Test
-    public void testAddUser() {
+    public void testAddUser() throws Exception {
         int nbUser = (int) userRepository.count();
         User user = new User();
         user.setEmail("test@test.fr");
         user.setName("test");
         user.setLastName("test");
         user.setRole("client");
-        userService.addOrUpdate(user);
+        userService.register(user);
         assertEquals(userService.getAllUser().size(), nbUser + 1);
     }
 
