@@ -37,8 +37,8 @@ public class UserController {
     }
 
     @PostMapping(path = "/add")
-    public ResponseEntity<String> addNewUser(@Valid @RequestBody User user) throws Exception {
-        userService.register(user);
+    public ResponseEntity<String> addNewUser(@Valid @RequestBody User user) {
+        userService.addOrUpdate(user);
         return ResponseEntity.ok("User is valid");
     }
 
@@ -49,7 +49,7 @@ public class UserController {
 
     @PutMapping(path = "/update")
     public User updateUser(@RequestBody User user) {
-        userService.update(user);
+        userService.addOrUpdate(user);
         return user;
     }
 

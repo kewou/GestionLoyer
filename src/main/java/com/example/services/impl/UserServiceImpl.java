@@ -13,10 +13,7 @@ import com.example.services.UserService;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,10 +49,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByName(name);
     }
 
-    @Override
-    public User getByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
 
     @Override
     public void delete(Long id) {
@@ -64,29 +57,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void update(User user) {
+    public void addOrUpdate(User user) {
         userRepository.save(user);
-    }
-
-    @Override
-    public void register(User userData) throws Exception {
-        if(checkIfUserExist(userData.getEmail())){
-            throw new Exception("User is already exist on database");
-        }
-        User user=new User();
-        BeanUtils.copyProperties(userData,user);
-        encodePassword(user,userData);
-        userRepository.save(user);
-    }
-
-    @Override
-    public boolean checkIfUserExist(String email){
-        return userRepository.findByEmail(email) !=null ? true : false;
-    }
-
-    private void encodePassword(User user,User userData){
-        String encoded = new BCryptPasswordEncoder().encode(userData.getPassword());
-        user.setPassword(encoded);
     }
 
 }

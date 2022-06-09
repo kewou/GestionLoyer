@@ -18,8 +18,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     User findByName(String name);
 
-    User findByEmail(String email);
-
     /*
     @Query("SELECT COUNT(u) FROM User u")
     int countUser();

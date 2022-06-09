@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import javax.validation.ConstraintViolationException;
-
 /**
  * @author frup73532
  */
@@ -32,7 +30,7 @@ import javax.validation.ConstraintViolationException;
 @RestController
 public class ApiHandleException {
 
-    private static Logger logger = LoggerFactory.getLogger(ApiHandleException.class);
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @ExceptionHandler(value = {NoInstanceFoundException.class})
     public ResponseEntity<Object> handleNoUserFound(NoInstanceFoundException e) {
@@ -45,7 +43,7 @@ public class ApiHandleException {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ConstraintViolationException.class)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, Object> body = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {

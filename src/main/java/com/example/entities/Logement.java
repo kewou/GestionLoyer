@@ -26,6 +26,7 @@ public class Logement implements Serializable {
     @Column(name = "montantLoyer")
     private int montantLoyer;
 
+    @Pattern(regexp = "^*$")
     @Column(name = "address")
     private String address;
 
