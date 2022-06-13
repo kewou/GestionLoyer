@@ -6,10 +6,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 @Configuration
 @EnableWebSecurity
@@ -31,6 +32,15 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().formLogin();
     }
 
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/configuration/ui","/swagger-resources","/configuration/ui",
+                        "/swagger-resources/**","/configuration/security","/api-docs/swagger-config","/swagger-ui/**","/webjars/**")
+                .antMatchers("/users")
+                .antMatchers("/swagger-ui-custom.html")
+                .antMatchers("/swagger-ui.html")
+                .antMatchers("/api-docs");
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
