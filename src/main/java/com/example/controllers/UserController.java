@@ -5,9 +5,11 @@
  */
 package com.example.controllers;
 
-import com.example.entities.Logement;
-import com.example.entities.User;
+import com.example.helper.ResponseHelper;
 import com.example.services.UserService;
+import com.example.domain.dto.UserDto;
+import com.example.domain.entities.Logement;
+import com.example.domain.entities.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -32,11 +35,11 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Operation(summary = "Tous les users",description="Tous les users")
+    @Operation(summary = "Tous les users", description = "Tous les users")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok",content = @Content(schema = @Schema(implementation = User.class))),
-            @ApiResponse(responseCode = "404", description = "Erreur de saisie",content = @Content),
-            @ApiResponse(responseCode = "500", description = "An Internal Server Error occurred",content = @Content)
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "404", description = "Erreur de saisie", content = @Content),
+            @ApiResponse(responseCode = "500", description = "An Internal Server Error occurred", content = @Content)
 
     })
     @GetMapping(path = "")
@@ -44,24 +47,25 @@ public class UserController {
         return userService.getAllUser();
     }
 
-    @Operation(summary = "Retourne un user",description="Retourne un user")
+    @Operation(summary = "Retourne un user", description = "Retourne un user")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok",content = @Content(schema = @Schema(implementation = User.class))),
-            @ApiResponse(responseCode = "404", description = "Erreur de saisie",content = @Content),
-            @ApiResponse(responseCode = "500", description = "An Internal Server Error occurred",content = @Content)
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "404", description = "Erreur de saisie", content = @Content),
+            @ApiResponse(responseCode = "500", description = "An Internal Server Error occurred", content = @Content)
 
     })
     @GetMapping("/{id}")
     public User getUser(
-            @Parameter(description="id of user")
+            @Parameter(description = "id of user")
             @PathVariable("id") long id) {
         return userService.getUser(id);
     }
 
     @PostMapping(path = "/add")
-    public ResponseEntity<String> addNewUser(@Valid @RequestBody User user) throws Exception {
-        userService.register(user);
-        return ResponseEntity.ok("User is valid");
+    public ResponseEntity<User> addNewUser(@Valid @RequestBody UserDto dto, Errors erros) throws Exception {
+        ResponseHelper.handle(erros);
+        User user = userService.register(dto);
+        return ResponseEntity.ok(user);
     }
 
     @DeleteMapping(path = "/{id}")

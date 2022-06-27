@@ -1,8 +1,7 @@
 package com.example.services.impl;
 
-import com.example.entities.Logement;
-import com.example.entities.User;
-import com.example.exceptions.NoInstanceFoundException;
+import com.example.domain.entities.Logement;
+import com.example.domain.exceptions.NoInstanceFoundException;
 import com.example.repository.LogementRepository;
 import com.example.services.LogementService;
 import org.springframework.beans.factory.annotation.Autowired;

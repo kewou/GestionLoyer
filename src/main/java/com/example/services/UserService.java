@@ -5,7 +5,8 @@
  */
 package com.example.services;
 
-import com.example.entities.User;
+import com.example.domain.dto.UserDto;
+import com.example.domain.entities.User;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public interface UserService {
 
     void update(User user);
 
-    void register(User user) throws Exception;
+    User register(UserDto user) throws Exception;
 
     boolean checkIfUserExist(String email);
 }

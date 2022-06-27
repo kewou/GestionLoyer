@@ -1,13 +1,12 @@
 package com.example.services.impl;
 
-import com.example.entities.Logement;
-import com.example.entities.RecapByMonth;
-import com.example.entities.User;
+import com.example.domain.entities.Logement;
+import com.example.domain.entities.RecapByMonth;
+import com.example.domain.entities.User;
 import com.example.repository.LogementRepository;
 import com.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashSet;

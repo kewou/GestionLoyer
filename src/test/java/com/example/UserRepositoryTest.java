@@ -1,6 +1,7 @@
 package com.example;
 
-import com.example.entities.User;
+import com.example.domain.dto.UserDto;
+import com.example.domain.entities.User;
 import com.example.repository.UserRepository;
 import com.example.services.UserService;
 import com.example.services.impl.StartUpService;
@@ -74,12 +75,12 @@ public class UserRepositoryTest {
     @Test
     public void testAddUser() throws Exception {
         int nbUser = (int) userRepository.count();
-        User user = new User();
-        user.setEmail("test@test.fr");
-        user.setName("test");
-        user.setLastName("test");
-        user.setRole("client");
-        userService.register(user);
+        UserDto dto = new UserDto();
+        dto.setEmail("test@test.fr");
+        dto.setName("test");
+        dto.setLastName("test");
+        dto.setRole("client");
+        userService.register(dto);
         assertEquals(userService.getAllUser().size(), nbUser + 1);
     }
 

@@ -1,6 +1,6 @@
 package com.example.services.impl;
 
-import com.example.entities.User;
+import com.example.domain.entities.User;
 import com.example.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

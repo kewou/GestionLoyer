@@ -39,7 +39,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/users")
                 .antMatchers("/swagger-ui-custom.html")
                 .antMatchers("/swagger-ui.html")
-                .antMatchers("/api-docs");
+                .antMatchers("/api-docs")
+                .antMatchers("/actuator");
     }
 
     @Override

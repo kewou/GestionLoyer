@@ -1,10 +1,9 @@
 package com.example.repository;
 
-import com.example.entities.RecapByMonth;
-import com.example.entities.User;
-import org.springframework.data.repository.CrudRepository;
+import com.example.domain.entities.RecapByMonth;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RecapByMonthRepository extends CrudRepository<RecapByMonth, Long> {
+public interface RecapByMonthRepository extends JpaRepository<RecapByMonth, Long> {
 }

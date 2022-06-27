@@ -1,6 +1,6 @@
 package com.example.services;
 
-import com.example.entities.Logement;
+import com.example.domain.entities.Logement;
 
 import java.util.List;
 

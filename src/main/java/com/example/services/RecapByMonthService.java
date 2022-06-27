@@ -1,7 +1,6 @@
 package com.example.services;
 
-import com.example.entities.RecapByMonth;
-import com.example.entities.User;
+import com.example.domain.entities.RecapByMonth;
 
 import java.util.List;
 

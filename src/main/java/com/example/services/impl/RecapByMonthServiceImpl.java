@@ -1,7 +1,7 @@
 package com.example.services.impl;
 
-import com.example.entities.RecapByMonth;
-import com.example.exceptions.NoInstanceFoundException;
+import com.example.domain.entities.RecapByMonth;
+import com.example.domain.exceptions.NoInstanceFoundException;
 import com.example.repository.RecapByMonthRepository;
 import com.example.services.RecapByMonthService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,9 +1,9 @@
 package com.example.repository;
 
-import com.example.entities.Logement;
-import org.springframework.data.repository.CrudRepository;
+import com.example.domain.entities.Logement;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface LogementRepository extends CrudRepository<Logement, Long> {
+public interface LogementRepository extends JpaRepository<Logement, Long> {
 }
