@@ -7,10 +7,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@OpenAPIDefinition(
-        info = @Info(
-                title = "SBeezyAPI",description="API SpringBoot pour la gestion de Loyer",version="V1"),
-        servers={@Server(url="localhost:8090")})
 public class BasicApplication {
 
     public static void main(String[] args) {
