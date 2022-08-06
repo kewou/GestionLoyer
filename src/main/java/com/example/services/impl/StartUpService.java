@@ -7,6 +7,7 @@ import com.example.repository.LogementRepository;
 import com.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -48,7 +49,7 @@ public class StartUpService implements CommandLineRunner {
         lgts.add(nkomkana);
 
         // Un recap de Nkomkana
-        RecapByMonth recapNkomkana = new RecapByMonth(new Date(),150000,100000,50000,nkomkana);
+        RecapByMonth recapNkomkana = new RecapByMonth(new Date(),100000,50000,nkomkana);
         Set<RecapByMonth> recaps = new HashSet<RecapByMonth>();
         recaps.add(recapNkomkana);
 

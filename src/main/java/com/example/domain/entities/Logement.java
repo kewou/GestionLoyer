@@ -22,7 +22,7 @@ public class Logement implements Serializable {
     private Long id;
 
     @Column(name = "montantLoyer")
-    private int montantLoyer;
+    private Integer montantLoyer;
 
     @Column(name = "address")
     private String address;
@@ -34,7 +34,7 @@ public class Logement implements Serializable {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER,mappedBy = "logement",orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL,fetch=FetchType.EAGER,mappedBy = "logement",orphanRemoval = true)
     private Set<RecapByMonth> recapByMonths;
 
     public Logement(){}

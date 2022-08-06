@@ -23,14 +23,11 @@ public class RecapByMonth implements Serializable {
     @Column(name = "dateVersement")
     private Date dateVersement;
 
-    @Column(name = "montantLoyer")
-    private int montantLoyer;
-
     @Column(name = "montantVerser")
-    private int montantVerser;
+    private Integer montantVerser;
 
     @Column(name = "solde")
-    private int solde;
+    private Integer solde;
 
     @ManyToOne
     @JoinColumn(name = "logement_id",nullable = false)
@@ -41,13 +38,11 @@ public class RecapByMonth implements Serializable {
         return this.logement;
     }
 
-    public RecapByMonth(){
+    public RecapByMonth(){}
 
-    }
 
-    public RecapByMonth(Date dateVersement, int montantLoyer, int montantVerser, int solde, Logement logement) {
+    public RecapByMonth(Date dateVersement, int montantVerser, int solde, Logement logement) {
         this.dateVersement = dateVersement;
-        this.montantLoyer = montantLoyer;
         this.montantVerser = montantVerser;
         this.solde = solde;
         this.logement = logement;

@@ -61,12 +61,12 @@ public class User implements Serializable, UserDetails {
     private Date getOutDate;
 
     @Column(name = "solde")
-    private int solde=0;
+    private Integer solde=0;
 
     @Column(name = "ancienneteEnMois")
-    private int ancienneteEnMois=0;
+    private Integer ancienneteEnMois=0;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL,fetch=FetchType.EAGER, mappedBy = "user", orphanRemoval = true)
     private Set<Logement> logements;
 
     public User() {
