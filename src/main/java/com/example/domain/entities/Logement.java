@@ -3,7 +3,6 @@ package com.example.domain.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
@@ -34,10 +33,11 @@ public class Logement implements Serializable {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(cascade = CascadeType.ALL,fetch=FetchType.EAGER,mappedBy = "logement",orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "logement", orphanRemoval = true)
     private Set<RecapByMonth> recapByMonths;
 
-    public Logement(){}
+    public Logement() {
+    }
 
     public Logement(int montantLoyer, String address, String description, User user) {
         this.montantLoyer = montantLoyer;

@@ -9,20 +9,20 @@ public class ResponseHelper {
 
     /**
      * helper method use to build ResponseEntity
+     *
      * @return {@link ResponseEntity}
      */
-    public static ResponseEntity<Void> ok()
-    {
+    public static ResponseEntity<Void> ok() {
         return ResponseEntity.ok().build();
     }
 
     /**
      * helper method use to build ResponseEntity
+     *
      * @param object {@link Object}
      * @return {@link ResponseEntity}
      */
-    public static <T> ResponseEntity<T> build(T object)
-    {
+    public static <T> ResponseEntity<T> build(T object) {
         return object != null
                 ? ResponseEntity.ok().body(object)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -30,12 +30,11 @@ public class ResponseHelper {
 
     /**
      * handle errors
+     *
      * @param errors {@link Errors}
      */
-    public static void handle(Errors errors)
-    {
-        if (errors.hasErrors())
-        {
+    public static void handle(Errors errors) {
+        if (errors.hasErrors()) {
             throw new ValidationException("Invalid parameters", errors);
         }
     }

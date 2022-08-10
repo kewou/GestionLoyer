@@ -1,7 +1,7 @@
 package com.example.controllers;
 
-import com.example.services.LogementService;
 import com.example.domain.entities.Logement;
+import com.example.services.LogementService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +18,7 @@ public class LogementController {
 
     @GetMapping()
     @Operation(description = "Get list of all users")
-    public List<Logement> getAll() throws Exception
-    {
+    public List<Logement> getAll() throws Exception {
         return logementService.getAllLogement();
     }
 

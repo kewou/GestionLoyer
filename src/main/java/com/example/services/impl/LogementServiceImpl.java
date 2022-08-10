@@ -1,7 +1,7 @@
 package com.example.services.impl;
 
 import com.example.domain.entities.Logement;
-import com.example.domain.exceptions.NoInstanceFoundException;
+import com.example.domain.exceptions.NoLogementFoundProblem;
 import com.example.repository.LogementRepository;
 import com.example.services.LogementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class LogementServiceImpl implements LogementService {
     @Override
     public Logement getLogement(Long id) {
         return logementRepository.findById(id).
-                orElseThrow(() -> new NoInstanceFoundException("No logement found with this id => " + id));
+                orElseThrow(() -> new NoLogementFoundProblem(id));
     }
 
     @Override

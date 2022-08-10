@@ -1,7 +1,7 @@
 package com.example.services.impl;
 
 import com.example.domain.entities.RecapByMonth;
-import com.example.domain.exceptions.NoInstanceFoundException;
+import com.example.domain.exceptions.NoRecapFoundProblem;
 import com.example.repository.RecapByMonthRepository;
 import com.example.services.RecapByMonthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +21,13 @@ public class RecapByMonthServiceImpl implements RecapByMonthService {
     @Override
     public RecapByMonth getRecapByMonth(Long id) {
         RecapByMonth recapByMonth = recapByMonthRepository.findById(id)
-                .orElseThrow(() -> new NoInstanceFoundException("No recapByMonth found with this id => " + id));
+                .orElseThrow(() -> new NoRecapFoundProblem(id));
         return recapByMonth;
     }
 
     @Override
     public List<RecapByMonth> getAllRecapByMonth() {
-        List<RecapByMonth> recapByMonths= new ArrayList<RecapByMonth>();
+        List<RecapByMonth> recapByMonths = new ArrayList<RecapByMonth>();
         recapByMonthRepository.findAll().forEach(recap -> recapByMonths.add(recap));
         return recapByMonths;
     }

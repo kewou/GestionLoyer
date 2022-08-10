@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix="info")
+@ConfigurationProperties(prefix = "info")
 @Getter
 @Setter
 public class InfoProperties {

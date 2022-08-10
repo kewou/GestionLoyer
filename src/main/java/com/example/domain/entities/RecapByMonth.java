@@ -30,7 +30,7 @@ public class RecapByMonth implements Serializable {
     private Integer solde;
 
     @ManyToOne
-    @JoinColumn(name = "logement_id",nullable = false)
+    @JoinColumn(name = "logement_id", nullable = false)
     private Logement logement;
 
     @JsonIgnore
@@ -38,7 +38,8 @@ public class RecapByMonth implements Serializable {
         return this.logement;
     }
 
-    public RecapByMonth(){}
+    public RecapByMonth() {
+    }
 
 
     public RecapByMonth(Date dateVersement, int montantVerser, int solde, Logement logement) {

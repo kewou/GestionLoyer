@@ -5,11 +5,11 @@
  */
 package com.example.controllers;
 
-import com.example.helper.ResponseHelper;
-import com.example.services.UserService;
 import com.example.domain.dto.UserDto;
 import com.example.domain.entities.Logement;
 import com.example.domain.entities.User;
+import com.example.helper.ResponseHelper;
+import com.example.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

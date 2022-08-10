@@ -5,11 +5,11 @@
  */
 package com.example.services.impl;
 
-import com.example.repository.UserRepository;
-import com.example.services.UserService;
 import com.example.domain.dto.UserDto;
 import com.example.domain.entities.User;
-import com.example.domain.exceptions.NoInstanceFoundException;
+import com.example.domain.exceptions.NoUserFoundProblem;
+import com.example.repository.UserRepository;
+import com.example.services.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NoInstanceFoundException("No user found with this id => " + id));
+                .orElseThrow(() -> new NoUserFoundProblem(id));
         return user;
     }
 

@@ -17,7 +17,10 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Set;
 
 /**
  * @author frup73532
@@ -34,21 +37,21 @@ public class User implements Serializable, UserDetails {
     private Long id;
 
     @NotBlank(message = "Entrer un nom svp")
-    @Size(min=2,max=10)
+    @Size(min = 2, max = 10)
     @Column(name = "name", nullable = false)
     private String name;
 
     @NotBlank(message = "Entrer un prénom svp")
-    @Size(min=2,max=10)
+    @Size(min = 2, max = 10)
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @NotBlank(message="L'adresse email ne peut etre vide")
-    @Email(message="Entrer une adresse email valide")
+    @NotBlank(message = "L'adresse email ne peut etre vide")
+    @Email(message = "Entrer une adresse email valide")
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name="password")
+    @Column(name = "password")
     private String password;
 
     @Column(name = "role", nullable = false)
@@ -61,12 +64,12 @@ public class User implements Serializable, UserDetails {
     private Date getOutDate;
 
     @Column(name = "solde")
-    private Integer solde=0;
+    private Integer solde = 0;
 
     @Column(name = "ancienneteEnMois")
-    private Integer ancienneteEnMois=0;
+    private Integer ancienneteEnMois = 0;
 
-    @OneToMany(cascade = CascadeType.ALL,fetch=FetchType.EAGER, mappedBy = "user", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user", orphanRemoval = true)
     private Set<Logement> logements;
 
     public User() {
