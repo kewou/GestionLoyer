@@ -10,7 +10,11 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 
 @Configuration
@@ -26,19 +30,20 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.exceptionHandling().authenticationEntryPoint(problemSupport).accessDeniedHandler(problemSupport);
-        /*
+        //http.exceptionHandling().authenticationEntryPoint(problemSupport).accessDeniedHandler(problemSupport);
+
         http
                 .csrf().disable() // protocole de sécurité qui gère un token
                 .authorizeRequests()
                     .antMatchers("/login*").permitAll() // Tout le monde a accès à cette page
                     .antMatchers("/admin").hasRole("ADMIN")
-                    .antMatchers("/proprio").hasRole("PROPRIO")
-                    .antMatchers("/user").hasRole("USER")
-                    //.anyRequest().authenticated()    // toutes les requetes doivent etre authentifiées
-                .and().formLogin();
-         */
+                    .antMatchers("/proprio").hasAnyRole("ADMIN","PROPRIO")
+                    .antMatchers("/user").hasAnyRole("ADMIN","USER")
+                    //.anyRequest().authenticated()   // toutes les requetes doivent etre authentifiées
+                    .and().formLogin().loginPage("/login.html");
     }
+
+
 
     @Override
     public void configure(WebSecurity web) throws Exception {

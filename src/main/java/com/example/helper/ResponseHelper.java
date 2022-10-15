@@ -35,7 +35,7 @@ public class ResponseHelper {
      */
     public static void handle(Errors errors) {
         if (errors.hasErrors()) {
-            throw new ValidationException("Invalid parameters", errors);
+            throw new ValidationException();
         }
     }
 

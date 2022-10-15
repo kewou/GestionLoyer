@@ -6,10 +6,9 @@
 package com.example.domain.entities;
 
 
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.data.annotation.Id;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
@@ -17,45 +16,44 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author frup73532
  */
 @Entity
-@Table(name = "users")
+@Builder
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class User implements Serializable, UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @javax.persistence.Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Entrer un nom svp")
-    @Size(min = 2, max = 10)
-    @Column(name = "name", nullable = false)
+    @Column(name = "reference", unique = true)
+    private String reference;
+
+    @Column(name = "name")
     private String name;
 
-    @NotBlank(message = "Entrer un prénom svp")
-    @Size(min = 2, max = 10)
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "last_name")
     private String lastName;
 
-    @NotBlank(message = "L'adresse email ne peut etre vide")
-    @Email(message = "Entrer une adresse email valide")
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name="phone")
+    private String phone;
+
+    @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "password")
     private String password;
 
-    @Column(name = "role", nullable = false)
-    private String role;
+    @Column(name = "roles")
+    private String roles;
 
     @Column(name = "entryDate")
     private Date entryDate;
@@ -70,14 +68,27 @@ public class User implements Serializable, UserDetails {
     private Integer ancienneteEnMois = 0;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user", orphanRemoval = true)
-    private Set<Logement> logements;
+    private Set<Logement> logements = new HashSet<>();
 
-    public User() {
-    }
+    @Transient
+    private List<GrantedAuthority> authorities = new ArrayList<>();
+
+    /*
+
+
+
+
+        @Override
+        public Collection<? extends GrantedAuthority> getAuthorities() {
+            return Arrays.stream(this.getRoles().split(","))
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toList());
+        }*/
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return new ArrayList<>();
+        return null;
     }
 
     @Override
@@ -92,17 +103,17 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override

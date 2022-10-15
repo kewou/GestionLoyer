@@ -7,12 +7,13 @@ import com.example.repository.LogementRepository;
 import com.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-//@Service
+
 public class StartUpService implements CommandLineRunner {
 
     @Autowired
@@ -32,14 +33,14 @@ public class StartUpService implements CommandLineRunner {
         admin.setName("Joel");
         admin.setLastName("beezy");
         admin.setEmail("kewou.noumia@gmail.com");
-        admin.setRole("Admin");
+        admin.setRoles("ADMIN");
         userRepository.save(admin);
         // Un user : Role Proprio
         User proprio = new User();
         proprio.setName("Kidou");
         proprio.setLastName("Dorine");
         proprio.setEmail("dorisclam@yahoo.fr");
-        proprio.setRole("Proprio");
+        proprio.setRoles("PROPRIO");
 
         // Un logement : Nkomkana
         Logement nkomkana = new Logement(300000, "Jean-Mermoz", "Duplex en bord de route", proprio);

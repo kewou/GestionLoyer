@@ -20,4 +20,8 @@ public class NoUserFoundProblem extends AbstractThrowableProblem {
     public NoUserFoundProblem(Long userId) {
         super(TYPE, String.format("No user found with this id '%s'", userId), Status.NOT_FOUND);
     }
+
+    public  NoUserFoundProblem(String reference) {
+        super(TYPE, String.format("No user found with this reference : '%s'", reference), Status.NOT_FOUND);
+    }
 }

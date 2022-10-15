@@ -1,27 +1,16 @@
 package com.example.domain.exceptions;
 
 import org.springframework.validation.Errors;
+import org.zalando.problem.AbstractThrowableProblem;
+import org.zalando.problem.Status;
 
-public class ValidationException extends RuntimeException {
-    private final Errors errors;
+import java.net.URI;
 
-    /**
-     * constructor
-     *
-     * @param message {@link String}
-     * @param errors  {@link Errors}
-     */
-    public ValidationException(String message, Errors errors) {
-        super(message);
-        this.errors = errors;
-    }
+public class ValidationException  extends AbstractThrowableProblem {
 
-    /**
-     * get the errors
-     *
-     * @return {@link Errors}
-     */
-    public Errors getErrors() {
-        return errors;
+    private static final URI TYPE = URI.create("https://example.org/not-found");
+
+    public ValidationException() {
+        super(TYPE, "erreur", Status.BAD_REQUEST);
     }
 }

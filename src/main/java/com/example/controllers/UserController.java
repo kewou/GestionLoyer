@@ -22,6 +22,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +36,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+
+
     @Operation(summary = "Tous les users", description = "Tous les users")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = User.class))),
@@ -42,7 +45,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "An Internal Server Error occurred", content = @Content)
 
     })
-    @GetMapping(path = "")
+    @GetMapping
     public List<User> getAllUsers() throws Exception {
         return userService.getAllUser();
     }
@@ -54,29 +57,30 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "An Internal Server Error occurred", content = @Content)
 
     })
-    @GetMapping("/{id}")
+    @GetMapping("/{reference}")
     public User getUser(
-            @Parameter(description = "id of user")
-            @PathVariable("id") long id) {
-        return userService.getUser(id);
+            @Parameter(description = "reference of user")
+            @NotBlank @PathVariable("reference") String reference) {
+        return userService.getUserByReference(reference);
     }
 
-    @PostMapping(path = "/add")
+    @PostMapping
     public ResponseEntity<User> addNewUser(@Valid @RequestBody UserDto dto, Errors erros) throws Exception {
         ResponseHelper.handle(erros);
         User user = userService.register(dto);
         return ResponseEntity.ok(user);
     }
 
-    @DeleteMapping(path = "/{id}")
-    public void deleteUser(@PathVariable("id") long id) {
-        userService.delete(id);
+    @DeleteMapping(path = "/{reference}")
+    public void deleteUser(@NotBlank @PathVariable("reference") String reference) {
+        userService.delete(reference);
     }
 
-    @PutMapping(path = "/update")
-    public User updateUser(@RequestBody User user) {
-        userService.update(user);
-        return user;
+    @PutMapping(path = "/{reference}")
+    public ResponseEntity<User> updateUser(@RequestBody UserDto userDto, @NotBlank @PathVariable("reference") String reference,Errors erros) {
+        ResponseHelper.handle(erros);
+        User user = userService.update(userDto,reference);
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping("/{id}/logements")

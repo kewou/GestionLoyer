@@ -17,13 +17,15 @@ public interface UserService {
 
     User getUser(Long id);
 
+    User getUserByReference(String reference);
+
     User getUserByEmail(String email);
 
     List<User> getAllUser();
 
-    void delete(Long id);
+    void delete(String reference);
 
-    void update(User user);
+    User update(UserDto user,String reference);
 
     User register(UserDto user) throws Exception;
 
