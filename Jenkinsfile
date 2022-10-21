@@ -8,14 +8,10 @@ pipeline{
 
             steps {
                 echo 'building the application'
+                mvn clean install
             }
         }
-        stage("test") {
 
-            steps {
-                echo 'testing the application, test update'
-            }
-        }
         stage("deploy") {
 
             steps {
