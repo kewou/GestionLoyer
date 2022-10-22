@@ -20,7 +20,7 @@ pipeline{
         stage("build") {
 
             steps {
-                sh 'mvn -Dmaven.test.failure.ignore=true install'
+                sh 'mvn clean install -Dmaven.test.skip=true '
             }
         }
 
@@ -30,7 +30,7 @@ pipeline{
             }
         }
 
-        stage("deploy") {
+        stage("deploy")
 
             steps {
                 echo 'deploy the application'
