@@ -17,14 +17,14 @@ pipeline{
             }
         }
 
-        stage("build") {
+        stage("Build") {
 
             steps {
-                sh 'mvn clean install -Dmaven.test.skip=true '
+                sh 'mvn clean install'
             }
         }
 
-        stage("test") {
+        stage("Sonar Analysis") {
             steps {
                 sh 'mvn test'
             }
