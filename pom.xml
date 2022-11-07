@@ -19,6 +19,19 @@
         <java.version>11</java.version>
     </properties>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <url>http://localhost:8081/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <scm>
+        <connection>scm:git:https://github.com/kewou/GestionLoyer.git</connection>
+        <url>https://github.com/kewou/GestionLoyer</url>
+        <developerConnection>scm:git:https://github.com/kewou/GestionLoyer.git</developerConnection>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
