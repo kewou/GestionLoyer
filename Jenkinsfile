@@ -20,13 +20,6 @@ pipeline{
             }
         }
 
-        stage("Build") {
-
-            steps {
-                sh 'mvn clean install'
-            }
-        }
-
         stage("Sonar Analysis") {
             steps {
                 echo 'Analyse sonar'
@@ -36,7 +29,7 @@ pipeline{
         stage("Build Image") {
             steps{
                 script {
-                    dockerImageName=docker.build Gestionloyer:latest
+                    dockerImageName=docker.build Gestionloyer
                 }
             }
         }
