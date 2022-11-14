@@ -31,6 +31,7 @@ pipeline{
         }
 
         stage("Build Image") {
+            agent { dockerfile true }
             steps {
                 sh 'docker build -t springboot .'
             }
