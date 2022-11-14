@@ -36,7 +36,7 @@ pipeline{
         stage("Build Image") {
             steps{
                 script {
-                    dockerImageName=docker.build registry + ":$BUILD_NUMBER"
+                    dockerImageName=docker.build Gestionloyer:latest
                 }
             }
         }
