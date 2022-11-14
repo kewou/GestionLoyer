@@ -30,9 +30,9 @@ pipeline{
             }
         }
 
-        stage("Deploy") {
+        stage("Build Image") {
             steps {
-                sh 'mvn deploy'
+                sh 'docker build -t springboot .'
             }
         }
 
