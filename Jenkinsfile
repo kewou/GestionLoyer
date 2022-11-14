@@ -1,4 +1,8 @@
 pipeline{
+    environment {
+        registry = "http://localhost:8081/repository/DockerNexus/"
+        registryCredential = 'DockerNexus'
+      }
     agent any
     tools {
         maven 'maven339'
@@ -31,7 +35,7 @@ pipeline{
 
         stage("Build Image") {
             steps {
-                sh 'docker.build http://localhost:8081/repository/DockerNexus/Gestionloyer'
+                docker.build registry + ":$BUILD_NUMBER"
             }
         }
 
