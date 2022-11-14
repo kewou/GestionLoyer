@@ -29,7 +29,7 @@ pipeline{
         stage("Build Image") {
             steps{
                 script {
-                    dockerImageName=docker.build Gestionloyer
+                    dockerImageName=docker.build "Gestionloyer"
                 }
             }
         }
