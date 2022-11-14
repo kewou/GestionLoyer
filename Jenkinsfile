@@ -30,13 +30,8 @@ pipeline{
         }
 
         stage("Build Image") {
-            agent{
-                docker{
-                    image 'springboot'
-                    }
-            }
             steps {
-                sh 'mvn clean install'
+                sh 'docker.build http://localhost:8081/repository/DockerNexus/Gestionloyer
             }
         }
 
