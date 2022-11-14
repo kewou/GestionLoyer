@@ -31,7 +31,7 @@ pipeline{
 
         stage("Build Image") {
             steps {
-                sh 'docker.build http://localhost:8081/repository/DockerNexus/Gestionloyer
+                sh 'docker.build http://localhost:8081/repository/DockerNexus/Gestionloyer'
             }
         }
 
