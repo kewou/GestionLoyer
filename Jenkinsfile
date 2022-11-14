@@ -7,6 +7,7 @@ pipeline{
     tools {
         maven 'maven339'
         jdk 'jdk8'
+        docker 'docker'
     }
 
     stages {
@@ -36,10 +37,19 @@ pipeline{
         stage("Build Image") {
             steps{
                 script {
-                    docker.build registry + ":$BUILD_NUMBER"
+                    dockerImageName=docker.build registry + ":$BUILD_NUMBER"
                 }
             }
+        }
 
+        stage("Deploy"){
+            steps{
+                script {
+                  docker.withRegistry( '', registryCredential ) {
+                    dockerImage.push()
+                  }
+                }
+              }
         }
 
     }
