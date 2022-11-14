@@ -1,6 +1,5 @@
 pipeline{
-
-    agent any
+    agent none
     tools {
         maven 'maven339'
         jdk 'jdk8'
@@ -31,9 +30,13 @@ pipeline{
         }
 
         stage("Build Image") {
-            agent { dockerfile true }
+            agent{
+                docker{
+                    image 'springboot'
+                    }
+            }
             steps {
-                sh 'docker build -t springboot .'
+                sh 'mvn clean install'
             }
         }
 
