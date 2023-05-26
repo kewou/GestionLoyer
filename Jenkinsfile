@@ -20,6 +20,13 @@ pipeline{
         stage("Build") {
 
             steps {
+                sh 'mvn compile'
+            }
+        }
+
+        stage("Test") {
+
+            steps {
                 sh 'mvn clean install'
             }
         }
@@ -30,10 +37,9 @@ pipeline{
             }
         }
 
-        stage("deploy") {
-
-            steps {
-                echo 'deploy the application'
+        stage('Deploy to Nexus') {
+            steps {             
+                sh 'mvn deploy -Dmaven.test.skip=true -Dmaven.deploy.skip=true'
             }
         }
     }
