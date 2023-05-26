@@ -26,7 +26,7 @@ pipeline{
 
         stage("Sonar Analysis") {
             steps {
-                sh 'mvn test'
+                echo 'Sonar : en cours de mise en place'
             }
         }
 
