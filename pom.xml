@@ -19,6 +19,13 @@
         <java.version>11</java.version>
     </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>my-nexus</id>
+            <url>http://localhost:8081/repository/maven-snapshots/</url>
+        </repository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
