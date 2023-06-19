@@ -20,27 +20,12 @@
     </properties>
 
     <distributionManagement>
-<<<<<<< HEAD
-        <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <url>http://localhost:8081/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-
-    <scm>
-        <connection>scm:git:https://github.com/kewou/GestionLoyer.git</connection>
-        <url>https://github.com/kewou/GestionLoyer</url>
-        <developerConnection>scm:git:https://github.com/kewou/GestionLoyer.git</developerConnection>
-    </scm>
-
-=======
         <repository>
             <id>my-nexus</id>
             <url>http://172.17.0.5:8081/repository/maven-snapshots/</url>
         </repository>
     </distributionManagement>
 
->>>>>>> jenkins
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
