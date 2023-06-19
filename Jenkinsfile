@@ -5,43 +5,35 @@ pipeline{
       }
     agent any
     tools {
-        maven 'maven339'
+        maven 'maven'
         jdk 'jdk8'
     }
 
     stages {
 
-        stage ('Initialize') {
+        stage("Build") {
+
             steps {
-                sh '''
-                    echo "PATH = ${PATH}"
-                    echo "M2_HOME = ${M2_HOME}"
-                '''
+                sh 'mvn compile'
+            }
+        }
+
+        stage("Test") {
+
+            steps {
+                sh 'mvn clean install'
             }
         }
 
         stage("Sonar Analysis") {
             steps {
-                echo 'Analyse sonar'
+                echo 'Sonar : en cours de mise en place'
             }
         }
-
-        stage("Build Image") {
-            steps{
-                script {
-                    dockerImageName=docker.build ('DockerNexus/gestionloyer')
-                }
+        stage('Deploy to Nexus') {
+            steps {             
+                sh 'mvn deploy -Dmaven.test.skip=true -P my-nexus --settings /var/jenkins_home/settings.xml'
             }
-        }
-
-        stage("Deploy"){
-            steps{
-                script {
-                  docker.withRegistry( '', registryCredential ) {
-                    dockerImage.push()
-                  }
-                }
-              }
         }
 
     }
