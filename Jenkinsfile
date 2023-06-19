@@ -29,7 +29,7 @@ pipeline{
         }
         stage('Deploy to Nexus') {
             steps {             
-                sh 'mvn deploy -Dmaven.test.skip=true -P my-nexus --settings /var/jenkins_home/workspace/settings.xml'
+                sh 'mvn deploy -Dmaven.test.skip=true -P my-nexus --settings /var/jenkins_home/settings.xml'
             }
         }
     }
