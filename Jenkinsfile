@@ -1,40 +1,40 @@
 pipeline{
-
+    environment {
+        registry = "http://localhost:8081/repository/DockerNexus/"
+        registryCredential = 'DockerNexus'
+      }
     agent any
     tools {
-        maven 'Maven 3.3.9'
-        jdk 'jdk11'
+        maven 'maven'
+        jdk 'jdk8'
     }
 
     stages {
 
-        stage ('Initialize') {
+        stage("Build") {
+
             steps {
-                sh '''
-                    echo "PATH = ${PATH}"
-                    echo "M2_HOME = ${M2_HOME}"
-                '''
+                sh 'mvn compile'
             }
         }
 
-        stage("build") {
+        stage("Test") {
 
             steps {
-                sh 'mvn clean install -Dmaven.test.skip=true '
+                sh 'mvn clean install'
             }
         }
 
-        stage("test") {
+        stage("Sonar Analysis") {
             steps {
-                sh 'mvn test'
+                echo 'Sonar : en cours de mise en place'
+            }
+        }
+        stage('Deploy to Nexus') {
+            steps {             
+                sh 'mvn deploy -Dmaven.test.skip=true -P my-nexus --settings /var/jenkins_home/settings.xml'
             }
         }
 
-        stage("deploy")
-
-            steps {
-                echo 'deploy the application'
-            }
-        }
     }
 }
