@@ -7,15 +7,6 @@ pipeline{
     }
 
     stages {
-
-        /*
-        stage("Build") {
-
-            steps {
-                sh 'mvn compile'
-            }
-        }
-        */
         stage("Test") {
 
             steps {
@@ -33,12 +24,12 @@ pipeline{
                     }
                 }
             }
-        }
-        /*
+        }  
+              
         stage('Deploy to Nexus') {
             steps {             
                 sh 'mvn deploy -Dmaven.test.skip=true -P my-nexus --settings /var/jenkins_home/settings.xml'
             }
-        }*/
+        }
     }
 }
