@@ -25,29 +25,25 @@ pipeline{
 
         stage("Sonar Analysis") {
             steps {
-        script {
-            withSonarQubeEnv('sonar') {
-                // Configuration properties
-                def sonarProperties = [
-                    "sonar.projectKey": "gestionLoyer",
-                    "sonar.projectName": "gestionLoyer",                    
-                    "sonar.sources": "src",
-                    "sonar.java.binaries": "target/classes",
-                    // ... autres propriétés de configuration SonarQube
-                ]
-                // Configuration étendue (facultatif)
-                def additionalProperties = [
-                    "sonar.exclusions": "**/*.xml",
-                    // ... autres propriétés de configuration supplémentaires
-                ]
-                
-                // Configuration de SonarQube
-                withSonarQubeProperties(sonarProperties + additionalProperties) {
-                    // Lancer l'analyse SonarQube
-                    sh "mvn sonar:sonar"
+                script {
+                    withSonarQubeEnv('sonar') {
+                        // Configuration properties
+                        /*
+                        def sonarProperties = [
+                            "sonar.projectKey": "gestionLoyer",
+                            "sonar.projectName": "gestionLoyer",                    
+                            "sonar.sources": "src",
+                            "sonar.java.binaries": "target/classes",
+                            // ... autres propriétés de configuration SonarQube
+                        ]
+
+                        */
+                        // Configuration de SonarQube
+
+                        sh "mvn sonar:sonar -Dsonar.projectKey=gestionLoyer -Dsonar.projectName=gestionLoyer -Dsonar.sources=src -Dsonar.language=java -Dsonar.java.binaries=target/classes"
+
+                    }
                 }
-            }
-        }
             }
         }
         /*
