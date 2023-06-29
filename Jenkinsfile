@@ -28,8 +28,7 @@ pipeline{
                 script {
                     withSonarQubeEnv('sonar') {
 
-                        sh "mvn sonar:sonar -Dsonar.projectKey=gestionLoyer -Dsonar.projectName=gestionLoyer -Dsonar.sources=src/main -Dsonar.language=java -Dsonar.java.binaries=target/classes
-                           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml"
+                        sh "mvn sonar:sonar -Dsonar.projectKey=gestionLoyer -Dsonar.projectName=gestionLoyer -Dsonar.sources=src/main -Dsonar.language=java -Dsonar.java.binaries=target/classes -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml"
 
                     }
                 }
