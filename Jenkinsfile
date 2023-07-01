@@ -14,6 +14,7 @@ pipeline{
             }
         }
 
+        /*
         stage("Sonar Analysis") {
             steps {
                 script {
@@ -29,6 +30,12 @@ pipeline{
         stage('Deploy to Nexus') {
             steps {             
                 sh 'mvn deploy -Dmaven.test.skip=true -P my-nexus --settings /var/jenkins_home/settings.xml'
+            }
+        }*/
+
+        stage ("Clean"){
+            steps {
+                sh 'mvn release:clean'
             }
         }
     }

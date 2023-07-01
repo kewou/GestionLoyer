@@ -22,7 +22,8 @@
     <distributionManagement>
         <repository>
             <id>my-nexus</id>
-            <url>http://172.16.0.4:8081/repository/maven-snapshots/</url>
+            <name>nexus-release</name>
+            <url>http://172.16.0.4:8081/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
 
@@ -106,6 +107,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-release-plugin</artifactId>
+            <version>2.5.3</version>
         </dependency>
     </dependencies>
 
