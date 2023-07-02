@@ -1,12 +1,23 @@
 pipeline{
 
     agent any
+
+    environment {
+        GITHUB_TOKEN = credentials('github_token')
+    }
     tools {
         maven 'maven'
         jdk 'jdk8'
     }
 
     stages {
+
+        stage("Maven version") {
+
+            steps {
+                sh 'mvn -version'
+            }
+        }        
         stage("Test") {
 
             steps {
