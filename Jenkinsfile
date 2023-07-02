@@ -14,28 +14,15 @@ pipeline{
             }
         }
 
-        /*
-        stage("Sonar Analysis") {
-            steps {
-                script {
-                    withSonarQubeEnv('sonar') {
-
-                        sh "mvn sonar:sonar -Dsonar.projectKey=gestionLoyer -Dsonar.projectName=gestionLoyer -Dsonar.sources=src/main -Dsonar.language=java -Dsonar.java.binaries=target/classes -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml"
-
-                    }
-                }
-            }
-        }  
-              
-        stage('Deploy to Nexus') {
-            steps {             
-                sh 'mvn deploy -Dmaven.test.skip=true -P my-nexus --settings /var/jenkins_home/settings.xml'
-            }
-        }*/
-
         stage ("Clean"){
             steps {
                 sh 'mvn release:clean'
+            }
+        }
+
+        stage ("Release") {
+            steps{
+                sh 'mvn release:prepare -DreleaseVersion=0.0.4 -DdevelopmentVersion=0.0.5-SNAPSHOT release:perform -Dtag=false'
             }
         }
     }
