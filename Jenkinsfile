@@ -22,7 +22,7 @@ pipeline{
 
         stage ("Release") {
             steps{
-                sh 'mvn release:prepare -DreleaseVersion=0.0.4 -DdevelopmentVersion=0.0.5-SNAPSHOT release:perform -Dtag=false'
+                sh 'mvn release:prepare -DreleaseVersion=0.0.4 -DdevelopmentVersion=0.0.5-SNAPSHOT release:perform -Dtag=false -DbranchName=jenkins'
             }
         }
     }
