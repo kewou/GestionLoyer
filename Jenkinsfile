@@ -11,16 +11,6 @@ pipeline{
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                withCredentials([string(credentialsId: 'github_token', variable: 'SECRET_VALUE')]) {
-                    sh "git config --global user.name 'myusername'"
-                    sh "git config --global user.email 'myemail@example.com'"
-                    sh "git config --global http.extraheader 'Authorization: Bearer ${SECRET_VALUE}'"
-                    sh "git clone https://github.com/kewou/GestionLoyer.git"
-                }
-            }        
-        }
         stage("Test") {
 
             steps {
