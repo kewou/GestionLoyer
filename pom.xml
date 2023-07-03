@@ -29,7 +29,7 @@
     <scm>
         <connection>scm:git:https://github.com/kewou/GestionLoyer.git</connection>
         <developerConnection>scm:git:https://github.com/kewou/GestionLoyer.git</developerConnection>
-        <url>https://github.com/kewou/GestionLoyer.git</url>
+        <url>https://github.com/kewou/repository</url>
         <tag>HEAD</tag>
     </scm>
 
