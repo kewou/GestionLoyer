@@ -29,7 +29,7 @@ pipeline{
                     variable: 'TOKEN'
                 )
                 ]){
-                    sh 'mvn release:prepare -DreleaseVersion=0.0.5 -DdevelopmentVersion=0.0.6-SNAPSHOT release:perform -Dtag=0.0.6 -DbranchName=jenkins -P my-nexus --settings /var/jenkins_home/settings.xml'
+                    sh 'mvn release:prepare -DreleaseVersion=0.0.5 -DdevelopmentVersion=0.0.6-SNAPSHOT release:perform -Dtag=Alicia -DbranchName=jenkins -P my-nexus --settings /var/jenkins_home/settings.xml'
                 }
             }
         }
