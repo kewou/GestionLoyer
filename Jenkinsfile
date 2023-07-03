@@ -1,39 +1,41 @@
 pipeline{
 
     agent any
+
     tools {
-        maven 'Maven 3.3.9'
-        jdk 'jdk11'
+        maven 'maven'
+        jdk 'jdk8'
     }
 
     stages {
+        stage("Test") {
 
-        stage ('Initialize') {
             steps {
-                sh '''
-                    echo "PATH = ${PATH}"
-                    echo "M2_HOME = ${M2_HOME}"
-                '''
+                sh 'mvn clean install'
             }
         }
 
+<<<<<<< HEAD
         stage("Build") {
 
+=======
+        stage ("Clean"){
+>>>>>>> jenkins
             steps {
-                sh 'mvn clean install -Dmaven.test.skip=true '
+                sh 'mvn release:clean'
             }
         }
 
-        stage("test") {
-            steps {
-                sh 'mvn test'
-            }
-        }
-
-        stage("deploy")
-
-            steps {
-                echo 'deploy the application'
+        stage ("Release") {
+            steps{
+                withCredentials([
+                string(
+                    credentialsId: 'github_token',
+                    variable: 'TOKEN'
+                )
+                ]){
+                    sh 'mvn release:prepare -DreleaseVersion=0.0.4 -DdevelopmentVersion=0.0.5-SNAPSHOT release:perform -Dtag=0.0.5 -DbranchName=jenkins -P my-nexus --settings /var/jenkins_home/settings.xml'
+                }
             }
         }
     }
