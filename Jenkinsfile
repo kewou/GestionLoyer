@@ -29,7 +29,7 @@ pipeline{
                     variable: 'TOKEN'
                 )
                 ]){
-                    sh 'mvn release:prepare -DreleaseVersion=0.0.4 -DdevelopmentVersion=0.0.5-SNAPSHOT release:perform -Dtag=crudOk -DbranchName=jenkins'
+                    sh 'mvn release:prepare -DreleaseVersion=0.0.4 -DdevelopmentVersion=0.0.5-SNAPSHOT release:perform -Dtag=0.0.4 -DbranchName=jenkins'
                 }
             }
         }
