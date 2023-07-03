@@ -28,8 +28,7 @@
     <scm>
         <connection>scm:git:https://github.com/kewou/GestionLoyer.git</connection>
         <developerConnection>scm:git:https://github.com/kewou/GestionLoyer.git</developerConnection>
-        <url>https://github.com/kewou/repository</url>
-        <tag>HEAD</tag>
+        <url>https://github.com/kewou/GestionLoyer</url>        
     </scm>
 
     <dependencies>
@@ -208,6 +207,28 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>my-nexus</id>
+            <repositories>
+            <repository>
+                <id>my-nexus-docker-snapshot</id>
+                <url>http://172.16.0.4:8081/repository/maven-snapshots/</url>
+                <snapshots>
+                <enabled>true</enabled>
+                </snapshots>
+            </repository>
+            <repository>
+                <id>my-nexus-docker-release</id>
+                <url>http://172.16.0.4:8081/repository/maven-releases/</url>
+                <releases>
+                <enabled>true</enabled>
+                </releases>
+            </repository>
+            </repositories>
+        </profile>
+    </profiles>
 
 
 </project>
