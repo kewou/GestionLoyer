@@ -1,7 +1,7 @@
 pipeline{
 
     agent any
-    
+
     tools {
         maven 'maven'
         jdk 'jdk8'
@@ -29,7 +29,7 @@ pipeline{
                     variable: 'TOKEN'
                 )
                 ]){
-                    sh 'mvn release:prepare -DreleaseVersion=0.0.4 -DdevelopmentVersion=0.0.5-SNAPSHOT release:perform -Dtag=false -DbranchName=jenkins'
+                    sh 'mvn release:prepare -DreleaseVersion=0.0.4 -DdevelopmentVersion=0.0.5-SNAPSHOT release:perform -Dtag=crudOk -DbranchName=jenkins'
                 }
             }
         }
