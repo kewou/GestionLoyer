@@ -65,10 +65,10 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> addNewUser(@Valid @RequestBody UserDto dto, Errors erros) throws Exception {
+    public ResponseEntity<UserDto> addNewUser(@Valid @RequestBody UserDto dto, Errors erros) throws Exception {
         ResponseHelper.handle(erros);
-        User user = userService.register(dto);
-        return ResponseEntity.ok(user);
+        UserDto userDto = userService.register(dto);
+        return ResponseEntity.ok(userDto);
     }
 
     @DeleteMapping(path = "/{reference}")

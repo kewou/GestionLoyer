@@ -2,8 +2,10 @@ package com.example.security;
 
 import com.example.services.impl.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -29,18 +31,30 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private SecurityProblemSupport problemSupport;
 
     @Override
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(authenticationService);
+    }
+
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
         //http.exceptionHandling().authenticationEntryPoint(problemSupport).accessDeniedHandler(problemSupport);
 
         http
                 .csrf().disable() // protocole de sécurité qui gère un token
                 .authorizeRequests()
-                    .antMatchers("/login*").permitAll() // Tout le monde a accès à cette page
+                    .antMatchers("/authenticate").permitAll() // Tout le monde a accès à cette page
                     .antMatchers("/admin").hasRole("ADMIN")
                     .antMatchers("/proprio").hasAnyRole("ADMIN","PROPRIO")
                     .antMatchers("/user").hasAnyRole("ADMIN","USER")
-                    //.anyRequest().authenticated()   // toutes les requetes doivent etre authentifiées
-                    .and().formLogin().loginPage("/login.html");
+                    .anyRequest().authenticated()   // toutes les requetes doivent etre authentifiées
+                    ;
     }
 
 
@@ -54,11 +68,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/swagger-ui.html")
                 .antMatchers("/api-docs")
                 .antMatchers("/actuator");
-    }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(authenticationService).passwordEncoder(new BCryptPasswordEncoder());
     }
 
 }

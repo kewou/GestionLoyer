@@ -27,7 +27,7 @@ public interface UserService {
 
     User update(UserDto user,String reference);
 
-    User register(UserDto user) throws Exception;
+    UserDto register(UserDto user) throws Exception;
 
     boolean checkIfUserExist(String email);
 }

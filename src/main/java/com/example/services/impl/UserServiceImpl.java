@@ -11,8 +11,10 @@ import com.example.domain.exceptions.NoUserFoundProblem;
 import com.example.domain.mapper.UserMapper;
 import com.example.repository.UserRepository;
 import com.example.services.UserService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +27,13 @@ import java.util.Random;
  */
 @Service
 @Transactional
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService{
 
     @Autowired
     private UserRepository userRepository;
 
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
 
     @Override
     public List<User> getAllUser() {
@@ -71,7 +74,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User register(UserDto dto) throws Exception {
+    public UserDto register(UserDto dto) throws Exception {
         if (!checkIfUserExist(dto.getEmail())) {
             User user=UserMapper.getMapper().dtoToUser(dto);
             if(user.getReference() == null) {
@@ -80,7 +83,7 @@ public class UserServiceImpl implements UserService {
             user.setPassword(encoder.encode(dto.getPassword()));
             user.setRoles("LOCATAIRE");
             userRepository.save(user);
-            return user;
+            return UserMapper.getMapper().userToUserDto(user);
         } else {
             throw new Exception("User is already exist on database");
         }
