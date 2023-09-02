@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.3.4.RELEASE</version>
-        <relativePath />
+        <relativePath/>
     </parent>
     <groupId>com.example</groupId>
     <artifactId>basic</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
 
     <name>basic</name>
     <description>Demo project for Spring Boot</description>
@@ -20,7 +21,7 @@
 
     <distributionManagement>
         <repository>
-            <id>my-nexus</id>            
+            <id>my-nexus</id>
             <url>http://172.16.0.4:8081/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
@@ -28,7 +29,7 @@
     <scm>
         <connection>scm:git:https://github.com/kewou/GestionLoyer.git</connection>
         <developerConnection>scm:git:https://github.com/kewou/GestionLoyer.git</developerConnection>
-        <url>https://github.com/kewou/GestionLoyer</url>        
+        <url>https://github.com/kewou/GestionLoyer</url>
     </scm>
 
     <dependencies>
@@ -222,20 +223,20 @@
         <profile>
             <id>my-nexus</id>
             <repositories>
-            <repository>
-                <id>my-nexus-docker-snapshot</id>
-                <url>http://172.16.0.4:8081/repository/maven-snapshots/</url>
-                <snapshots>
-                <enabled>true</enabled>
-                </snapshots>
-            </repository>
-            <repository>
-                <id>my-nexus-docker-release</id>
-                <url>http://172.16.0.4:8081/repository/maven-releases/</url>
-                <releases>
-                <enabled>true</enabled>
-                </releases>
-            </repository>
+                <repository>
+                    <id>my-nexus-docker-snapshot</id>
+                    <url>http://172.16.0.4:8081/repository/maven-snapshots/</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>my-nexus-docker-release</id>
+                    <url>http://172.16.0.4:8081/repository/maven-releases/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                </repository>
             </repositories>
         </profile>
     </profiles>
