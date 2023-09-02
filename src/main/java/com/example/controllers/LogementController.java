@@ -1,7 +1,7 @@
 package com.example.controllers;
 
 import com.example.domain.entities.Logement;
-import com.example.services.LogementService;
+import com.example.services.impl.LogementService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

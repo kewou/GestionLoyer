@@ -1,5 +1,6 @@
 package com.example.security;
 
+import com.example.filter.JwtFilter;
 import com.example.services.impl.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -11,12 +12,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 
 @Configuration
@@ -30,17 +30,25 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private SecurityProblemSupport problemSupport;
 
+    @Autowired
+    private JwtFilter jwtFilter;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(authenticationService).passwordEncoder(passwordEncoder());
+    }
+
+
     @Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(authenticationService);
-    }
-
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -49,25 +57,30 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable() // protocole de sécurité qui gère un token
                 .authorizeRequests()
-                    .antMatchers("/authenticate").permitAll() // Tout le monde a accès à cette page
-                    .antMatchers("/admin").hasRole("ADMIN")
-                    .antMatchers("/proprio").hasAnyRole("ADMIN","PROPRIO")
-                    .antMatchers("/user").hasAnyRole("ADMIN","USER")
-                    .anyRequest().authenticated()   // toutes les requetes doivent etre authentifiées
-                    ;
-    }
+                .antMatchers("/authenticate").permitAll() // Tout le monde a accès à cette page
+                .antMatchers("/admin").hasRole("ADMIN")
+                .antMatchers("/proprio").hasAnyRole("ADMIN", "PROPRIO")
+                .antMatchers("/users/**").hasAnyRole("ADMIN", "LOCATAIRE")
+                .anyRequest().authenticated()   // toutes les requetes doivent etre authentifiées
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        ;
 
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+    }
 
 
     @Override
     public void configure(WebSecurity web) throws Exception {
+
         web.ignoring().antMatchers("/configuration/ui", "/swagger-resources", "/configuration/ui",
                         "/swagger-resources/**", "/configuration/security", "/api-docs/swagger-config", "/swagger-ui/**", "/webjars/**")
-                .antMatchers("/users")
+                .antMatchers("/users/**")
                 .antMatchers("/swagger-ui-custom.html")
                 .antMatchers("/swagger-ui.html")
                 .antMatchers("/api-docs")
                 .antMatchers("/actuator");
+
     }
 
 }

@@ -5,11 +5,11 @@
  */
 package com.example.controllers;
 
-import com.example.domain.dto.UserDto;
+import com.example.domain.dto.ClientDto;
+import com.example.domain.entities.Client;
 import com.example.domain.entities.Logement;
-import com.example.domain.entities.User;
 import com.example.helper.ResponseHelper;
-import com.example.services.UserService;
+import com.example.services.impl.ClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,61 +31,60 @@ import java.util.Set;
  */
 @RestController
 @RequestMapping("/users")
-public class UserController {
+public class ClientController {
 
     @Autowired
-    private UserService userService;
+    private ClientService clientService;
 
 
-
-    @Operation(summary = "Tous les users", description = "Tous les users")
+    @Operation(summary = "Tous les Clients", description = "Tous les Clients")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = Client.class))),
             @ApiResponse(responseCode = "404", description = "Erreur de saisie", content = @Content),
             @ApiResponse(responseCode = "500", description = "An Internal Server Error occurred", content = @Content)
 
     })
     @GetMapping
-    public List<User> getAllUsers() throws Exception {
-        return userService.getAllUser();
+    public List<Client> getAllClients() throws Exception {
+        return clientService.getAllClient();
     }
 
-    @Operation(summary = "Retourne un user", description = "Retourne un user")
+    @Operation(summary = "Retourne un Client", description = "Retourne un Client")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = Client.class))),
             @ApiResponse(responseCode = "404", description = "Erreur de saisie", content = @Content),
             @ApiResponse(responseCode = "500", description = "An Internal Server Error occurred", content = @Content)
 
     })
     @GetMapping("/{reference}")
-    public User getUser(
-            @Parameter(description = "reference of user")
+    public Client getClient(
+            @Parameter(description = "reference of Client")
             @NotBlank @PathVariable("reference") String reference) {
-        return userService.getUserByReference(reference);
+        return clientService.getClientByReference(reference);
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> addNewUser(@Valid @RequestBody UserDto dto, Errors erros) throws Exception {
+    public ResponseEntity<ClientDto> addNewClient(@Valid @RequestBody ClientDto dto, Errors erros) throws Exception {
         ResponseHelper.handle(erros);
-        UserDto userDto = userService.register(dto);
-        return ResponseEntity.ok(userDto);
+        ClientDto ClientDto = clientService.register(dto);
+        return ResponseEntity.ok(ClientDto);
     }
 
     @DeleteMapping(path = "/{reference}")
-    public void deleteUser(@NotBlank @PathVariable("reference") String reference) {
-        userService.delete(reference);
+    public void deleteClient(@NotBlank @PathVariable("reference") String reference) {
+        clientService.delete(reference);
     }
 
     @PutMapping(path = "/{reference}")
-    public ResponseEntity<User> updateUser(@RequestBody UserDto userDto, @NotBlank @PathVariable("reference") String reference,Errors erros) {
+    public ResponseEntity<Client> updateClient(@RequestBody ClientDto ClientDto, @NotBlank @PathVariable("reference") String reference, Errors erros) {
         ResponseHelper.handle(erros);
-        User user = userService.update(userDto,reference);
-        return ResponseEntity.ok(user);
+        Client Client = clientService.update(ClientDto, reference);
+        return ResponseEntity.ok(Client);
     }
 
     @GetMapping("/{id}/logements")
     public Set<Logement> getAllLogement(@PathVariable("id") long id) {
-        return userService.getUser(id).getLogements();
+        return clientService.getClient(id).getLogements();
     }
 
 }

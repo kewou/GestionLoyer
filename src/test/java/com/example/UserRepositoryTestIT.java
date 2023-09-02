@@ -1,10 +1,8 @@
 package com.example;
 
-import com.example.domain.dto.UserDto;
-import com.example.domain.entities.User;
-import com.example.repository.UserRepository;
-import com.example.services.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.domain.dto.ClientDto;
+import com.example.repository.ClientRepository;
+import com.example.services.impl.ClientService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
@@ -15,16 +13,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.transaction.Transactional;
 import java.util.HashMap;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,10 +31,10 @@ public class UserRepositoryTestIT {
     private static final String URL = "/users";
 
     @Autowired
-    private UserService userService;
+    private ClientService clientService;
 
     @Autowired
-    private UserRepository userRepository;
+    private ClientRepository clientRepository;
 
     @Autowired
     ObjectMapper mapper;
@@ -49,39 +44,43 @@ public class UserRepositoryTestIT {
 
 
     @BeforeEach
-    public void setUp() {userRepository.deleteAll();}
+    public void setUp() {
+        clientRepository.deleteAll();
+    }
 
     @Test
-    void contextLoads() {}
+    void contextLoads() {
+    }
 
     @Test
-    public void getAllUserTest() throws Exception{
+    public void getAllUserTest() throws Exception {
         mockMvc.perform(get(URL).
-                contentType(MediaType.APPLICATION_JSON))
+                        contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void createUserTest() throws Exception {
-        String val = mapper.writeValueAsString(UserDto.builder()
+        String val = mapper.writeValueAsString(ClientDto.builder()
                 .name("NOUMIA")
                 .lastName("joel")
                 .email("kewou.noumia@gmail.com")
                 .phone("0615664758")
                 .password("sbeezy12")
                 .build());
-        Assertions.assertTrue(userRepository.findAll().isEmpty());
+        Assertions.assertTrue(clientRepository.findAll().isEmpty());
         this.mockMvc.perform(post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
+
                         .content(val))
                 .andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()));
-        Assertions.assertEquals(userRepository.findAll().size(),1);
+        Assertions.assertEquals(clientRepository.findAll().size(), 1);
     }
 
     @Test
     public void getUserTest() throws Exception {
-        String val = mapper.writeValueAsString(UserDto.builder()
+        String val = mapper.writeValueAsString(ClientDto.builder()
                 .reference("test_id")
                 .name("NOUMIA")
                 .lastName("joel")
@@ -89,11 +88,11 @@ public class UserRepositoryTestIT {
                 .phone("0615664758")
                 .password("sbeezy12")
                 .build());
-        Assertions.assertTrue(userRepository.findAll().isEmpty());
+        Assertions.assertTrue(clientRepository.findAll().isEmpty());
         this.mockMvc.perform(post(URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(val));
-        Assertions.assertEquals(userRepository.findAll().size(),1);
+        Assertions.assertEquals(clientRepository.findAll().size(), 1);
         String res = this.mockMvc.perform(get(URL + "/test_id")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -107,7 +106,7 @@ public class UserRepositoryTestIT {
 
     @Test
     public void updateUserTest() throws Exception {
-        String valPost = mapper.writeValueAsString(UserDto.builder()
+        String valPost = mapper.writeValueAsString(ClientDto.builder()
                 .reference("test_id")
                 .name("NOUMIA")
                 .lastName("joel")
@@ -115,12 +114,12 @@ public class UserRepositoryTestIT {
                 .phone("0615664758")
                 .password("sbeezy12")
                 .build());
-        Assertions.assertTrue(userRepository.findAll().isEmpty());
+        Assertions.assertTrue(clientRepository.findAll().isEmpty());
         this.mockMvc.perform(post(URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(valPost));
-        Assertions.assertEquals(userRepository.findAll().size(),1);
-        String ref = userRepository.findAll().iterator().next().getReference();
+        Assertions.assertEquals(clientRepository.findAll().size(), 1);
+        String ref = clientRepository.findAll().iterator().next().getReference();
         HashMap<String, Object> m = new HashMap<String, Object>();
         m.put("reference", "referenceUpdate");
         String valPut = mapper.writeValueAsString(m);
@@ -139,7 +138,7 @@ public class UserRepositoryTestIT {
     @Test
     @Transactional
     public void deleteRouteProfileTest() throws Exception {
-        String val = mapper.writeValueAsString(UserDto.builder()
+        String val = mapper.writeValueAsString(ClientDto.builder()
                 .reference("test_id")
                 .name("NOUMIA")
                 .lastName("joel")
@@ -147,15 +146,15 @@ public class UserRepositoryTestIT {
                 .phone("0615664758")
                 .password("sbeezy12")
                 .build());
-        Assertions.assertTrue(userRepository.findAll().isEmpty());
+        Assertions.assertTrue(clientRepository.findAll().isEmpty());
         this.mockMvc.perform(post(URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(val));
-        Assertions.assertEquals(userRepository.findAll().size(),1);
-        String ref = userRepository.findAll().iterator().next().getReference();
+        Assertions.assertEquals(clientRepository.findAll().size(), 1);
+        String ref = clientRepository.findAll().iterator().next().getReference();
         this.mockMvc.perform(delete(URL + "/" + ref))
                 .andExpect(status().is(HttpStatus.OK.value()));
-        Assertions.assertTrue(userRepository.findAll().isEmpty());
+        Assertions.assertTrue(clientRepository.findAll().isEmpty());
 
     }
 

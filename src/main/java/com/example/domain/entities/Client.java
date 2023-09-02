@@ -12,23 +12,20 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * @author frup73532
+ * @author Sbeezy
  */
 @Entity
-@Builder
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements Serializable, UserDetails {
+public class Client implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,7 +40,7 @@ public class User implements Serializable, UserDetails {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name="phone")
+    @Column(name = "phone")
     private String phone;
 
     @Column(name = "email", unique = true)
@@ -52,44 +49,16 @@ public class User implements Serializable, UserDetails {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "roles")
-    private String roles;
-
-    @Column(name = "entryDate")
-    private Date entryDate;
-
-    @Column(name = "getOutDate")
-    private Date getOutDate;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "client_id"))
+    @Column(name = "role")
+    private Set<String> roles = new HashSet<>();
 
     @Column(name = "solde")
     private Integer solde = 0;
 
-    @Column(name = "ancienneteEnMois")
-    private Integer ancienneteEnMois = 0;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "client", orphanRemoval = true)
     private Set<Logement> logements = new HashSet<>();
-
-    @Transient
-    private List<GrantedAuthority> authorities = new ArrayList<>();
-
-    /*
-
-
-
-
-        @Override
-        public Collection<? extends GrantedAuthority> getAuthorities() {
-            return Arrays.stream(this.getRoles().split(","))
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
-        }*/
-
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
 
     @Override
     public String getPassword() {
@@ -118,6 +87,18 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        Set<GrantedAuthority> authorities = new HashSet<>();
+
+        // Ajoutez les rôles de l'utilisateur en tant qu'objets GrantedAuthority
+        for (String role : this.getRoles()) {
+            authorities.add(new SimpleGrantedAuthority(role));
+        }
+
+        return authorities;
     }
 }

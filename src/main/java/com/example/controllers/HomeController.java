@@ -1,7 +1,7 @@
 package com.example.controllers;
 
-import com.example.domain.model.JwtRequest;
-import com.example.domain.model.JwtResponse;
+import com.example.domain.jwt.JwtRequest;
+import com.example.domain.jwt.JwtResponse;
 import com.example.services.impl.AuthenticationService;
 import com.example.utils.JWTUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class HomeController {
     private AuthenticationService authenticationService;
 
     @GetMapping("/")
-    public String home(){
+    public String home() {
         return "Welcome to Gestion Loyer Application";
     }
 
@@ -40,14 +40,13 @@ public class HomeController {
                             jwtRequest.getPassword()
                     )
             );
-        }catch (BadCredentialsException e){
-            throw new Exception("INCALID CREDENTIAL",e);
+        } catch (BadCredentialsException e) {
+            throw new Exception("INCALID CREDENTIAL", e);
         }
-        final UserDetails userDetails
-                = authenticationService.loadUserByUsername(jwtRequest.getUsername());
-        final String token =
-                jwtUtils.generateToken(userDetails);
+        // Identifiants user + pass ok => On cree le token JWT
+        final UserDetails userDetails = authenticationService.loadUserByUsername(jwtRequest.getUsername());
+        final String token = jwtUtils.generateToken(userDetails);
 
-        return  new JwtResponse(token);
+        return new JwtResponse(token);
     }
 }
