@@ -58,9 +58,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable() // protocole de sécurité qui gère un token
                 .authorizeRequests()
                 .antMatchers("/authenticate").permitAll() // Tout le monde a accès à cette page
-                .antMatchers("/admin").hasRole("ADMIN")
-                .antMatchers("/proprio").hasAnyRole("ADMIN", "PROPRIO")
-                .antMatchers("/users/**").hasAnyRole("ADMIN", "LOCATAIRE")
+                .antMatchers("/admin").hasAuthority("ADMIN")
+                .antMatchers("/proprio").hasAnyAuthority("ADMIN", "PROPRIO")
+                .antMatchers("/users").hasAnyAuthority("ADMIN", "LOCATAIRE")
                 .anyRequest().authenticated()   // toutes les requetes doivent etre authentifiées
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -72,15 +72,12 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-
         web.ignoring().antMatchers("/configuration/ui", "/swagger-resources", "/configuration/ui",
                         "/swagger-resources/**", "/configuration/security", "/api-docs/swagger-config", "/swagger-ui/**", "/webjars/**")
-                .antMatchers("/users/**")
                 .antMatchers("/swagger-ui-custom.html")
                 .antMatchers("/swagger-ui.html")
                 .antMatchers("/api-docs")
                 .antMatchers("/actuator");
-
     }
 
 }
