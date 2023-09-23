@@ -69,7 +69,7 @@ public class UserRepositoryTestIT {
                 .password("sbeezy12")
                 .build());
         Assertions.assertTrue(clientRepository.findAll().isEmpty());
-        this.mockMvc.perform(post(URL)
+        this.mockMvc.perform(post(URL + "/create")
                         .contentType(MediaType.APPLICATION_JSON)
 
                         .content(val))
@@ -89,7 +89,7 @@ public class UserRepositoryTestIT {
                 .password("sbeezy12")
                 .build());
         Assertions.assertTrue(clientRepository.findAll().isEmpty());
-        this.mockMvc.perform(post(URL)
+        this.mockMvc.perform(post(URL + "/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(val));
         Assertions.assertEquals(clientRepository.findAll().size(), 1);
@@ -115,7 +115,7 @@ public class UserRepositoryTestIT {
                 .password("sbeezy12")
                 .build());
         Assertions.assertTrue(clientRepository.findAll().isEmpty());
-        this.mockMvc.perform(post(URL)
+        this.mockMvc.perform(post(URL + "/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(valPost));
         Assertions.assertEquals(clientRepository.findAll().size(), 1);
@@ -147,7 +147,7 @@ public class UserRepositoryTestIT {
                 .password("sbeezy12")
                 .build());
         Assertions.assertTrue(clientRepository.findAll().isEmpty());
-        this.mockMvc.perform(post(URL)
+        this.mockMvc.perform(post(URL + "/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(val));
         Assertions.assertEquals(clientRepository.findAll().size(), 1);
