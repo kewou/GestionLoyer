@@ -63,7 +63,7 @@ public class ClientController {
         return clientService.getClientByReference(reference);
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<ClientDto> addNewClient(@Valid @RequestBody ClientDto dto, Errors erros) throws Exception {
         ResponseHelper.handle(erros);
         ClientDto ClientDto = clientService.register(dto);
