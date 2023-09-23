@@ -1,5 +1,6 @@
 package com.example.filter;
 
+import com.example.domain.exceptions.AuthenticationProblem;
 import com.example.services.impl.AuthenticationService;
 import com.example.utils.JWTUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,20 +28,28 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
+        if (httpServletRequest.getRequestURI().startsWith("/beezyApi/authenticate")) {
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
+            return;
+        }
         String authorization = httpServletRequest.getHeader("Authorization");
         String token = null;
         String userName = null;
 
-        if(null != authorization && authorization.startsWith("Bearer ")) {
+        if (null == authorization || !authorization.startsWith("Bearer ")) {
+            throw new AuthenticationProblem("Token JWT incorrect");
+        } else {
             token = authorization.substring(7);
-            userName = jwtUtils.getUsernameFromToken(token);
+            try {
+                userName = jwtUtils.getUsernameFromToken(token);
+            } catch (Exception e) {
+                throw new AuthenticationProblem("Token JWT invalide");
+            }
         }
 
-        if(null != userName && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails
-                    = authenticationService.loadUserByUsername(userName);
-
-            if(jwtUtils.validateToken(token,userDetails)) {
+        if (null != userName && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = authenticationService.loadUserByUsername(userName);
+            if (jwtUtils.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
                         = new UsernamePasswordAuthenticationToken(userDetails,
                         null, userDetails.getAuthorities());
@@ -50,6 +59,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            } else {
+                throw new AuthenticationProblem("Token JWT invalide");
             }
 
         }

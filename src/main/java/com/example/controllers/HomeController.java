@@ -1,5 +1,6 @@
 package com.example.controllers;
 
+import com.example.domain.exceptions.AuthenticationProblem;
 import com.example.domain.jwt.JwtRequest;
 import com.example.domain.jwt.JwtResponse;
 import com.example.services.impl.AuthenticationService;
@@ -41,12 +42,17 @@ public class HomeController {
                     )
             );
         } catch (BadCredentialsException e) {
-            throw new Exception("INCALID CREDENTIAL", e);
+            throw new AuthenticationProblem("INVALID CREDENTIAL");
         }
         // Identifiants user + pass ok => On cree le token JWT
         final UserDetails userDetails = authenticationService.loadUserByUsername(jwtRequest.getUsername());
         final String token = jwtUtils.generateToken(userDetails);
 
         return new JwtResponse(token);
+    }
+
+    @GetMapping("/locataire")
+    public String homePrivee() {
+        return "Welcome to your Perso Page Locataire";
     }
 }
