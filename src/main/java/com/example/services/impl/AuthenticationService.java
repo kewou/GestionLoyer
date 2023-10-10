@@ -1,7 +1,6 @@
 package com.example.services.impl;
 
-import com.example.domain.entities.User;
-import com.example.services.UserService;
+import com.example.domain.entities.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,16 +11,16 @@ import org.springframework.stereotype.Service;
 public class AuthenticationService implements UserDetailsService {
 
     @Autowired
-    UserService userService;
+    ClientService clientService;
 
 
     @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        User user = userService.getUserByEmail(s);
-        if (user != null) {
-            return user;
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Client client = clientService.getClientByEmail(username);
+        if (client != null) {
+            return client;
         } else {
-            throw new UsernameNotFoundException("User" + s + "not found");
+            throw new UsernameNotFoundException("User" + username + "not found");
         }
     }
 

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
@@ -28,8 +27,8 @@ public class Logement implements Serializable {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "client", nullable = false)
+    private Client client;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "logement", orphanRemoval = true)
     private Set<RecapByMonth> recapByMonths;
@@ -37,16 +36,16 @@ public class Logement implements Serializable {
     public Logement() {
     }
 
-    public Logement(int montantLoyer, String address, String description, User user) {
+    public Logement(int montantLoyer, String address, String description, Client client) {
         this.montantLoyer = montantLoyer;
         this.address = address;
         this.description = description;
-        this.user = user;
+        this.client = client;
     }
 
     @JsonIgnore
-    public User getUser() {
-        return this.user;
+    public Client getUser() {
+        return this.client;
     }
 
 

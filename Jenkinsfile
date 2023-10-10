@@ -1,5 +1,8 @@
 pipeline{
-
+    environment {
+        registry = "http://localhost:8081/repository/DockerNexus/"
+        registryCredential = 'DockerNexus'
+      }
     agent any
 
     tools {
@@ -29,9 +32,10 @@ pipeline{
                     variable: 'TOKEN'
                 )
                 ]){
-                    sh 'mvn release:prepare -DreleaseVersion=0.0.5 -DdevelopmentVersion=0.0.6-SNAPSHOT release:perform -Dtag=0.0.5 -DbranchName=jenkins -P my-nexus --settings /var/jenkins_home/settings.xml'
+                    sh 'mvn release:prepare -DreleaseVersion=0.0.6 -DdevelopmentVersion=0.0.7-SNAPSHOT release:perform -Dtag=0.0.6 -DbranchName=main -P my-nexus --settings /var/jenkins_home/settings.xml'
                 }
             }
         }
+
     }
 }
