@@ -27,7 +27,7 @@ pipeline{
                     variable: 'TOKEN'
                 )
                 ]){
-                    sh 'git tag'
+                    sh 'git log --tags --simplify-by-decoration --pretty="format:%ai %d"'
                     sh 'mvn release:prepare -DreleaseVersion=0.0.6 -DdevelopmentVersion=0.0.7-SNAPSHOT release:perform -Dtag=0.0.6 -DbranchName=main -P my-nexus -P scm-release --settings /var/jenkins_home/settings.xml '
                 }
             }
