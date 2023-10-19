@@ -11,16 +11,11 @@ pipeline{
     }
 
     stages {
-        stage("Test") {
 
-            steps {
-                sh 'mvn clean install'
-            }
-        }
 
         stage ("Clean"){
             steps {
-                sh 'mvn release:clean'
+                sh 'mvn release:clean -P scm-release'
             }
         }
 
@@ -33,6 +28,7 @@ pipeline{
                 )
                 ]){
                     sh 'git tag'
+                    sh 'mvn release:prepare -DreleaseVersion=0.0.6 -DdevelopmentVersion=0.0.7-SNAPSHOT release:perform -Dtag=0.0.6 -DbranchName=main -P my-nexus -P scm-release --settings /var/jenkins_home/settings.xml '
                 }
             }
         }
