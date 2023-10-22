@@ -4,14 +4,12 @@ pipeline{
         registryCredential = 'DockerNexus'
       }
     agent any
-
     tools {
         maven 'maven'
         jdk 'jdk8'
     }
 
     stages {
-
         stage("Test") {
 
             steps {
@@ -19,24 +17,21 @@ pipeline{
             }
         }
 
-        stage ("Clean"){
+        stage("Sonar Analysis") {
             steps {
-                sh 'mvn release:clean -P scm-release'
-            }
-        }
+                script {
+                    withSonarQubeEnv('sonar') {
 
-        stage ("Release") {
-            steps{
-                withCredentials([
-                string(
-                    credentialsId: 'github_token',
-                    variable: 'TOKEN'
-                )
-                ]){
-                    sh 'git tag -d $(git tag -l)'
-                    sh 'git log --tags --simplify-by-decoration --pretty="format:%ai %d"'
-                    sh 'mvn release:prepare -DreleaseVersion=0.0.6 -DdevelopmentVersion=0.0.7-SNAPSHOT release:perform -Dtag=0.0.6 -DbranchName=main -P my-nexus -P scm-release --settings /var/jenkins_home/settings.xml '
+                        sh "mvn sonar:sonar -Dsonar.projectKey=gestionLoyer -Dsonar.projectName=gestionLoyer -Dsonar.sources=src/main -Dsonar.language=java -Dsonar.java.binaries=target/classes -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml"
+
+                    }
                 }
+            }
+        }  
+              
+        stage('Deploy to Nexus') {
+            steps {             
+                sh 'mvn deploy -Dmaven.test.skip=true -P my-nexus --settings /var/jenkins_home/settings.xml'
             }
         }
 
