@@ -28,10 +28,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-        if (httpServletRequest.getRequestURI().startsWith("/beezyApi/authenticate")) {
+        if (httpServletRequest.getRequestURI().startsWith("/beezyApi/authenticate") || httpServletRequest.getRequestURI().startsWith("/beezyApi/users/create")) {
             filterChain.doFilter(httpServletRequest, httpServletResponse);
             return;
         }
+
         String authorization = httpServletRequest.getHeader("Authorization");
         String token = null;
         String userName = null;
