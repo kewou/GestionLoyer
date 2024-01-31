@@ -1,9 +1,9 @@
 package com.example.filter;
 
-import com.example.domain.exceptions.AuthenticationProblem;
 import com.example.services.impl.AuthenticationService;
 import com.example.utils.JWTUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,7 +28,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-        if (httpServletRequest.getRequestURI().startsWith("/beezyApi/authenticate") || httpServletRequest.getRequestURI().startsWith("/beezyApi/users/create")) {
+        if (httpServletRequest.getMethod().equals(HttpMethod.OPTIONS.name())
+                || httpServletRequest.getRequestURI().startsWith("/beezyApi/authenticate")
+                || httpServletRequest.getRequestURI().startsWith("/beezyApi/users/create")) {
             filterChain.doFilter(httpServletRequest, httpServletResponse);
             return;
         }
@@ -37,14 +39,16 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = null;
         String userName = null;
 
-        if (null == authorization || !authorization.startsWith("Bearer ")) {
-            throw new AuthenticationProblem("Token JWT incorrect");
+        if (authorization == null || !authorization.trim().startsWith("Bearer ")) {
+            sendErrorResponse(httpServletResponse, HttpServletResponse.SC_UNAUTHORIZED, "Token JWT incorrect");
+            return;
         } else {
             token = authorization.substring(7);
             try {
                 userName = jwtUtils.getUsernameFromToken(token);
             } catch (Exception e) {
-                throw new AuthenticationProblem("Token JWT invalide");
+                sendErrorResponse(httpServletResponse, HttpServletResponse.SC_UNAUTHORIZED, "Token JWT invalide");
+                return;
             }
         }
 
@@ -61,11 +65,20 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             } else {
-                throw new AuthenticationProblem("Token JWT invalide");
+                sendErrorResponse(httpServletResponse, HttpServletResponse.SC_UNAUTHORIZED, "Token JWT invalide");
+                return;
             }
 
         }
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
 
+        filterChain.doFilter(httpServletRequest, httpServletResponse);
+    }
+
+    private void sendErrorResponse(HttpServletResponse response, int status, String errorMessage) throws IOException {
+        response.setStatus(status);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"error\":\"" + errorMessage + "\"}");
+        response.getWriter().flush();
+        response.getWriter().close();
     }
 }

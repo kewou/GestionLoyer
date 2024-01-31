@@ -33,7 +33,7 @@ public class ResponseHelper {
      *
      * @param errors {@link Errors}
      */
-    public static void handle(Errors errors) {
+    public static void handle(Errors errors) throws ValidationException {
         if (errors.hasErrors()) {
             throw new ValidationException();
         }

@@ -2,7 +2,6 @@ package com.example.config;
 
 
 import com.example.config.properties.InfoProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
@@ -14,8 +13,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import org.zalando.problem.ProblemModule;
-import org.zalando.problem.validation.ConstraintViolationProblemModule;
 
 @Configuration
 public class ApplicationConfiguration {
@@ -34,10 +31,6 @@ public class ApplicationConfiguration {
                         .version(infoProperties.getVersion()));
     }
 
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper().registerModules(new ProblemModule(), new ConstraintViolationProblemModule());
-    }
 
     @Bean
     public CorsFilter corsFilter() {
@@ -46,7 +39,10 @@ public class ApplicationConfiguration {
         config.addAllowedOrigin("http://localhost:4200"); // Ajoutez votre URL front-end
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
+        config.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", config);
+
+
         return new CorsFilter(source);
     }
 }

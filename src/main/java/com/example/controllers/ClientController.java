@@ -8,6 +8,8 @@ package com.example.controllers;
 import com.example.domain.dto.ClientDto;
 import com.example.domain.entities.Client;
 import com.example.domain.entities.Logement;
+import com.example.domain.exceptions.NoClientFoundException;
+import com.example.domain.exceptions.ValidationException;
 import com.example.helper.ResponseHelper;
 import com.example.services.impl.ClientService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,10 +59,17 @@ public class ClientController {
 
     })
     @GetMapping("/{reference}")
-    public Client getClient(
+    public Client getClientByReference(
             @Parameter(description = "reference of Client")
-            @NotBlank @PathVariable("reference") String reference) {
+            @NotBlank @PathVariable("reference") String reference) throws NoClientFoundException {
         return clientService.getClientByReference(reference);
+    }
+
+    @GetMapping("/email/{email}")
+    public Client getClientByEmail(
+            @Parameter(description = "email of Client")
+            @NotBlank @PathVariable("email") String email) throws NoClientFoundException {
+        return clientService.getClientByEmail(email);
     }
 
     @PostMapping("/create")
@@ -76,14 +85,14 @@ public class ClientController {
     }
 
     @PutMapping(path = "/{reference}")
-    public ResponseEntity<Client> updateClient(@RequestBody ClientDto ClientDto, @NotBlank @PathVariable("reference") String reference, Errors erros) {
+    public ResponseEntity<Client> updateClient(@RequestBody ClientDto ClientDto, @NotBlank @PathVariable("reference") String reference, Errors erros) throws ValidationException, NoClientFoundException {
         ResponseHelper.handle(erros);
         Client Client = clientService.update(ClientDto, reference);
         return ResponseEntity.ok(Client);
     }
 
     @GetMapping("/{id}/logements")
-    public Set<Logement> getAllLogement(@PathVariable("id") long id) {
+    public Set<Logement> getAllLogement(@PathVariable("id") long id) throws NoClientFoundException {
         return clientService.getClient(id).getLogements();
     }
 

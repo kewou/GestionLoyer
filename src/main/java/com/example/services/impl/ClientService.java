@@ -7,7 +7,7 @@ package com.example.services.impl;
 
 import com.example.domain.dto.ClientDto;
 import com.example.domain.entities.Client;
-import com.example.domain.exceptions.NoUserFoundProblem;
+import com.example.domain.exceptions.NoClientFoundException;
 import com.example.domain.mapper.ClientMapper;
 import com.example.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,16 +37,16 @@ public class ClientService {
     }
 
 
-    public Client getClient(Long id) {
+    public Client getClient(Long id) throws NoClientFoundException {
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new NoUserFoundProblem(id));
+                .orElseThrow(() -> new NoClientFoundException(id));
         return client;
     }
 
 
-    public Client getClientByReference(String reference) {
+    public Client getClientByReference(String reference) throws NoClientFoundException {
         Client client = clientRepository.findByReference(reference)
-                .orElseThrow(() -> new NoUserFoundProblem(reference));
+                .orElseThrow(() -> new NoClientFoundException(reference));
         return client;
     }
 
@@ -61,7 +61,7 @@ public class ClientService {
     }
 
 
-    public Client update(ClientDto clientDto, String reference) {
+    public Client update(ClientDto clientDto, String reference) throws NoClientFoundException {
         Client client = getClientByReference(reference);
         Client clientUpdate = ClientMapper.getMapper().dtoToClient(clientDto);
         ClientMapper.getMapper().update(client, clientUpdate);

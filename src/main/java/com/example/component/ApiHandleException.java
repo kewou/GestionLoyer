@@ -5,33 +5,46 @@
  */
 package com.example.component;
 
-import com.example.domain.exceptions.AuthenticationProblem;
+import com.example.domain.exceptions.AuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
-import org.zalando.problem.spring.web.advice.ProblemHandling;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import javax.servlet.ServletException;
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
- * @author frup73532
+ * Joel NOUMIA
  */
 @ControllerAdvice
-public class ApiHandleException implements ProblemHandling {
+public class ApiHandleException extends ResponseEntityExceptionHandler {
 
     private static Logger logger = LoggerFactory.getLogger(ApiHandleException.class);
 
-    @ExceptionHandler(AuthenticationProblem.class)
-    public ResponseEntity<Problem> handleAuthenticationProblem(AuthenticationProblem ex) {
-        Problem problem = Problem.builder()
-                .withStatus(Status.UNAUTHORIZED)
-                .withDetail(ex.getMessage())
-                .build();
+    @ExceptionHandler(ServletException.class)
+    public ResponseEntity<Object> handleAuthentication(ServletException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("message", ex.getMessage());
+        body.put("status", HttpStatus.UNAUTHORIZED);
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
+        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Object> handleCredential(AuthenticationException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("message", ex.getMessage());
+        body.put("status", HttpStatus.UNAUTHORIZED);
+
+        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
     }
 
 

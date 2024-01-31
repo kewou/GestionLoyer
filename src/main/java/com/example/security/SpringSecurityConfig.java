@@ -5,7 +5,7 @@ import com.example.services.impl.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,19 +16,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
 
 @Configuration
 @EnableWebSecurity
-@Import(SecurityProblemSupport.class)
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     AuthenticationService authenticationService;
-
-    @Autowired
-    private SecurityProblemSupport problemSupport;
 
     @Autowired
     private JwtFilter jwtFilter;
@@ -52,12 +47,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        //http.exceptionHandling().authenticationEntryPoint(problemSupport).accessDeniedHandler(problemSupport);
-
         http
                 .csrf().disable() // protocole de sécurité qui gère un token
                 .authorizeRequests()
                 .antMatchers("/public", "/users/create", "/authenticate").permitAll() // Tout le monde a accès à cette page
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/admin").hasAuthority("ADMIN")
                 .antMatchers("/proprio").hasAnyAuthority("ADMIN", "PROPRIO")
                 .antMatchers("/locataire").hasAnyAuthority("ADMIN", "LOCATAIRE")

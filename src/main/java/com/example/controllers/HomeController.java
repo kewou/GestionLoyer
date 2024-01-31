@@ -1,6 +1,6 @@
 package com.example.controllers;
 
-import com.example.domain.exceptions.AuthenticationProblem;
+import com.example.domain.exceptions.AuthenticationException;
 import com.example.domain.jwt.JwtRequest;
 import com.example.domain.jwt.JwtResponse;
 import com.example.services.impl.AuthenticationService;
@@ -42,7 +42,7 @@ public class HomeController {
                     )
             );
         } catch (BadCredentialsException e) {
-            throw new AuthenticationProblem("INVALID CREDENTIAL");
+            throw new AuthenticationException("INVALID CREDENTIAL");
         }
         // Identifiants user + pass ok => On cree le token JWT
         final UserDetails userDetails = authenticationService.loadUserByUsername(jwtRequest.getUsername());
