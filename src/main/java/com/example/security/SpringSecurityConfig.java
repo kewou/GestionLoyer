@@ -50,7 +50,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable() // protocole de sécurité qui gère un token
                 .authorizeRequests()
-                .antMatchers("/public", "/users/create", "/authenticate").permitAll() // Tout le monde a accès à cette page
+                .antMatchers("/", "/*.js", "/*.css", "/assets/**", "/users/create", "/authenticate").permitAll() // Tout le monde a accès à cette page
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/admin").hasAuthority("ADMIN")
                 .antMatchers("/proprio").hasAnyAuthority("ADMIN", "PROPRIO")
@@ -60,18 +60,17 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         ;
 
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Ajout du Filtre
     }
 
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/configuration/ui", "/swagger-resources", "/configuration/ui",
-                        "/swagger-resources/**", "/configuration/security", "/api-docs/swagger-config", "/swagger-ui/**", "/webjars/**")
-                .antMatchers("/swagger-ui-custom.html")
-                .antMatchers("/swagger-ui.html")
-                .antMatchers("/api-docs")
-                .antMatchers("/actuator");
+        web.ignoring()
+                .antMatchers("/configuration/ui", "/swagger-resources", "/configuration/ui",
+                        "/swagger-resources/**", "/configuration/security", "/api-docs/swagger-config", "/swagger-ui/**", "/webjars/**",
+                        "/swagger-ui-custom.html", "/swagger-ui.html", "/api-docs", "/actuator", "/index.html")
+                .antMatchers();
     }
 
 }
