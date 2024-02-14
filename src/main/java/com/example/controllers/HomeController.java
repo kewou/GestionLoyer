@@ -27,10 +27,6 @@ public class HomeController {
     @Autowired
     private AuthenticationService authenticationService;
 
-    @GetMapping("/")
-    public String home() {
-        return "Welcome to Gestion Loyer Application";
-    }
 
     @PostMapping("/authenticate")
     public JwtResponse authenticate(@RequestBody JwtRequest jwtRequest) throws Exception {
