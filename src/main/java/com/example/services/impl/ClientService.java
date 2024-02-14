@@ -83,7 +83,7 @@ public class ClientService {
             clientRepository.save(client);
             return ClientMapper.getMapper().clientToClientDto(client);
         } else {
-            throw new Exception("Client is already exist on database");
+            throw new Exception("Client with email " + dto.getEmail() + " is already exist on database");
         }
     }
 
