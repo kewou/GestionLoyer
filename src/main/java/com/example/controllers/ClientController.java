@@ -10,6 +10,7 @@ import com.example.domain.entities.Client;
 import com.example.domain.entities.Logement;
 import com.example.domain.exceptions.NoClientFoundException;
 import com.example.domain.exceptions.ValidationException;
+import com.example.domain.mapper.ClientMapper;
 import com.example.helper.ResponseHelper;
 import com.example.services.impl.ClientService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -47,8 +50,23 @@ public class ClientController {
 
     })
     @GetMapping
-    public List<Client> getAllClients() throws Exception {
-        return clientService.getAllClient();
+    public ResponseEntity<List<ClientDto>> getAllClients() throws Exception {
+        List<ClientDto> dtoClients = new ArrayList<>();
+        clientService.getAllClient().forEach(client -> {
+                    ClientDto dto = ClientMapper.getMapper().dto(client);
+                    dtoClients.add(dto);
+                }
+        );
+        return dtoClients.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(dtoClients);
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<ClientDto> addNewClient(@Valid @RequestBody ClientDto dto, Errors erros) throws Exception {
+        ResponseHelper.handle(erros);
+        Client client = ClientMapper.getMapper().entitie(dto);
+        clientService.register(client);
+        URI uri = URI.create("/users/" + client.getReference());
+        return ResponseEntity.created(uri).body(dto);
     }
 
     @Operation(summary = "Retourne un Client", description = "Retourne un Client")
@@ -59,10 +77,11 @@ public class ClientController {
 
     })
     @GetMapping("/{reference}")
-    public Client getClientByReference(
+    public ResponseEntity<ClientDto> getClientByReference(
             @Parameter(description = "reference of Client")
             @NotBlank @PathVariable("reference") String reference) throws NoClientFoundException {
-        return clientService.getClientByReference(reference);
+        ClientDto dto = ClientMapper.getMapper().dto(clientService.getClientByReference(reference));
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/email/{email}")
@@ -72,24 +91,20 @@ public class ClientController {
         return clientService.getClientByEmail(email);
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<ClientDto> addNewClient(@Valid @RequestBody ClientDto dto, Errors erros) throws Exception {
+    @PutMapping(path = "")
+    public ResponseEntity<ClientDto> updateClient(@RequestBody ClientDto ClientDto, Errors erros) throws ValidationException, NoClientFoundException {
         ResponseHelper.handle(erros);
-        ClientDto ClientDto = clientService.register(dto);
-        return ResponseEntity.ok(ClientDto);
+        ClientDto dto = ClientMapper.getMapper().dto(clientService.update(ClientDto));
+        return ResponseEntity.ok(dto);
     }
+
 
     @DeleteMapping(path = "/{reference}")
-    public void deleteClient(@NotBlank @PathVariable("reference") String reference) {
-        clientService.delete(reference);
+    public ResponseEntity<Void> deleteClient(@NotBlank @PathVariable("reference") String reference) throws NoClientFoundException {
+        ClientDto dto = ClientMapper.getMapper().dto(clientService.delete(reference));
+        return ResponseEntity.noContent().build();
     }
 
-    @PutMapping(path = "/{reference}")
-    public ResponseEntity<Client> updateClient(@RequestBody ClientDto ClientDto, @NotBlank @PathVariable("reference") String reference, Errors erros) throws ValidationException, NoClientFoundException {
-        ResponseHelper.handle(erros);
-        Client Client = clientService.update(ClientDto, reference);
-        return ResponseEntity.ok(Client);
-    }
 
     @GetMapping("/{id}/logements")
     public Set<Logement> getAllLogement(@PathVariable("id") long id) throws NoClientFoundException {

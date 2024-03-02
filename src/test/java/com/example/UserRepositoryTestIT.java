@@ -56,7 +56,7 @@ public class UserRepositoryTestIT {
     public void getAllUserTest() throws Exception {
         mockMvc.perform(get(URL).
                         contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -74,12 +74,12 @@ public class UserRepositoryTestIT {
 
                         .content(val))
                 .andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()));
+                .andExpect(status().is(HttpStatus.CREATED.value()));
         Assertions.assertEquals(clientRepository.findAll().size(), 1);
     }
 
     @Test
-    public void getUserTest() throws Exception {
+    public void getUserByReferenceTest() throws Exception {
         String val = mapper.writeValueAsString(ClientDto.builder()
                 .reference("test_id")
                 .name("NOUMIA")
@@ -119,25 +119,26 @@ public class UserRepositoryTestIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(valPost));
         Assertions.assertEquals(clientRepository.findAll().size(), 1);
-        String ref = clientRepository.findAll().iterator().next().getReference();
+        //String ref = clientRepository.findAll().iterator().next().getReference();
         HashMap<String, Object> m = new HashMap<String, Object>();
-        m.put("reference", "referenceUpdate");
+        m.put("reference", "test_id");
+        m.put("name", "KEWOU");
         String valPut = mapper.writeValueAsString(m);
-        this.mockMvc.perform(put(URL + "/" + ref).contentType(MediaType.APPLICATION_JSON)
+        this.mockMvc.perform(put(URL).contentType(MediaType.APPLICATION_JSON)
                         .content(valPut))
                 .andExpect(status().is(HttpStatus.OK.value()));
-        String res = this.mockMvc.perform(get(URL + "/referenceUpdate")
+        String res = this.mockMvc.perform(get(URL + "/test_id")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn().getResponse().getContentAsString();
-        String reference = mapper.readerForMapOf(Object.class).readTree(res).get("reference").asText();
-        Assertions.assertNotEquals(reference, "test_id");
+        String name = mapper.readerForMapOf(Object.class).readTree(res).get("name").asText();
+        Assertions.assertEquals(name, "KEWOU");
     }
 
 
     @Test
     @Transactional
-    public void deleteRouteProfileTest() throws Exception {
+    public void deleteUserTest() throws Exception {
         String val = mapper.writeValueAsString(ClientDto.builder()
                 .reference("test_id")
                 .name("NOUMIA")
@@ -153,7 +154,7 @@ public class UserRepositoryTestIT {
         Assertions.assertEquals(clientRepository.findAll().size(), 1);
         String ref = clientRepository.findAll().iterator().next().getReference();
         this.mockMvc.perform(delete(URL + "/" + ref))
-                .andExpect(status().is(HttpStatus.OK.value()));
+                .andExpect(status().is(HttpStatus.NO_CONTENT.value()));
         Assertions.assertTrue(clientRepository.findAll().isEmpty());
 
     }

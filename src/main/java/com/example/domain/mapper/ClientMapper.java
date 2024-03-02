@@ -15,9 +15,10 @@ public interface ClientMapper {
         return Mappers.getMapper(ClientMapper.class);
     }
 
-    ClientDto clientToClientDto(Client client);
+    Client entitie(ClientDto clientDto);
 
-    Client dtoToClient(ClientDto clientDto);
+    @Mapping(target = "password", ignore = true)
+    ClientDto dto(Client client);
 
     @Mapping(target = "authorities", ignore = true)
     void update(@MappingTarget Client entity, Client updateEntity);

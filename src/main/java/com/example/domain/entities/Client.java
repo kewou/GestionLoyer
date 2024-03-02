@@ -101,4 +101,9 @@ public class Client implements UserDetails {
 
         return authorities;
     }
+
+    public Client(String name) {
+        this.name = name;
+    }
+    
 }
