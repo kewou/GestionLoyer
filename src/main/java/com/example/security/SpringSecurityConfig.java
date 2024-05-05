@@ -53,7 +53,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/", "/*.js", "/*.css", "/assets/**", "/users/create", "/authenticate").permitAll() // Tout le monde a accès à cette page
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/admin").hasAuthority("ADMIN")
-                .antMatchers("/proprio").hasAnyAuthority("ADMIN", "PROPRIO")
+                .antMatchers("/bailleur").hasAnyAuthority("ADMIN", "BAILLEUR")
                 .antMatchers("/locataire").hasAnyAuthority("ADMIN", "LOCATAIRE")
                 .anyRequest().authenticated()   // toutes les requetes doivent etre authentifiées
                 .and()

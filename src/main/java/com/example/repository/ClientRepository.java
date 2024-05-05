@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 /**
- * @author frup73532
+ * @author Sbeezy
  */
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {

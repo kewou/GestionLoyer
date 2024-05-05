@@ -7,7 +7,6 @@ package com.example.controllers;
 
 import com.example.domain.dto.ClientDto;
 import com.example.domain.entities.Client;
-import com.example.domain.entities.Logement;
 import com.example.domain.exceptions.NoClientFoundException;
 import com.example.domain.exceptions.ValidationException;
 import com.example.domain.mapper.ClientMapper;
@@ -29,7 +28,6 @@ import javax.validation.constraints.NotBlank;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author frup73532
@@ -105,10 +103,5 @@ public class ClientController {
         return ResponseEntity.noContent().build();
     }
 
-
-    @GetMapping("/{id}/logements")
-    public Set<Logement> getAllLogement(@PathVariable("id") long id) throws NoClientFoundException {
-        return clientService.getClient(id).getLogements();
-    }
 
 }

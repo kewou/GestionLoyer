@@ -5,12 +5,14 @@
  */
 package com.example.domain.exceptions;
 
+import javassist.NotFoundException;
+
 import java.net.URI;
 
 /**
  * @author frup73532
  */
-public class NoClientFoundException extends Exception {
+public class NoClientFoundException extends NotFoundException {
 
     private static final URI TYPE = URI.create("https://example.org/not-found");
 
