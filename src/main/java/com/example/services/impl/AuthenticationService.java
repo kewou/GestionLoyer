@@ -7,6 +7,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.net.URLDecoder;
+
 @Service
 public class AuthenticationService implements UserDetailsService {
 
@@ -16,11 +18,11 @@ public class AuthenticationService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Client client = clientService.getClientByEmail(username);
+        Client client = clientService.getClientByEmail(URLDecoder.decode(username));
         if (client != null) {
             return client;
         } else {
-            throw new UsernameNotFoundException("User" + username + "not found");
+            throw new UsernameNotFoundException("User " + username + " not found");
         }
     }
 

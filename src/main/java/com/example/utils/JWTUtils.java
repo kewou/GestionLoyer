@@ -8,6 +8,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,9 +58,9 @@ public class JWTUtils implements Serializable {
 
 
     //generate token for user
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails) throws UnsupportedEncodingException {
         Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, userDetails.getUsername());
+        return doGenerateToken(claims, URLEncoder.encode(userDetails.getUsername(), StandardCharsets.UTF_8));
     }
 
 
@@ -72,7 +76,7 @@ public class JWTUtils implements Serializable {
 
     //validate token
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = getUsernameFromToken(token);
+        final String username = URLDecoder.decode(getUsernameFromToken(token));
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 }

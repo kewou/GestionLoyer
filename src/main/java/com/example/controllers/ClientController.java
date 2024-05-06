@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,10 +84,11 @@ public class ClientController {
     }
 
     @GetMapping("/email/{email}")
-    public Client getClientByEmail(
+    public ResponseEntity<ClientDto> getClientByEmail(
             @Parameter(description = "email of Client")
             @NotBlank @PathVariable("email") String email) throws NoClientFoundException {
-        return clientService.getClientByEmail(email);
+        ClientDto dto = ClientMapper.getMapper().dto(clientService.getClientByEmail(URLDecoder.decode(email)));
+        return ResponseEntity.ok(dto);
     }
 
     @PutMapping(path = "")
