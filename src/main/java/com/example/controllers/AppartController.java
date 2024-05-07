@@ -76,7 +76,7 @@ public class AppartController {
             Errors erros,
             @NotBlank @PathVariable("idAppart") Long idAppart) throws NoAppartFoundException, ValidationException {
         ResponseHelper.handle(erros);
-        AppartDto dto = AppartMapper.getMapper().dto(appartService.updateLogementById(appartDto, idAppart));
+        AppartDto dto = AppartMapper.getMapper().dto(appartService.updateAppartById(appartDto, idAppart));
         return ResponseEntity.ok(dto);
     }
 

@@ -52,7 +52,7 @@ public class AppartService {
                 orElseThrow(() -> new NoAppartFoundException(id));
     }
 
-    public Appart updateLogementById(AppartDto appartDto, Long id) throws NoAppartFoundException {
+    public Appart updateAppartById(AppartDto appartDto, Long id) throws NoAppartFoundException {
         Appart appart = getAppartById(id);
         Appart appartUpdate = AppartMapper.getMapper().entitie(appartDto);
         AppartMapper.getMapper().update(appart, appartUpdate);

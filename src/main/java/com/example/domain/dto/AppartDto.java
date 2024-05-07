@@ -23,10 +23,10 @@ public class AppartDto {
     private String nom;
 
     @NotNull(message = "Entrer un montant svp")
-    private int prixLoyer;
+    private Integer prixLoyer;
 
     @NotNull(message = "Entrer un montant svp")
-    private int prixCaution;
+    private Integer prixCaution;
 
     private ClientDto locataire;
 
