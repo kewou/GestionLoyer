@@ -2,8 +2,10 @@ package com.example.controllers;
 
 import com.example.domain.dto.AppartDto;
 import com.example.domain.entities.Appart;
+import com.example.domain.entities.Client;
 import com.example.domain.entities.Logement;
 import com.example.domain.exceptions.NoAppartFoundException;
+import com.example.domain.exceptions.NoClientFoundException;
 import com.example.domain.exceptions.NoLogementFoundException;
 import com.example.domain.exceptions.ValidationException;
 import com.example.domain.mapper.AppartMapper;
@@ -80,10 +82,26 @@ public class AppartController {
         return ResponseEntity.ok(dto);
     }
 
-    @DeleteMapping(path = "/{idAppart}")
+    @DeleteMapping("/{idAppart}")
     public ResponseEntity<Void> deleteAppartById(@NotBlank @PathVariable("idAppart") Long idAppart) throws NoAppartFoundException {
         appartService.deleteById(idAppart);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{idAppart}/nouveau-locataire/{referenceLocataire}")
+    public ResponseEntity<AppartDto> updateAppartAssigneLocataire(
+            @NotBlank @PathVariable("referenceLocataire") String referenceLocataire,
+            @NotBlank @PathVariable("idAppart") Long idAppart) throws NoClientFoundException, NoAppartFoundException, ValidationException {
+        Client locataire = clientService.getClientByReference(referenceLocataire);
+        AppartDto dto = AppartMapper.getMapper().dto(appartService.updateAppartAssigneLocataire(idAppart, locataire));
+        return ResponseEntity.ok(dto);
+    }
+
+    @PatchMapping("/{idAppart}/sortir-locataire")
+    public ResponseEntity<AppartDto> updateAppartSortirLocataire(
+            @NotBlank @PathVariable("idAppart") Long idAppart) throws NoAppartFoundException, ValidationException {
+        AppartDto dto = AppartMapper.getMapper().dto(appartService.updateAppartSortirLocataire(idAppart));
+        return ResponseEntity.ok(dto);
     }
 
 

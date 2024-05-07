@@ -7,7 +7,6 @@ import com.example.domain.entities.Client;
 import com.example.domain.entities.Transaction;
 import com.example.domain.exceptions.NoAppartFoundException;
 import com.example.domain.exceptions.NoClientFoundException;
-import com.example.domain.exceptions.ValidationException;
 import com.example.domain.mapper.AppartMapper;
 import com.example.domain.mapper.TransactionMapper;
 import com.example.helper.ResponseHelper;
@@ -75,15 +74,6 @@ public class TransactionController {
         URI uri = URI.create("/users/" + "/ref/" + "/apparts");
 
         return ResponseEntity.created(uri).body(dtoRetour);
-    }
-
-    @PatchMapping("/{idAppart}/nouveau-locataire/{referenceLocataire}")
-    public ResponseEntity<AppartDto> updateAppartAssigneLocataire(
-            @NotBlank @PathVariable("referenceLocataire") String referenceLocataire,
-            @NotBlank @PathVariable("idAppart") Long idAppart) throws NoClientFoundException, NoAppartFoundException, ValidationException {
-        Client locataire = clientService.getClientByReference(referenceLocataire);
-        AppartDto dto = AppartMapper.getMapper().dto(appartService.updateAppartAssigneLocataire(idAppart, locataire));
-        return ResponseEntity.ok(dto);
     }
 
 

@@ -20,6 +20,6 @@ public interface LoyerRepository extends JpaRepository<Loyer, Long> {
     List<Loyer> findByAppart(@Param("appart") Appart appart);
 
     @Query("SELECT l FROM Loyer l WHERE l.isOk=false AND l.appart = :appart")
-    List<Loyer> findByIsKo(Appart appart);
+    List<Loyer> findByIsKo(@Param("appart") Appart appart);
 
 }

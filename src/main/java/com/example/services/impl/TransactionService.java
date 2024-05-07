@@ -26,6 +26,9 @@ public class TransactionService {
 
 
     public Transaction register(Client bailleur, Transaction transaction, Appart appart) {
+        if (appart.getLocataire() == null) {
+            throw new RuntimeException("L'appartement dont on paye le loyer doit avoir un locataire");
+        }
         int prixLoyer = appart.getPrixLoyer().intValue();
         if (transaction.getMontantVerser() < prixLoyer) {
             throw new TransactionLoyerException("Le montant de la transaction doit etre supérieux au prix du loyer !");

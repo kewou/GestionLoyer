@@ -79,4 +79,11 @@ public class AppartService {
     }
 
     private Logger logger = LoggerFactory.getLogger(AppartService.class);
+
+    public Appart updateAppartSortirLocataire(Long idAppart) throws NoAppartFoundException {
+        Appart appart = getAppartById(idAppart);
+        appart.setLocataire(null);
+        appartRepository.save(appart);
+        return appart;
+    }
 }
