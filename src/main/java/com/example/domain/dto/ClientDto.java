@@ -31,8 +31,7 @@ public class ClientDto {
 
     @NotBlank(message = "Entrer un numéro de téléphone")
     private String phone;
-
-    @NotBlank(message = "Entrer un nom password")
+    
     private String password;
 
 

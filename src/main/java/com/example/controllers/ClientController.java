@@ -91,10 +91,11 @@ public class ClientController {
         return ResponseEntity.ok(dto);
     }
 
-    @PutMapping(path = "")
-    public ResponseEntity<ClientDto> updateClient(@RequestBody ClientDto ClientDto, Errors erros) throws ValidationException, NoClientFoundException {
+    @PutMapping("/{reference}")
+    public ResponseEntity<ClientDto> updateClient(@RequestBody ClientDto ClientDto, @Parameter(description = "reference of Client")
+    @NotBlank @PathVariable("reference") String reference, Errors erros) throws ValidationException, NoClientFoundException {
         ResponseHelper.handle(erros);
-        ClientDto dto = ClientMapper.getMapper().dto(clientService.update(ClientDto));
+        ClientDto dto = ClientMapper.getMapper().dto(clientService.update(ClientDto, reference));
         return ResponseEntity.ok(dto);
     }
 

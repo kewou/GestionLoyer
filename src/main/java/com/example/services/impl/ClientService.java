@@ -75,8 +75,8 @@ public class ClientService {
     }
 
 
-    public Client update(ClientDto clientDto) throws NoClientFoundException {
-        Client client = getClientByReference(clientDto.getReference());
+    public Client update(ClientDto clientDto, String reference) throws NoClientFoundException {
+        Client client = getClientByReference(reference);
         Client clientUpdate = ClientMapper.getMapper().entitie(clientDto);
         ClientMapper.getMapper().update(client, clientUpdate);
         clientRepository.save(client);
