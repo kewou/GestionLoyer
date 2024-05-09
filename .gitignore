@@ -5,6 +5,7 @@
 *.jar
 *.sw?
 *~
+*.properties
 .#*
 .*.md.html
 .DS_Store
