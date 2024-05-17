@@ -5,8 +5,7 @@ import com.example.domain.dto.TransactionDto;
 import com.example.domain.entities.Appart;
 import com.example.domain.entities.Client;
 import com.example.domain.entities.Transaction;
-import com.example.domain.exceptions.NoAppartFoundException;
-import com.example.domain.exceptions.NoClientFoundException;
+import com.example.domain.exceptions.BusinessException;
 import com.example.domain.exceptions.ValidationException;
 import com.example.domain.mapper.AppartMapper;
 import com.example.domain.mapper.TransactionMapper;
@@ -43,15 +42,13 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @GetMapping("")
-    public ResponseEntity<List<AppartDto>> getAllAppart(@NotBlank @PathVariable("reference") String reference) throws NoClientFoundException {
+    public ResponseEntity<List<AppartDto>> getAllAppart(@NotBlank @PathVariable("reference") String reference) throws BusinessException {
         Client bailleur = clientService.getClientByReference(reference);
         List<AppartDto> dtoApparts = new ArrayList<>();
-        logementService.getAllLogementByUser(bailleur).forEach(logement -> {
-                    appartService.getAllAppartByLogement(logement).forEach(appart -> {
-                        AppartDto dto = AppartMapper.getMapper().dto(appart);
-                        dtoApparts.add(dto);
-                    });
-                }
+        logementService.getAllLogementByUser(bailleur).forEach(logement -> appartService.getAllAppartByLogement(logement).forEach(appart -> {
+            AppartDto dto = AppartMapper.getMapper().dto(appart);
+            dtoApparts.add(dto);
+        })
         );
 
         return dtoApparts.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(dtoApparts);
@@ -66,7 +63,7 @@ public class TransactionController {
     @PostMapping("/{idAppart}/nouvelle-transaction")
     public ResponseEntity<TransactionDto> addNewTransaction(@Valid @RequestBody TransactionDto dto, Errors erros,
                                                             @NotBlank @PathVariable("reference") String reference,
-                                                            @NotBlank @PathVariable("idAppart") Long idAppart) throws NoAppartFoundException, NoClientFoundException {
+                                                            @NotBlank @PathVariable("idAppart") Long idAppart) throws BusinessException {
         ResponseHelper.handle(erros);
         Client bailleur = clientService.getClientByReference(reference);
         Appart appart = appartService.getAppartById(idAppart);
@@ -80,7 +77,7 @@ public class TransactionController {
     @PatchMapping("/{idAppart}/nouveau-locataire/{referenceLocataire}")
     public ResponseEntity<AppartDto> updateAppartAssigneLocataire(
             @NotBlank @PathVariable("referenceLocataire") String referenceLocataire,
-            @NotBlank @PathVariable("idAppart") Long idAppart) throws NoClientFoundException, NoAppartFoundException, ValidationException {
+            @NotBlank @PathVariable("idAppart") Long idAppart) throws ValidationException, BusinessException {
         Client locataire = clientService.getClientByReference(referenceLocataire);
         AppartDto dto = AppartMapper.getMapper().dto(appartService.updateAppartAssigneLocataire(idAppart, locataire));
         return ResponseEntity.ok(dto);

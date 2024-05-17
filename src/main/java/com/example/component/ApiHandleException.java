@@ -6,8 +6,7 @@
 package com.example.component;
 
 import com.example.domain.exceptions.AuthenticationException;
-import com.example.domain.exceptions.TransactionLoyerException;
-import javassist.NotFoundException;
+import com.example.domain.exceptions.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -28,7 +27,7 @@ import java.util.Map;
 @ControllerAdvice
 public class ApiHandleException extends ResponseEntityExceptionHandler {
 
-    private static Logger logger = LoggerFactory.getLogger(ApiHandleException.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApiHandleException.class);
 
     @ExceptionHandler(ServletException.class)
     public ResponseEntity<Object> handleAuthentication(ServletException ex) {
@@ -50,16 +49,6 @@ public class ApiHandleException extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<Object> handleNoFound(NotFoundException ex) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("message", ex.getMessage());
-        body.put("status", HttpStatus.NOT_FOUND);
-
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
-    }
-
 
     @ExceptionHandler(ConstraintDeclarationException.class)
     public ResponseEntity<Object> handleValidationDto(ConstraintDeclarationException ex) {
@@ -71,14 +60,27 @@ public class ApiHandleException extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(TransactionLoyerException.class)
-    public ResponseEntity<Object> handleTransaction(TransactionLoyerException ex) {
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Object> handleBusinessException(BusinessException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("message", ex.getMessage());
-        body.put("status", HttpStatus.BAD_REQUEST);
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        if (ex.isNotFoundType()) {
+            status = HttpStatus.NOT_FOUND;
+            body.put("status", status);
+        }
+        if (ex.isOtherType()) {
+            status = HttpStatus.BAD_REQUEST;
+            body.put("status", HttpStatus.BAD_REQUEST);
+        }
+        if (ex.isInternalErrorType()) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            body.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(body, status);
     }
+
 
 }
