@@ -38,7 +38,7 @@ public class ClientService {
         return clientRepository.findAll();
     }
 
-    public Client register(Client client) throws Exception {
+    public Client register(Client client) throws RuntimeException {
         if (!checkIfClientExist(client.getEmail())) {
             if (client.getReference() == null) {
                 client.setReference(generateReference());
@@ -50,7 +50,7 @@ public class ClientService {
             clientRepository.save(client);
             return client;
         } else {
-            throw new Exception("Client with email " + client.getEmail() + " is already exist on database");
+            throw new RuntimeException("Client with email " + client.getEmail() + " is already exist on database");
         }
     }
 

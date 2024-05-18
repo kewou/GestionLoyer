@@ -6,7 +6,10 @@
 package com.example.domain.entities;
 
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,7 +26,6 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class Client implements UserDetails {
 
@@ -101,6 +103,10 @@ public class Client implements UserDetails {
 
     public Client(String name) {
         this.name = name;
+    }
+
+    public Client() {
+
     }
 
 }

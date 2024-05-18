@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-public class UserRepositoryTestIT {
+public class AllTestIntegrationTest {
 
     private static final String URL = "/users";
 
@@ -124,7 +124,7 @@ public class UserRepositoryTestIT {
         m.put("reference", "test_id");
         m.put("name", "KEWOU");
         String valPut = mapper.writeValueAsString(m);
-        this.mockMvc.perform(put(URL).contentType(MediaType.APPLICATION_JSON)
+        this.mockMvc.perform(put(URL + "/test_id").contentType(MediaType.APPLICATION_JSON)
                         .content(valPut))
                 .andExpect(status().is(HttpStatus.OK.value()));
         String res = this.mockMvc.perform(get(URL + "/test_id")
