@@ -1,5 +1,6 @@
 package com.example.security;
 
+import com.example.filter.ClientPreFilter;
 import com.example.filter.JwtFilter;
 import com.example.services.impl.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtFilter jwtFilter;
 
+    @Autowired
+    private ClientPreFilter clientPreFilter;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -53,7 +57,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/", "/*.js", "/*.css", "/assets/**", "/users/create", "/authenticate").permitAll() // Tout le monde a accès à cette page
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/admin").hasAuthority("ADMIN")
-                .antMatchers("/proprio").hasAnyAuthority("ADMIN", "PROPRIO")
+                .antMatchers("/bailleur").hasAnyAuthority("ADMIN", "BAILLEUR")
                 .antMatchers("/locataire").hasAnyAuthority("ADMIN", "LOCATAIRE")
                 .anyRequest().authenticated()   // toutes les requetes doivent etre authentifiées
                 .and()
@@ -61,6 +65,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         ;
 
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Ajout du Filtre
+        http.addFilterAfter(clientPreFilter, JwtFilter.class);
     }
 
 

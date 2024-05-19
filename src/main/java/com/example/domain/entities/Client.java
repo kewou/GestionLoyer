@@ -54,10 +54,7 @@ public class Client implements UserDetails {
     @Column(name = "role")
     private Set<String> roles = new HashSet<>();
 
-    @Column(name = "solde")
-    private Integer solde = 0;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "client", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "client", orphanRemoval = true)
     private Set<Logement> logements = new HashSet<>();
 
     @Override
@@ -101,4 +98,9 @@ public class Client implements UserDetails {
 
         return authorities;
     }
+
+    public Client(String name) {
+        this.name = name;
+    }
+
 }

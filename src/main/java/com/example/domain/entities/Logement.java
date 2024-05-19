@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -17,9 +18,6 @@ public class Logement implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "montantLoyer")
-    private Integer montantLoyer;
-
     @Column(name = "address")
     private String address;
 
@@ -27,24 +25,19 @@ public class Logement implements Serializable {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "client", nullable = false)
+    @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "logement", orphanRemoval = true)
-    private Set<RecapByMonth> recapByMonths;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "logement", orphanRemoval = true)
+    private Set<Appart> apparts = new HashSet<>();
 
     public Logement() {
     }
 
-    public Logement(int montantLoyer, String address, String description, Client client) {
-        this.montantLoyer = montantLoyer;
-        this.address = address;
-        this.description = description;
-        this.client = client;
-    }
 
     @JsonIgnore
-    public Client getUser() {
+    public Client getClient() {
         return this.client;
     }
 
