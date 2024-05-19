@@ -17,6 +17,9 @@ public class Appart {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(name = "reference", unique = true)
+    private String reference;
+
     @Column(name = "nom", unique = true)
     private String nom;
 

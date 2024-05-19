@@ -1,6 +1,9 @@
 package com.example;
 
+import com.example.domain.dto.AppartDto;
 import com.example.domain.dto.ClientDto;
+import com.example.domain.dto.LogementDto;
+import com.example.domain.dto.TransactionDto;
 import com.example.repository.AppartRepository;
 import com.example.repository.ClientRepository;
 import com.example.repository.LogementRepository;
@@ -57,7 +60,10 @@ public class IntegrationsTest {
 
     @BeforeEach
     public void setUp() {
+        logementRepository.deleteAll();
         clientRepository.deleteAll();
+        appartRepository.deleteAll();
+        transactionRepository.deleteAll();
     }
 
     @Test
@@ -172,14 +178,14 @@ public class IntegrationsTest {
 
     }
 
-    /*
+
     @Test
     public void createLogementTest() throws Exception {
         this.createUserTest();
         String logement = mapper.writeValueAsString(LogementDto.builder()
                 .address("Nkomkana")
                 .description("immeuble")
-                .id(1L)
+                .reference("refLgt")
                 .build());
         Assertions.assertTrue(logementRepository.findAll().isEmpty());
 
@@ -197,12 +203,13 @@ public class IntegrationsTest {
         this.createLogementTest();
         String appart = mapper.writeValueAsString(AppartDto.builder()
                 .nom("beezyAppart")
+                .reference("refAppart")
                 .prixLoyer(500)
                 .prixCaution(200)
                 .build());
         Assertions.assertTrue(appartRepository.findAll().isEmpty());
 
-        mockMvc.perform(post(URL + "/refUser/logements/1/apparts/create")
+        mockMvc.perform(post(URL + "/refUser/logements/refLgt/apparts/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(appart))
                 .andDo(print())
@@ -210,21 +217,21 @@ public class IntegrationsTest {
         Assertions.assertEquals(appartRepository.findAll().size(), 1);
     }
 
-    /*
+
     @Test
     public void createTransactionTest() throws Exception {
         this.createAppartTest();
         String transaction = mapper.writeValueAsString(TransactionDto.builder()
-                .montantVerser(100)
+                .montantVerser(500)
                 .build());
         Assertions.assertTrue(transactionRepository.findAll().isEmpty());
 
-        mockMvc.perform(post(URL + "/refUser/logements/1/apparts/create")
+        mockMvc.perform(post(URL + "/refUser/apparts/refAppart/nouvelle-transaction")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(transaction))
                 .andDo(print())
                 .andExpect(status().is(HttpStatus.CREATED.value()));
         Assertions.assertEquals(transactionRepository.findAll().size(), 1);
-    }*/
+    }
 
 }

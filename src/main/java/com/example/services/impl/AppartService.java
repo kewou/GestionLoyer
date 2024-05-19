@@ -9,8 +9,8 @@ import com.example.domain.exceptions.BusinessException;
 import com.example.domain.mapper.AppartMapper;
 import com.example.repository.AppartRepository;
 import com.example.repository.LoyerRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.example.utils.GeneralUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +21,7 @@ import java.util.List;
 import static com.example.domain.exceptions.BusinessException.BusinessErrorType.NOT_FOUND;
 
 @Service
+@Slf4j
 @Transactional
 public class AppartService {
 
@@ -33,6 +34,12 @@ public class AppartService {
     public Appart register(Appart appart) {
         Loyer newLoyerVide = new Loyer(appart);
         newLoyerVide.setDateLoyer(LocalDate.now());
+        if (newLoyerVide.getReference() == null) {
+            newLoyerVide.setReference(GeneralUtils.generateReference());
+        }
+        if (appart.getReference() == null) {
+            appart.setReference(GeneralUtils.generateReference());
+        }
         appartRepository.save(appart);
         loyerRepository.save(newLoyerVide);
 
@@ -43,31 +50,30 @@ public class AppartService {
         return appartRepository.findByLogement(logement);
     }
 
-    public Appart getLogementApprtById(Logement logement, Long idAppart) throws BusinessException {
-
-        return appartRepository.findByLogementAndId(logement, idAppart)
-                .orElseThrow(() -> new BusinessException(String.format("No appart found with this id %d", idAppart),
+    public Appart getLogementApprtByRef(Logement logement, String refAppart) throws BusinessException {
+        return appartRepository.findByLogementAndReference(logement, refAppart)
+                .orElseThrow(() -> new BusinessException(String.format("No appart found with this reference %s", refAppart),
                         NOT_FOUND));
     }
 
-    public Appart getAppartById(Long id) throws BusinessException {
-        return appartRepository.findById(id).
-                orElseThrow(() -> new BusinessException(String.format("No appart found with this id %d", id),
+    public Appart getAppartByRef(String refAppart) throws BusinessException {
+        return appartRepository.findByReference(refAppart).
+                orElseThrow(() -> new BusinessException(String.format("No appart found with this reference %s", refAppart),
                         NOT_FOUND));
     }
 
-    public Appart updateLogementById(AppartDto appartDto, Long id) throws BusinessException {
-        Appart appart = getAppartById(id);
+    public Appart updateLogementByRef(AppartDto appartDto, String refAppart) throws BusinessException {
+        Appart appart = getAppartByRef(refAppart);
         Appart appartUpdate = AppartMapper.getMapper().entitie(appartDto);
         AppartMapper.getMapper().update(appart, appartUpdate);
         appartRepository.save(appart);
         return appart;
     }
 
-    public void deleteById(Long id) throws BusinessException {
-        Appart appart = getAppartById(id);
-        logger.info("Appartement id = " + appart.getId() + " is found");
-        appartRepository.deleteById(id);
+    public void deleteByRef(String refAppart) throws BusinessException {
+        Appart appart = getAppartByRef(refAppart);
+        log.info("Appartement reference = " + appart.getReference() + " is found");
+        appartRepository.deleteByReference(refAppart);
     }
 
 
@@ -75,17 +81,16 @@ public class AppartService {
         return appartRepository.findSuggestionsByNomStartingWithIgnoreCase(term);
     }
 
-    public Appart updateAppartAssigneLocataire(Long idAppart, Client locataire) throws BusinessException {
-        Appart appart = getAppartById(idAppart);
+    public Appart updateAppartAssigneLocataire(String refAppart, Client locataire) throws BusinessException {
+        Appart appart = getAppartByRef(refAppart);
         appart.setLocataire(locataire);
         appartRepository.save(appart);
         return appart;
     }
 
-    private Logger logger = LoggerFactory.getLogger(AppartService.class);
 
-    public Appart updateAppartSortirLocataire(Long idAppart) throws BusinessException {
-        Appart appart = getAppartById(idAppart);
+    public Appart updateAppartSortirLocataire(String refAppart) throws BusinessException {
+        Appart appart = getAppartByRef(refAppart);
         appart.setLocataire(null);
         appartRepository.save(appart);
         return appart;

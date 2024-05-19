@@ -13,7 +13,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class LogementDto {
 
-    private Long id;
+    private String reference;
 
     @NotBlank(message = "Entrer une adresse svp")
     private String address;

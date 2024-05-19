@@ -17,7 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class AppartDto {
 
-    private Long id;
+    private String reference;
 
     @NotBlank(message = "Entrer un nom pour le distinguer")
     private String nom;

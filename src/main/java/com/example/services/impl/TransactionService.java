@@ -7,6 +7,8 @@ import com.example.domain.entities.Transaction;
 import com.example.domain.exceptions.BusinessException;
 import com.example.repository.LoyerRepository;
 import com.example.repository.TransactionRepository;
+import com.example.utils.GeneralUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.util.List;
 import static com.example.domain.exceptions.BusinessException.BusinessErrorType.OTHER;
 
 @Service
+@Slf4j
 @Transactional
 public class TransactionService {
 
@@ -41,6 +44,7 @@ public class TransactionService {
         int nbLoyerPayer = transaction.getMontantVerser() / prixLoyer;
         transaction.setNbLoyerPayer(nbLoyerPayer);
         transaction.setDate(dateActuelle);
+        transaction.setReference(GeneralUtils.generateReference());
 
         // Reccupère l objet loyer du mois courant (existe forcément)
         Loyer loyerCourant = loyerRepository.findByMonthAndAppart(moisActuel, appart).get();
@@ -74,6 +78,7 @@ public class TransactionService {
             }
         }
         transactionRepository.save(transaction);
+        log.info("Transaction du montant : " + montantTransaction + " :ok ");
         return transaction;
     }
 

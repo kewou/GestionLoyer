@@ -45,10 +45,10 @@ public class ClientPreFilter extends OncePerRequestFilter {
             String pathInfo = httpServletRequest.getRequestURI();
             String[] parts = pathInfo.split("/");
             String reference = parts[3];
-            String logementId = parts[5];
+            String logementRef = parts[5];
             try {
                 clientService.getClientByReference(reference);
-                logementService.getLogementById(Long.parseLong(logementId));
+                logementService.getLogementByReference(logementRef);
             } catch (BusinessException e) {
                 sendErrorResponse(httpServletResponse, e.getMessage());
             }

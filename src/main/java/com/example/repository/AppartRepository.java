@@ -17,7 +17,11 @@ public interface AppartRepository extends JpaRepository<Appart, Long> {
 
     List<Appart> findByLogement(Logement logement);
 
-    Optional<Appart> findByLogementAndId(Logement logement, Long idAppart);
+    Optional<Appart> findByLogementAndReference(Logement logement, String refAppart);
 
     List<AppartDto> findSuggestionsByNomStartingWithIgnoreCase(String term);
+
+    Optional<Appart> findByReference(String reference);
+
+    void deleteByReference(String reference);
 }

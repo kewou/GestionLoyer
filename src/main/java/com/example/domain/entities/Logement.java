@@ -18,6 +18,9 @@ public class Logement implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(name = "reference", unique = true)
+    private String reference;
+
     @Column(name = "address", unique = true)
     private String address;
 

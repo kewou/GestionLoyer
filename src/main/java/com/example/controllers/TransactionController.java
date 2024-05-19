@@ -6,7 +6,6 @@ import com.example.domain.entities.Appart;
 import com.example.domain.entities.Client;
 import com.example.domain.entities.Transaction;
 import com.example.domain.exceptions.BusinessException;
-import com.example.domain.exceptions.ValidationException;
 import com.example.domain.mapper.AppartMapper;
 import com.example.domain.mapper.TransactionMapper;
 import com.example.helper.ResponseHelper;
@@ -60,27 +59,18 @@ public class TransactionController {
         return ResponseEntity.ok().body(suggestions);
     }
 
-    @PostMapping("/{idAppart}/nouvelle-transaction")
+    @PostMapping("/{refAppart}/nouvelle-transaction")
     public ResponseEntity<TransactionDto> addNewTransaction(@Valid @RequestBody TransactionDto dto, Errors erros,
                                                             @NotBlank @PathVariable("reference") String reference,
-                                                            @NotBlank @PathVariable("idAppart") Long idAppart) throws BusinessException {
+                                                            @NotBlank @PathVariable("refAppart") String refAppart) throws BusinessException {
         ResponseHelper.handle(erros);
         Client bailleur = clientService.getClientByReference(reference);
-        Appart appart = appartService.getAppartById(idAppart);
+        Appart appart = appartService.getAppartByRef(refAppart);
         Transaction transaction = TransactionMapper.getMapper().entitie(dto);
         TransactionDto dtoRetour = TransactionMapper.getMapper().dto(transactionService.register(bailleur, transaction, appart));
         URI uri = URI.create("/users/" + "/ref/" + "/apparts");
 
         return ResponseEntity.created(uri).body(dtoRetour);
-    }
-
-    @PatchMapping("/{idAppart}/nouveau-locataire/{referenceLocataire}")
-    public ResponseEntity<AppartDto> updateAppartAssigneLocataire(
-            @NotBlank @PathVariable("referenceLocataire") String referenceLocataire,
-            @NotBlank @PathVariable("idAppart") Long idAppart) throws ValidationException, BusinessException {
-        Client locataire = clientService.getClientByReference(referenceLocataire);
-        AppartDto dto = AppartMapper.getMapper().dto(appartService.updateAppartAssigneLocataire(idAppart, locataire));
-        return ResponseEntity.ok(dto);
     }
 
 

@@ -2,6 +2,7 @@ package com.example.controllers;
 
 import com.example.domain.dto.AppartDto;
 import com.example.domain.entities.Appart;
+import com.example.domain.entities.Client;
 import com.example.domain.entities.Logement;
 import com.example.domain.exceptions.BusinessException;
 import com.example.domain.exceptions.ValidationException;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users/{reference}/logements/{id}/apparts")
+@RequestMapping("/users/{reference}/logements/{refLgt}/apparts")
 public class AppartController {
 
     @Autowired
@@ -36,21 +37,22 @@ public class AppartController {
     private ClientService clientService;
 
     @PostMapping("/create")
-    public ResponseEntity<AppartDto> addNewAppartement(@Valid @RequestBody AppartDto dto, Errors erros, @NotBlank @PathVariable("id") Long idLogement) throws BusinessException {
+    public ResponseEntity<AppartDto> addNewAppartement(@Valid @RequestBody AppartDto dto, Errors erros,
+                                                       @NotBlank @PathVariable("refLgt") String refLgt) throws BusinessException {
         ResponseHelper.handle(erros);
-        Logement logement = logementService.getLogementById(idLogement);
+        Logement logement = logementService.getLogementByReference(refLgt);
         Appart appart = AppartMapper.getMapper().entitie(dto);
         appart.setLogement(logement);
         appart.setBailleur(logement.getClient());
         appartService.register(appart);
-        URI uri = URI.create("/users/" + "/logements/" + idLogement + "/apparts");
+        URI uri = URI.create("/users/" + "/logements/" + refLgt + "/apparts");
         return ResponseEntity.created(uri).body(dto);
     }
 
     @GetMapping("")
     @Operation(description = "Get list of all appart by logement")
-    public ResponseEntity<List<AppartDto>> getAllAppartByLogement(@NotBlank @PathVariable("id") Long idLogement) throws BusinessException {
-        Logement logement = logementService.getLogementById(idLogement);
+    public ResponseEntity<List<AppartDto>> getAllAppartByLogement(@NotBlank @PathVariable("refLgt") String refLgt) throws BusinessException {
+        Logement logement = logementService.getLogementByReference(refLgt);
         List<AppartDto> dtoApparts = new ArrayList<>();
         appartService.getAllAppartByLogement(logement).forEach(appart -> {
                     AppartDto dto = AppartMapper.getMapper().dto(appart);
@@ -60,29 +62,47 @@ public class AppartController {
         return dtoApparts.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(dtoApparts);
     }
 
-    @GetMapping("/{idAppart}")
-    public ResponseEntity<AppartDto> getAppartLogementById(
-            @NotBlank @PathVariable("id") Long idLogement,
-            @NotBlank @PathVariable("idAppart") Long idAppart) throws BusinessException {
-        Logement logement = logementService.getLogementById(idLogement);
-        AppartDto dto = AppartMapper.getMapper().dto(appartService.getLogementApprtById(logement, idAppart));
+    @GetMapping("/{refAppart}")
+    public ResponseEntity<AppartDto> getAppartLogementByRef(
+            @NotBlank @PathVariable("refLgt") String refLgt,
+            @NotBlank @PathVariable("refAppart") String refAppart) throws BusinessException {
+        Logement logement = logementService.getLogementByReference(refLgt);
+        AppartDto dto = AppartMapper.getMapper().dto(appartService.getLogementApprtByRef(logement, refAppart));
         return ResponseEntity.ok(dto);
     }
 
-    @PutMapping("/{idAppart}")
-    public ResponseEntity<AppartDto> updateAppartLogementById(
+    @PutMapping("/{refAppart}")
+    public ResponseEntity<AppartDto> updateAppartLogementByRef(
             @RequestBody AppartDto appartDto,
             Errors erros,
-            @NotBlank @PathVariable("idAppart") Long idAppart) throws ValidationException, BusinessException {
+            @NotBlank @PathVariable("refAppart") String refAppart) throws ValidationException, BusinessException {
         ResponseHelper.handle(erros);
-        AppartDto dto = AppartMapper.getMapper().dto(appartService.updateLogementById(appartDto, idAppart));
+        AppartDto dto = AppartMapper.getMapper().dto(appartService.updateLogementByRef(appartDto, refAppart));
         return ResponseEntity.ok(dto);
     }
 
-    @DeleteMapping(path = "/{idAppart}")
-    public ResponseEntity<Void> deleteAppartById(@NotBlank @PathVariable("idAppart") Long idAppart) throws BusinessException {
-        appartService.deleteById(idAppart);
+    @DeleteMapping(path = "/{refAppart}")
+    public ResponseEntity<Void> deleteAppartById(@NotBlank @PathVariable("refAppart") String refAppart) throws BusinessException {
+        appartService.deleteByRef(refAppart);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{refAppart}/nouveau-locataire/{referenceLocataire}")
+    public ResponseEntity<AppartDto> updateAppartAssigneLocataire(
+            @NotBlank @PathVariable("referenceLocataire") String referenceLocataire,
+            @NotBlank @PathVariable("refAppart") String refAppart) throws ValidationException, BusinessException {
+        Client locataire = clientService.getClientByReference(referenceLocataire);
+        AppartDto dto = AppartMapper.getMapper().dto(appartService.updateAppartAssigneLocataire(refAppart, locataire));
+        return ResponseEntity.ok(dto);
+    }
+
+    @PatchMapping("/{refAppart}/sortir-locataire/{referenceLocataire}")
+    public ResponseEntity<AppartDto> updateAppartSortLocataire(
+            @NotBlank @PathVariable("referenceLocataire") String referenceLocataire,
+            @NotBlank @PathVariable("refAppart") String refAppart) throws ValidationException, BusinessException {
+        Client locataire = clientService.getClientByReference(referenceLocataire);
+        AppartDto dto = AppartMapper.getMapper().dto(appartService.updateAppartSortirLocataire(refAppart));
+        return ResponseEntity.ok(dto);
     }
 
 

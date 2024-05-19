@@ -13,7 +13,10 @@ public interface LogementRepository extends JpaRepository<Logement, Long> {
 
     List<Logement> findByClient(Client client);
 
-    Optional<Logement> findByClientAndId(Client bailleur, Long id);
+    Optional<Logement> findByReference(String reference);
 
+    Optional<Logement> findByClientAndReference(Client bailleur, String refLgt);
+
+    void deleteByReference(String reference);
 
 }

@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class TransactionDto {
 
-    private Long id;
+    private String reference;
 
     @NotNull(message = "Entrer un montant svp")
     private Integer montantVerser;

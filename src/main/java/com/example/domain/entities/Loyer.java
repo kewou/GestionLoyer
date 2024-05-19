@@ -20,6 +20,9 @@ public class Loyer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "reference", unique = true)
+    private String reference;
+
     @Column(name = "dateLoyer")
     private LocalDate dateLoyer;  // Permet de définir le mois du loyer en question
 

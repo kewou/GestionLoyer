@@ -20,6 +20,6 @@ public interface AppartMapper {
     @Mapping(target = "locataire.password", ignore = true)
     AppartDto dto(Appart appart);
 
-
+    @Mapping(target = "loyers", ignore = true)
     void update(@MappingTarget Appart entity, Appart updateEntity);
 }

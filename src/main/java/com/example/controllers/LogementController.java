@@ -56,28 +56,29 @@ public class LogementController {
         return dtoLogements.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(dtoLogements);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<LogementDto> getUserLogementById(
-            @Parameter(description = "id of Logement")
-            @NotBlank @PathVariable("id") Long id, @NotBlank @PathVariable("reference") String reference) throws BusinessException {
-        Client bailleur = clientService.getClientByReference(reference);
-        LogementDto dto = LogementMapper.getMapper().dto(logementService.getUserLogementById(bailleur, id));
+    @GetMapping("/{refLgt}")
+    public ResponseEntity<LogementDto> getUserLogementByRef(
+            @Parameter(description = "refLgt of Logement")
+            @NotBlank @PathVariable("reference") String refUser,
+            @NotBlank @PathVariable("refLgt") String refLgt) throws BusinessException {
+        Client bailleur = clientService.getClientByReference(refUser);
+        LogementDto dto = LogementMapper.getMapper().dto(logementService.getUserLogementByRef(bailleur, refLgt));
         return ResponseEntity.ok(dto);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<LogementDto> updateLogementById(@RequestBody LogementDto logementDto, Errors erros,
-                                                          @Parameter(description = "id of Logement")
-                                                          @NotBlank @PathVariable("id") Long id,
-                                                          @NotBlank @PathVariable("reference") String reference) throws ValidationException, BusinessException {
+    @PutMapping("/{refLgt}")
+    public ResponseEntity<LogementDto> updateLogementByRef(@RequestBody LogementDto logementDto, Errors erros,
+                                                           @Parameter(description = "reference of Logement")
+                                                           @NotBlank @PathVariable("refLgt") String refLgt)
+            throws ValidationException, BusinessException {
         ResponseHelper.handle(erros);
-        LogementDto dto = LogementMapper.getMapper().dto(logementService.updateLogementById(logementDto, id));
+        LogementDto dto = LogementMapper.getMapper().dto(logementService.updateLogementByReference(logementDto, refLgt));
         return ResponseEntity.ok(dto);
     }
 
-    @DeleteMapping(path = "/{id}")
-    public ResponseEntity<Void> deleteLogementById(@NotBlank @PathVariable("id") Long id) throws BusinessException {
-        logementService.deleteById(id);
+    @DeleteMapping(path = "/{refLgt}")
+    public ResponseEntity<Void> deleteLogementByRef(@NotBlank @PathVariable("refLgt") String refLgt) throws BusinessException {
+        logementService.deleteByReference(refLgt);
         return ResponseEntity.noContent().build();
     }
 

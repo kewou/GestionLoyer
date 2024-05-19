@@ -15,6 +15,9 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(name = "reference", unique = true)
+    private String reference;
+
     @ManyToOne
     @JoinColumn(name = "client_id_bailleur")
     private Client bailleur;

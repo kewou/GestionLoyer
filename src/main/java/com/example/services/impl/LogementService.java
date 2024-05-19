@@ -6,8 +6,8 @@ import com.example.domain.entities.Logement;
 import com.example.domain.exceptions.BusinessException;
 import com.example.domain.mapper.LogementMapper;
 import com.example.repository.LogementRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.example.utils.GeneralUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +17,7 @@ import java.util.List;
 import static com.example.domain.exceptions.BusinessException.BusinessErrorType.NOT_FOUND;
 
 @Service
+@Slf4j
 @Transactional
 public class LogementService {
 
@@ -28,36 +29,36 @@ public class LogementService {
     }
 
     public Logement register(Logement logement) {
+        if (logement.getReference() == null) {
+            logement.setReference(GeneralUtils.generateReference());
+        }
         logementRepository.save(logement);
         return logement;
     }
 
-    public Logement getUserLogementById(Client bailleur, Long id) throws BusinessException {
-        return logementRepository.findByClientAndId(bailleur, id)
-                .orElseThrow(() -> new BusinessException(String.format("No logement found with this id %d", id), NOT_FOUND));
+    public Logement getUserLogementByRef(Client bailleur, String refLgt) throws BusinessException {
+        return logementRepository.findByClientAndReference(bailleur, refLgt)
+                .orElseThrow(() -> new BusinessException(String.format("No logement found with this ref %s", refLgt), NOT_FOUND));
     }
 
-    public Logement getLogementById(Long id) throws BusinessException {
-        return logementRepository.findById(id).
-                orElseThrow(() -> new BusinessException(String.format("No logement found with this id %d", id), NOT_FOUND));
+    public Logement getLogementByReference(String refLgt) throws BusinessException {
+        return logementRepository.findByReference(refLgt).
+                orElseThrow(() -> new BusinessException(String.format("No logement found with this ref %s", refLgt), NOT_FOUND));
     }
 
-    public Logement updateLogementById(LogementDto logementDto, Long id) throws BusinessException {
-        Logement logement = getLogementById(id);
+    public Logement updateLogementByReference(LogementDto logementDto, String refLgt) throws BusinessException {
+        Logement logement = getLogementByReference(refLgt);
         Logement logementUpdate = LogementMapper.getMapper().entitie(logementDto);
         LogementMapper.getMapper().update(logement, logementUpdate);
         logementRepository.save(logement);
         return logement;
     }
 
-    public void deleteById(Long id) throws BusinessException {
-        Logement logement = getLogementById(id);
-        logger.info("Logement id = " + logement.getId() + " is found");
-        logementRepository.deleteById(id);
+    public void deleteByReference(String refLgt) throws BusinessException {
+        Logement logement = getLogementByReference(refLgt);
+        log.info("Logement ref = " + logement.getReference() + " is found");
+        logementRepository.deleteByReference(refLgt);
     }
-
-
-    private Logger logger = LoggerFactory.getLogger(LogementService.class);
 
 
 }
