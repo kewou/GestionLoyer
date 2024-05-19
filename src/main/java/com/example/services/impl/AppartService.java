@@ -5,7 +5,7 @@ import com.example.domain.entities.Appart;
 import com.example.domain.entities.Client;
 import com.example.domain.entities.Logement;
 import com.example.domain.entities.Loyer;
-import com.example.domain.exceptions.NoAppartFoundException;
+import com.example.domain.exceptions.BusinessException;
 import com.example.domain.mapper.AppartMapper;
 import com.example.repository.AppartRepository;
 import com.example.repository.LoyerRepository;
@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
+
+import static com.example.domain.exceptions.BusinessException.BusinessErrorType.NOT_FOUND;
 
 @Service
 @Transactional
@@ -41,18 +43,20 @@ public class AppartService {
         return appartRepository.findByLogement(logement);
     }
 
-    public Appart getLogementApprtById(Logement logement, Long idAppart) throws NoAppartFoundException {
-        Appart Appart = appartRepository.findByLogementAndId(logement, idAppart)
-                .orElseThrow(() -> new NoAppartFoundException(idAppart));
-        return Appart;
+    public Appart getLogementApprtById(Logement logement, Long idAppart) throws BusinessException {
+
+        return appartRepository.findByLogementAndId(logement, idAppart)
+                .orElseThrow(() -> new BusinessException(String.format("No appart found with this id %d", idAppart),
+                        NOT_FOUND));
     }
 
-    public Appart getAppartById(Long id) throws NoAppartFoundException {
+    public Appart getAppartById(Long id) throws BusinessException {
         return appartRepository.findById(id).
-                orElseThrow(() -> new NoAppartFoundException(id));
+                orElseThrow(() -> new BusinessException(String.format("No appart found with this id %d", id),
+                        NOT_FOUND));
     }
 
-    public Appart updateAppartById(AppartDto appartDto, Long id) throws NoAppartFoundException {
+    public Appart updateLogementById(AppartDto appartDto, Long id) throws BusinessException {
         Appart appart = getAppartById(id);
         Appart appartUpdate = AppartMapper.getMapper().entitie(appartDto);
         AppartMapper.getMapper().update(appart, appartUpdate);
@@ -60,7 +64,7 @@ public class AppartService {
         return appart;
     }
 
-    public void deleteById(Long id) throws NoAppartFoundException {
+    public void deleteById(Long id) throws BusinessException {
         Appart appart = getAppartById(id);
         logger.info("Appartement id = " + appart.getId() + " is found");
         appartRepository.deleteById(id);
@@ -71,7 +75,7 @@ public class AppartService {
         return appartRepository.findSuggestionsByNomStartingWithIgnoreCase(term);
     }
 
-    public Appart updateAppartAssigneLocataire(Long idAppart, Client locataire) throws NoAppartFoundException {
+    public Appart updateAppartAssigneLocataire(Long idAppart, Client locataire) throws BusinessException {
         Appart appart = getAppartById(idAppart);
         appart.setLocataire(locataire);
         appartRepository.save(appart);
@@ -80,7 +84,7 @@ public class AppartService {
 
     private Logger logger = LoggerFactory.getLogger(AppartService.class);
 
-    public Appart updateAppartSortirLocataire(Long idAppart) throws NoAppartFoundException {
+    public Appart updateAppartSortirLocataire(Long idAppart) throws BusinessException {
         Appart appart = getAppartById(idAppart);
         appart.setLocataire(null);
         appartRepository.save(appart);

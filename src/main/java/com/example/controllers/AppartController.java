@@ -2,11 +2,8 @@ package com.example.controllers;
 
 import com.example.domain.dto.AppartDto;
 import com.example.domain.entities.Appart;
-import com.example.domain.entities.Client;
 import com.example.domain.entities.Logement;
-import com.example.domain.exceptions.NoAppartFoundException;
-import com.example.domain.exceptions.NoClientFoundException;
-import com.example.domain.exceptions.NoLogementFoundException;
+import com.example.domain.exceptions.BusinessException;
 import com.example.domain.exceptions.ValidationException;
 import com.example.domain.mapper.AppartMapper;
 import com.example.helper.ResponseHelper;
@@ -39,7 +36,7 @@ public class AppartController {
     private ClientService clientService;
 
     @PostMapping("/create")
-    public ResponseEntity<AppartDto> addNewAppartement(@Valid @RequestBody AppartDto dto, Errors erros, @NotBlank @PathVariable("id") Long idLogement) throws NoLogementFoundException {
+    public ResponseEntity<AppartDto> addNewAppartement(@Valid @RequestBody AppartDto dto, Errors erros, @NotBlank @PathVariable("id") Long idLogement) throws BusinessException {
         ResponseHelper.handle(erros);
         Logement logement = logementService.getLogementById(idLogement);
         Appart appart = AppartMapper.getMapper().entitie(dto);
@@ -52,7 +49,7 @@ public class AppartController {
 
     @GetMapping("")
     @Operation(description = "Get list of all appart by logement")
-    public ResponseEntity<List<AppartDto>> getAllAppartByLogement(@NotBlank @PathVariable("id") Long idLogement) throws Exception {
+    public ResponseEntity<List<AppartDto>> getAllAppartByLogement(@NotBlank @PathVariable("id") Long idLogement) throws BusinessException {
         Logement logement = logementService.getLogementById(idLogement);
         List<AppartDto> dtoApparts = new ArrayList<>();
         appartService.getAllAppartByLogement(logement).forEach(appart -> {
@@ -66,7 +63,7 @@ public class AppartController {
     @GetMapping("/{idAppart}")
     public ResponseEntity<AppartDto> getAppartLogementById(
             @NotBlank @PathVariable("id") Long idLogement,
-            @NotBlank @PathVariable("idAppart") Long idAppart) throws NoLogementFoundException, NoAppartFoundException {
+            @NotBlank @PathVariable("idAppart") Long idAppart) throws BusinessException {
         Logement logement = logementService.getLogementById(idLogement);
         AppartDto dto = AppartMapper.getMapper().dto(appartService.getLogementApprtById(logement, idAppart));
         return ResponseEntity.ok(dto);
@@ -76,32 +73,16 @@ public class AppartController {
     public ResponseEntity<AppartDto> updateAppartLogementById(
             @RequestBody AppartDto appartDto,
             Errors erros,
-            @NotBlank @PathVariable("idAppart") Long idAppart) throws NoAppartFoundException, ValidationException {
+            @NotBlank @PathVariable("idAppart") Long idAppart) throws ValidationException, BusinessException {
         ResponseHelper.handle(erros);
-        AppartDto dto = AppartMapper.getMapper().dto(appartService.updateAppartById(appartDto, idAppart));
+        AppartDto dto = AppartMapper.getMapper().dto(appartService.updateLogementById(appartDto, idAppart));
         return ResponseEntity.ok(dto);
     }
 
-    @DeleteMapping("/{idAppart}")
-    public ResponseEntity<Void> deleteAppartById(@NotBlank @PathVariable("idAppart") Long idAppart) throws NoAppartFoundException {
+    @DeleteMapping(path = "/{idAppart}")
+    public ResponseEntity<Void> deleteAppartById(@NotBlank @PathVariable("idAppart") Long idAppart) throws BusinessException {
         appartService.deleteById(idAppart);
         return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/{idAppart}/nouveau-locataire/{referenceLocataire}")
-    public ResponseEntity<AppartDto> updateAppartAssigneLocataire(
-            @NotBlank @PathVariable("referenceLocataire") String referenceLocataire,
-            @NotBlank @PathVariable("idAppart") Long idAppart) throws NoClientFoundException, NoAppartFoundException, ValidationException {
-        Client locataire = clientService.getClientByReference(referenceLocataire);
-        AppartDto dto = AppartMapper.getMapper().dto(appartService.updateAppartAssigneLocataire(idAppart, locataire));
-        return ResponseEntity.ok(dto);
-    }
-
-    @PatchMapping("/{idAppart}/sortir-locataire")
-    public ResponseEntity<AppartDto> updateAppartSortirLocataire(
-            @NotBlank @PathVariable("idAppart") Long idAppart) throws NoAppartFoundException, ValidationException {
-        AppartDto dto = AppartMapper.getMapper().dto(appartService.updateAppartSortirLocataire(idAppart));
-        return ResponseEntity.ok(dto);
     }
 
 

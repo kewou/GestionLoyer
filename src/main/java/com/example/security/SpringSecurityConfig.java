@@ -1,5 +1,6 @@
 package com.example.security;
 
+import com.example.filter.ClientPreFilter;
 import com.example.filter.JwtFilter;
 import com.example.services.impl.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JwtFilter jwtFilter;
+
+    @Autowired
+    private ClientPreFilter clientPreFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -61,6 +65,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         ;
 
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Ajout du Filtre
+        http.addFilterAfter(clientPreFilter, JwtFilter.class);
     }
 
 

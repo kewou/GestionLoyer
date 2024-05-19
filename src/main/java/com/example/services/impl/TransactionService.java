@@ -4,7 +4,7 @@ import com.example.domain.entities.Appart;
 import com.example.domain.entities.Client;
 import com.example.domain.entities.Loyer;
 import com.example.domain.entities.Transaction;
-import com.example.domain.exceptions.TransactionLoyerException;
+import com.example.domain.exceptions.BusinessException;
 import com.example.repository.LoyerRepository;
 import com.example.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
+
+import static com.example.domain.exceptions.BusinessException.BusinessErrorType.OTHER;
 
 @Service
 @Transactional
@@ -25,13 +27,10 @@ public class TransactionService {
     private LoyerRepository loyerRepository;
 
 
-    public Transaction register(Client bailleur, Transaction transaction, Appart appart) {
-        if (appart.getLocataire() == null) {
-            throw new RuntimeException("L'appartement dont on paye le loyer doit avoir un locataire");
-        }
+    public Transaction register(Client bailleur, Transaction transaction, Appart appart) throws BusinessException {
         int prixLoyer = appart.getPrixLoyer().intValue();
         if (transaction.getMontantVerser() < prixLoyer) {
-            throw new TransactionLoyerException("Le montant de la transaction doit etre supérieux au prix du loyer !");
+            throw new BusinessException("Le montant de la transaction doit etre supérieux au prix du loyer !", OTHER);
         }
         // Obtenir la date actuelle
         LocalDate dateActuelle = LocalDate.now();
@@ -78,7 +77,7 @@ public class TransactionService {
         return transaction;
     }
 
-    private Loyer getLoyerLePlusAncien(List<Loyer> loyers) {
+    private Loyer getLoyerLePlusAncien(List<Loyer> loyers) throws BusinessException {
         if (!loyers.isEmpty()) {
             LocalDate datePlusAncienne = loyers.get(0).getDateLoyer();
             Loyer loyerPlusAncien = loyers.get(0);
@@ -90,11 +89,11 @@ public class TransactionService {
             }
             return loyerPlusAncien;
         } else {
-            throw new RuntimeException("Au moins un loyer non payé");
+            throw new BusinessException("Au moins un loyer non payé", OTHER);
         }
     }
 
-    private Loyer getLoyerLePlusVieu(List<Loyer> loyers) {
+    private Loyer getLoyerLePlusVieu(List<Loyer> loyers) throws BusinessException {
         if (!loyers.isEmpty()) {
             LocalDate datePlusVielle = loyers.get(0).getDateLoyer();
             Loyer loyerPlusVieu = loyers.get(0);
@@ -106,11 +105,11 @@ public class TransactionService {
             }
             return loyerPlusVieu;
         } else {
-            throw new RuntimeException("Au moins un loyer doit etre trouver");
+            throw new BusinessException("Au moins un loyer doit etre trouver", OTHER);
         }
     }
 
-    private Loyer getLoyerMoisSuivant(List<Loyer> loyers, Loyer loyerCourant) {
+    private Loyer getLoyerMoisSuivant(List<Loyer> loyers, Loyer loyerCourant) throws BusinessException {
         // Calculer le mois suivant
         int moisActuel = loyerCourant.getDateLoyer().getMonthValue();
         int moisSuivant = (moisActuel == 12) ? 1 : moisActuel + 1;
@@ -119,7 +118,7 @@ public class TransactionService {
                 return loyer;
             }
         }
-        throw new RuntimeException("Cette recherche doit retourner un objet !");
+        throw new BusinessException("Cette recherche doit retourner un objet !", OTHER);
     }
 
 

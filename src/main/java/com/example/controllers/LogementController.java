@@ -3,8 +3,7 @@ package com.example.controllers;
 import com.example.domain.dto.LogementDto;
 import com.example.domain.entities.Client;
 import com.example.domain.entities.Logement;
-import com.example.domain.exceptions.NoClientFoundException;
-import com.example.domain.exceptions.NoLogementFoundException;
+import com.example.domain.exceptions.BusinessException;
 import com.example.domain.exceptions.ValidationException;
 import com.example.domain.mapper.LogementMapper;
 import com.example.helper.ResponseHelper;
@@ -34,7 +33,7 @@ public class LogementController {
     private ClientService clientService;
 
     @PostMapping("/create")
-    public ResponseEntity<LogementDto> addNewLogement(@Valid @RequestBody LogementDto dto, Errors erros, @NotBlank @PathVariable("reference") String reference) throws Exception {
+    public ResponseEntity<LogementDto> addNewLogement(@Valid @RequestBody LogementDto dto, Errors erros, @NotBlank @PathVariable("reference") String reference) throws BusinessException {
         ResponseHelper.handle(erros);
         Client bailleur = clientService.getClientByReference(reference);
         Logement logement = LogementMapper.getMapper().entitie(dto);
@@ -46,7 +45,7 @@ public class LogementController {
 
     @GetMapping("")
     @Operation(description = "Get list of all logement by user")
-    public ResponseEntity<List<LogementDto>> getAllLogementByUser(@NotBlank @PathVariable("reference") String reference) throws Exception {
+    public ResponseEntity<List<LogementDto>> getAllLogementByUser(@NotBlank @PathVariable("reference") String reference) throws BusinessException {
         Client bailleur = clientService.getClientByReference(reference);
         List<LogementDto> dtoLogements = new ArrayList<>();
         logementService.getAllLogementByUser(bailleur).forEach(logement -> {
@@ -60,7 +59,7 @@ public class LogementController {
     @GetMapping("/{id}")
     public ResponseEntity<LogementDto> getUserLogementById(
             @Parameter(description = "id of Logement")
-            @NotBlank @PathVariable("id") Long id, @NotBlank @PathVariable("reference") String reference) throws NoLogementFoundException, NoClientFoundException {
+            @NotBlank @PathVariable("id") Long id, @NotBlank @PathVariable("reference") String reference) throws BusinessException {
         Client bailleur = clientService.getClientByReference(reference);
         LogementDto dto = LogementMapper.getMapper().dto(logementService.getUserLogementById(bailleur, id));
         return ResponseEntity.ok(dto);
@@ -69,14 +68,15 @@ public class LogementController {
     @PutMapping("/{id}")
     public ResponseEntity<LogementDto> updateLogementById(@RequestBody LogementDto logementDto, Errors erros,
                                                           @Parameter(description = "id of Logement")
-                                                          @NotBlank @PathVariable("id") Long id, @NotBlank @PathVariable("reference") String reference) throws NoLogementFoundException, ValidationException {
+                                                          @NotBlank @PathVariable("id") Long id,
+                                                          @NotBlank @PathVariable("reference") String reference) throws ValidationException, BusinessException {
         ResponseHelper.handle(erros);
         LogementDto dto = LogementMapper.getMapper().dto(logementService.updateLogementById(logementDto, id));
         return ResponseEntity.ok(dto);
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<Void> deleteLogementById(@NotBlank @PathVariable("id") Long id) throws NoLogementFoundException {
+    public ResponseEntity<Void> deleteLogementById(@NotBlank @PathVariable("id") Long id) throws BusinessException {
         logementService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

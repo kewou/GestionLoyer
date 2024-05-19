@@ -3,7 +3,7 @@ package com.example.services.impl;
 import com.example.domain.dto.LogementDto;
 import com.example.domain.entities.Client;
 import com.example.domain.entities.Logement;
-import com.example.domain.exceptions.NoLogementFoundException;
+import com.example.domain.exceptions.BusinessException;
 import com.example.domain.mapper.LogementMapper;
 import com.example.repository.LogementRepository;
 import org.slf4j.Logger;
@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+
+import static com.example.domain.exceptions.BusinessException.BusinessErrorType.NOT_FOUND;
 
 @Service
 @Transactional
@@ -25,23 +27,22 @@ public class LogementService {
         return logementRepository.findByClient(bailleur);
     }
 
-    public Logement register(Logement logement) throws Exception {
+    public Logement register(Logement logement) {
         logementRepository.save(logement);
         return logement;
     }
 
-    public Logement getUserLogementById(Client bailleur, Long id) throws NoLogementFoundException {
-        Logement logement = logementRepository.findByClientAndId(bailleur, id)
-                .orElseThrow(() -> new NoLogementFoundException(id));
-        return logement;
+    public Logement getUserLogementById(Client bailleur, Long id) throws BusinessException {
+        return logementRepository.findByClientAndId(bailleur, id)
+                .orElseThrow(() -> new BusinessException(String.format("No logement found with this id %d", id), NOT_FOUND));
     }
 
-    public Logement getLogementById(Long id) throws NoLogementFoundException {
+    public Logement getLogementById(Long id) throws BusinessException {
         return logementRepository.findById(id).
-                orElseThrow(() -> new NoLogementFoundException(id));
+                orElseThrow(() -> new BusinessException(String.format("No logement found with this id %d", id), NOT_FOUND));
     }
 
-    public Logement updateLogementById(LogementDto logementDto, Long id) throws NoLogementFoundException {
+    public Logement updateLogementById(LogementDto logementDto, Long id) throws BusinessException {
         Logement logement = getLogementById(id);
         Logement logementUpdate = LogementMapper.getMapper().entitie(logementDto);
         LogementMapper.getMapper().update(logement, logementUpdate);
@@ -49,7 +50,7 @@ public class LogementService {
         return logement;
     }
 
-    public void deleteById(Long id) throws NoLogementFoundException {
+    public void deleteById(Long id) throws BusinessException {
         Logement logement = getLogementById(id);
         logger.info("Logement id = " + logement.getId() + " is found");
         logementRepository.deleteById(id);
