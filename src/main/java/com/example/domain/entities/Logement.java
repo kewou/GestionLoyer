@@ -18,7 +18,7 @@ public class Logement implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "address")
+    @Column(name = "address", unique = true)
     private String address;
 
     @Column(name = "description")
@@ -33,6 +33,10 @@ public class Logement implements Serializable {
     private Set<Appart> apparts = new HashSet<>();
 
     public Logement() {
+    }
+
+    public Logement(String address) {
+        this.address = address;
     }
 
 

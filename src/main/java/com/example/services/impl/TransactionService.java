@@ -121,40 +121,6 @@ public class TransactionService {
         }
         throw new RuntimeException("Cette recherche doit retourner un objet !");
     }
-        /*
-        // On paye les loyers à partir du mois pivot : loyer.getNbMoisPayer() + 1 = 0 = mois courant
-        int soldeRestant = transaction.getMontantVerser();
-        int indiceMoisLoyer = 0;
-        int montantLoyer = appart.getPrixLoyer().intValue();
-        while (nbLoyerPayer >= 1) {
-            Optional<Loyer> anotherLoyerOptional = loyerRepository.findByMonthAndAppart(loyer.getNbMoisPayer() + 1 + indiceMoisLoyer + moisActuel, appart);
-            if (anotherLoyerOptional.isPresent()) {
-                // On a trouvé un Loyer, donc c'est un retard de paiement, on met l'objet à jour
-                Loyer loyerTrouver = anotherLoyerOptional.get();
-                if (!loyerTrouver.getIsOk()) {
-                    loyerTrouver.setSolde(loyerTrouver.getSolde() + soldeRestant);
-                    loyerTrouver.setNbMoisPayer(loyerTrouver.getNbMoisPayer() + 1);
-                    loyerTrouver.setIsOk(true);
-                    loyerRepository.save(loyerTrouver);
-                }
-            } else {
-                // On a pas trouvé un Loyer, c'est un paiement en avance, on crée l'objet
-                Loyer newLoyer = new Loyer(appart);
-                newLoyer.setDateLoyer(dateActuelle.plusMonths(indiceMoisLoyer + 1));
-                int newSolde = soldeRestant - montantLoyer;
-                newLoyer.setSolde(newSolde);
-                newLoyer.setIsOk(true);
-                newLoyer.setNbMoisPayer(newLoyer.getNbMoisPayer() + soldeRestant / montantLoyer);
-                loyerRepository.save(newLoyer);
-            }
-            indiceMoisLoyer++;
-            nbLoyerPayer--;
-            soldeRestant = soldeRestant - montantLoyer;
-
-        }
-        transactionRepository.save(transaction);
-        return transaction;
-    }*/
 
 
 }

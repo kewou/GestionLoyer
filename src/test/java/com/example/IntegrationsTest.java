@@ -1,7 +1,10 @@
 package com.example;
 
 import com.example.domain.dto.ClientDto;
+import com.example.repository.AppartRepository;
 import com.example.repository.ClientRepository;
+import com.example.repository.LogementRepository;
+import com.example.repository.TransactionRepository;
 import com.example.services.impl.ClientService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-public class AllTestIntegrationTest {
+public class IntegrationsTest {
 
     private static final String URL = "/users";
 
@@ -35,6 +38,15 @@ public class AllTestIntegrationTest {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    @Autowired
+    private LogementRepository logementRepository;
+
+    @Autowired
+    private AppartRepository appartRepository;
 
     @Autowired
     ObjectMapper mapper;
@@ -62,6 +74,7 @@ public class AllTestIntegrationTest {
     @Test
     public void createUserTest() throws Exception {
         String val = mapper.writeValueAsString(ClientDto.builder()
+                .reference("refUser")
                 .name("NOUMIA")
                 .lastName("joel")
                 .email("kewou.noumia@gmail.com")
@@ -161,18 +174,57 @@ public class AllTestIntegrationTest {
 
     /*
     @Test
-    public void testLogement() {
-        String email = "kewou.noumia@gmail.com";
-        User user = userService.getUserByEmail(email);
-        assertEquals(user.getLogements().size(), 1);
+    public void createLogementTest() throws Exception {
+        this.createUserTest();
+        String logement = mapper.writeValueAsString(LogementDto.builder()
+                .address("Nkomkana")
+                .description("immeuble")
+                .id(1L)
+                .build());
+        Assertions.assertTrue(logementRepository.findAll().isEmpty());
+
+        mockMvc.perform(post(URL + "/refUser/logements/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(logement))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.CREATED.value()));
+        Assertions.assertEquals(logementRepository.findAll().size(), 1);
     }
 
+
     @Test
-    public void testRecapLogement() {
-        String email = "kewou.noumia@gmail.com";
-        User user = userService.getUserByEmail(email);
-        assertEquals(user.getLogements().iterator().next().getRecapByMonths().size(), 1);
+    public void createAppartTest() throws Exception {
+        this.createLogementTest();
+        String appart = mapper.writeValueAsString(AppartDto.builder()
+                .nom("beezyAppart")
+                .prixLoyer(500)
+                .prixCaution(200)
+                .build());
+        Assertions.assertTrue(appartRepository.findAll().isEmpty());
+
+        mockMvc.perform(post(URL + "/refUser/logements/1/apparts/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(appart))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.CREATED.value()));
+        Assertions.assertEquals(appartRepository.findAll().size(), 1);
     }
-    */
+
+    /*
+    @Test
+    public void createTransactionTest() throws Exception {
+        this.createAppartTest();
+        String transaction = mapper.writeValueAsString(TransactionDto.builder()
+                .montantVerser(100)
+                .build());
+        Assertions.assertTrue(transactionRepository.findAll().isEmpty());
+
+        mockMvc.perform(post(URL + "/refUser/logements/1/apparts/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(transaction))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.CREATED.value()));
+        Assertions.assertEquals(transactionRepository.findAll().size(), 1);
+    }*/
 
 }
