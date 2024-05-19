@@ -1,8 +1,8 @@
 package com.example.security;
 
+import com.example.features.accueil.domain.services.AuthenticationService;
 import com.example.filter.ClientPreFilter;
 import com.example.filter.JwtFilter;
-import com.example.services.impl.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

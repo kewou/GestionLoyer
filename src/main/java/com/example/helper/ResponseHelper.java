@@ -1,6 +1,6 @@
 package com.example.helper;
 
-import com.example.domain.exceptions.ValidationException;
+import com.example.exceptions.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;

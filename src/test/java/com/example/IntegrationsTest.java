@@ -1,14 +1,14 @@
 package com.example;
 
-import com.example.domain.dto.AppartDto;
-import com.example.domain.dto.ClientDto;
-import com.example.domain.dto.LogementDto;
-import com.example.domain.dto.TransactionDto;
-import com.example.repository.AppartRepository;
-import com.example.repository.ClientRepository;
-import com.example.repository.LogementRepository;
-import com.example.repository.TransactionRepository;
-import com.example.services.impl.ClientService;
+import com.example.features.appart.application.mapper.AppartDto;
+import com.example.features.appart.infra.AppartRepository;
+import com.example.features.logement.application.mapper.LogementDto;
+import com.example.features.logement.infra.LogementRepository;
+import com.example.features.transaction.application.mapper.TransactionDto;
+import com.example.features.transaction.infra.TransactionRepository;
+import com.example.features.user.application.mapper.ClientDto;
+import com.example.features.user.domain.services.impl.ClientService;
+import com.example.features.user.infra.ClientRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
@@ -85,7 +85,7 @@ public class IntegrationsTest {
                 .lastName("joel")
                 .email("kewou.noumia@gmail.com")
                 .phone("0615664758")
-                .password("sbeezy12")
+                .password("Tourneyuvbekuyb*155r14")
                 .build());
         Assertions.assertTrue(clientRepository.findAll().isEmpty());
         this.mockMvc.perform(post(URL + "/create")
@@ -105,7 +105,7 @@ public class IntegrationsTest {
                 .lastName("joel")
                 .email("kewou.noumia@gmail.com")
                 .phone("0615664758")
-                .password("sbeezy12")
+                .password("Tourneyuvbekuyb*155r14")
                 .build());
         Assertions.assertTrue(clientRepository.findAll().isEmpty());
         this.mockMvc.perform(post(URL + "/create")
@@ -131,7 +131,7 @@ public class IntegrationsTest {
                 .lastName("joel")
                 .email("kewou.noumia@gmail.com")
                 .phone("0615664758")
-                .password("sbeezy12")
+                .password("Tourneyuvbekuyb*155r14")
                 .build());
         Assertions.assertTrue(clientRepository.findAll().isEmpty());
         this.mockMvc.perform(post(URL + "/create")
@@ -164,7 +164,7 @@ public class IntegrationsTest {
                 .lastName("joel")
                 .email("kewou.noumia@gmail.com")
                 .phone("0615664758")
-                .password("sbeezy12")
+                .password("Tourneyuvbekuyb*155r14")
                 .build());
         Assertions.assertTrue(clientRepository.findAll().isEmpty());
         this.mockMvc.perform(post(URL + "/create")

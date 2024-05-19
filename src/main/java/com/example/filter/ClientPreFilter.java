@@ -1,8 +1,8 @@
 package com.example.filter;
 
-import com.example.domain.exceptions.BusinessException;
-import com.example.services.impl.ClientService;
-import com.example.services.impl.LogementService;
+import com.example.exceptions.BusinessException;
+import com.example.features.logement.domain.services.LogementService;
+import com.example.features.user.domain.services.impl.ClientService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

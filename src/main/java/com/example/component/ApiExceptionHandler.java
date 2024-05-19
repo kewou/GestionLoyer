@@ -5,9 +5,9 @@
  */
 package com.example.component;
 
-import com.example.domain.exceptions.AuthenticationException;
-import com.example.domain.exceptions.BusinessException;
-import com.example.domain.exceptions.ValidationException;
+import com.example.exceptions.AuthenticationException;
+import com.example.exceptions.BusinessException;
+import com.example.exceptions.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

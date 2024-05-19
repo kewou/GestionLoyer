@@ -1,6 +1,6 @@
 package com.example.filter;
 
-import com.example.services.impl.AuthenticationService;
+import com.example.features.accueil.domain.services.AuthenticationService;
 import com.example.utils.JWTUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;

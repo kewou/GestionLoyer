@@ -1,0 +1,114 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.example.features.user.application;
+
+import com.example.exceptions.BusinessException;
+import com.example.exceptions.ValidationException;
+import com.example.features.user.application.appService.ClientAppService;
+import com.example.features.user.application.mapper.ClientDto;
+import com.example.features.user.application.mapper.ClientMapper;
+import com.example.features.user.domain.entities.Client;
+import com.example.features.user.domain.services.impl.ClientService;
+import com.example.helper.ResponseHelper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author frup73532
+ */
+@RestController
+@RequestMapping("/users")
+public class ClientController {
+
+    private ClientAppService clientAppService;
+
+    @Autowired
+    public ClientController(ClientService clientAppService) {
+        this.clientAppService = clientAppService;
+    }
+
+
+    @Operation(summary = "Tous les Clients", description = "Tous les Clients")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = Client.class))),
+            @ApiResponse(responseCode = "404", description = "Erreur de saisie", content = @Content),
+            @ApiResponse(responseCode = "500", description = "An Internal Server Error occurred", content = @Content)
+
+    })
+    @GetMapping
+    public ResponseEntity<List<ClientDto>> getAllClients() {
+        List<ClientDto> dtoClients = new ArrayList<>();
+        clientAppService.getAllClient().forEach(client -> {
+                    ClientDto dto = ClientMapper.getMapper().dto(client);
+                    dtoClients.add(dto);
+                }
+        );
+        return dtoClients.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(dtoClients);
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<ClientDto> addNewClient(@Valid @RequestBody ClientDto dto, Errors erros) throws BusinessException {
+        ResponseHelper.handle(erros);
+        Client client = ClientMapper.getMapper().entitie(dto);
+        clientAppService.register(client);
+        URI uri = URI.create("/users/" + client.getReference());
+        return ResponseEntity.created(uri).body(dto);
+    }
+
+    @Operation(summary = "Retourne un Client", description = "Retourne un Client")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = Client.class))),
+            @ApiResponse(responseCode = "404", description = "Erreur de saisie", content = @Content),
+            @ApiResponse(responseCode = "500", description = "An Internal Server Error occurred", content = @Content)
+
+    })
+    @GetMapping("/{reference}")
+    public ResponseEntity<ClientDto> getClientByReference(
+            @Parameter(description = "reference of Client")
+            @NotBlank @PathVariable("reference") String reference) throws BusinessException {
+        ClientDto dto = ClientMapper.getMapper().dto(clientAppService.getClientByReference(reference));
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/email/{email}")
+    public Client getClientByEmail(
+            @Parameter(description = "email of Client")
+            @NotBlank @PathVariable("email") String email) {
+        return clientAppService.getClientByEmail(email);
+    }
+
+    @PutMapping(path = "/{reference}")
+    public ResponseEntity<ClientDto> updateClient(@RequestBody ClientDto ClientDto,
+                                                  @NotBlank @PathVariable("reference") String reference,
+                                                  Errors erros) throws ValidationException, BusinessException {
+        ResponseHelper.handle(erros);
+        ClientDto dto = ClientMapper.getMapper().dto(clientAppService.update(ClientDto, reference));
+        return ResponseEntity.ok(dto);
+    }
+
+
+    @DeleteMapping(path = "/{reference}")
+    public ResponseEntity<Void> deleteClient(@NotBlank @PathVariable("reference") String reference) throws BusinessException {
+        ClientDto dto = ClientMapper.getMapper().dto(clientAppService.delete(reference));
+        return ResponseEntity.noContent().build();
+    }
+
+
+}
