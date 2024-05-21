@@ -35,7 +35,7 @@ public class ResponseHelper {
      */
     public static void handle(Errors errors) throws ValidationException {
         if (errors.hasErrors()) {
-            throw new ValidationException();
+            throw new ValidationException(errors.getAllErrors());
         }
     }
 
