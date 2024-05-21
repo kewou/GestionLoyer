@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,9 +61,8 @@ public class ClientController {
     public ResponseEntity<ClientDto> addNewClient(@Valid @RequestBody ClientDto dto, Errors erros) throws BusinessException {
         ResponseHelper.handle(erros);
         Client client = ClientMapper.getMapper().entitie(dto);
-        clientService.register(client);
-        URI uri = URI.create("/users/" + client.getReference());
-        return ResponseEntity.created(uri).body(dto);
+        final Client registeredClient = clientService.register(client);
+        return getClientByReference(registeredClient.getReference());
     }
 
     @Operation(summary = "Retourne un Client", description = "Retourne un Client")

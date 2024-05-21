@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Data
@@ -30,8 +31,10 @@ public class ClientDto {
     private String email;
 
     @NotBlank(message = "Entrer un numéro de téléphone")
+    @Pattern(regexp = "(\\d)+")
     private String phone;
-    
+
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}$")
     private String password;
 
 
