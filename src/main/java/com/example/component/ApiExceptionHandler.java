@@ -7,8 +7,7 @@ package com.example.component;
 
 import com.example.domain.exceptions.AuthenticationException;
 import com.example.domain.exceptions.BusinessException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.example.domain.exceptions.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -25,9 +24,7 @@ import java.util.Map;
  * Joel NOUMIA
  */
 @ControllerAdvice
-public class ApiHandleException extends ResponseEntityExceptionHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(ApiHandleException.class);
+public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ServletException.class)
     public ResponseEntity<Object> handleAuthentication(ServletException ex) {
@@ -50,8 +47,19 @@ public class ApiHandleException extends ResponseEntityExceptionHandler {
     }
 
 
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<Object> handleValidationDto(ValidationException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("message", ex.getMessage());
+        body.put("status", HttpStatus.BAD_REQUEST);
+        body.put("errors", ex.errorCodes());
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(ConstraintDeclarationException.class)
-    public ResponseEntity<Object> handleValidationDto(ConstraintDeclarationException ex) {
+    public ResponseEntity<Object> handleConstraintErrors(ConstraintDeclarationException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("message", ex.getMessage());
@@ -80,6 +88,16 @@ public class ApiHandleException extends ResponseEntityExceptionHandler {
         }
 
         return new ResponseEntity<>(body, status);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Object> handleSQLErrors(RuntimeException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("message", "Une erreur interne est survenue");
+        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
+
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 

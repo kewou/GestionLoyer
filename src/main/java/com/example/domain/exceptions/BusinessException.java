@@ -2,7 +2,7 @@ package com.example.domain.exceptions;
 
 public class BusinessException extends Exception {
 
-    private BusinessErrorType type;
+    private final BusinessErrorType type;
 
     public BusinessException(String message, BusinessErrorType type) {
         super(message);
@@ -28,15 +28,15 @@ public class BusinessException extends Exception {
         }
     }
 
-    public Boolean isNotFoundType() {
+    public boolean isNotFoundType() {
         return type == BusinessErrorType.NOT_FOUND;
     }
 
-    public Boolean isOtherType() {
+    public boolean isOtherType() {
         return type == BusinessErrorType.OTHER;
     }
 
-    public Boolean isInternalErrorType() {
+    public boolean isInternalErrorType() {
         return type == BusinessErrorType.INTERNAL_SERVER_ERROR;
     }
 }
