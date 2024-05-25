@@ -6,6 +6,7 @@ import com.example.features.logement.application.mapper.LogementDto;
 import com.example.features.logement.application.mapper.LogementMapper;
 import com.example.features.logement.domain.entities.Logement;
 import com.example.features.logement.infra.LogementRepository;
+import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.domain.entities.Client;
 import com.example.utils.GeneralUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.example.exceptions.BusinessException.BusinessErrorType.NOT_FOUND;
 
@@ -22,47 +24,68 @@ import static com.example.exceptions.BusinessException.BusinessErrorType.NOT_FOU
 @Transactional
 public class LogementService implements LogementAppService {
 
+    private ClientAppService clientAppService;
     private LogementRepository logementRepository;
 
     @Autowired
-    public LogementService(LogementRepository logementRepository) {
+    public LogementService(LogementRepository logementRepository, ClientAppService clientAppService) {
+        this.clientAppService = clientAppService;
         this.logementRepository = logementRepository;
     }
 
-    public List<Logement> getAllLogementByUser(Client bailleur) {
-        return logementRepository.findByClient(bailleur);
+    public List<LogementDto> getAllLogementByUser(String reference) throws BusinessException {
+        Client bailleur = clientAppService.getClientFromDatabase(reference);
+        return logementRepository.findByClient(bailleur).stream()
+                .map(LogementMapper.getMapper()::dto)
+                .collect(Collectors.toList());
     }
 
-    public Logement register(Logement logement) {
+
+    public LogementDto register(String reference, LogementDto logementDto) throws BusinessException {
+        Client bailleur = clientAppService.getClientFromDatabase(reference);
+        Logement logement = LogementMapper.getMapper().entitie(logementDto);
         if (logement.getReference() == null) {
             logement.setReference(GeneralUtils.generateReference());
         }
+        logement.setClient(bailleur);
         logementRepository.save(logement);
-        return logement;
+        log.info("Logement ref = " + logement.getReference() + " is created");
+        return logementDto;
     }
 
-    public Logement getUserLogementByRef(Client bailleur, String refLgt) throws BusinessException {
-        return logementRepository.findByClientAndReference(bailleur, refLgt)
+
+    public LogementDto getUserLogementByRef(String refUser, String refLgt) throws BusinessException {
+        Client bailleur = clientAppService.getClientFromDatabase(refUser);
+        Logement lgt = logementRepository.findByClientAndReference(bailleur, refLgt)
                 .orElseThrow(() -> new BusinessException(String.format("No logement found with this ref %s", refLgt), NOT_FOUND));
+        return LogementMapper.getMapper().dto(lgt);
     }
 
-    public Logement getLogementByReference(String refLgt) throws BusinessException {
-        return logementRepository.findByReference(refLgt).
-                orElseThrow(() -> new BusinessException(String.format("No logement found with this ref %s", refLgt), NOT_FOUND));
+    public LogementDto getLogementByReference(String refLgt) throws BusinessException {
+        Logement lgt = this.getLogementFromDatabase(refLgt);
+        return LogementMapper.getMapper().dto(lgt);
     }
 
-    public Logement updateLogementByReference(LogementDto logementDto, String refLgt) throws BusinessException {
-        Logement logement = getLogementByReference(refLgt);
+    public LogementDto updateLogementByReference(LogementDto logementDto, String refLgt) throws BusinessException {
+        Logement logement = this.getLogementFromDatabase(refLgt);
         Logement logementUpdate = LogementMapper.getMapper().entitie(logementDto);
         LogementMapper.getMapper().update(logement, logementUpdate);
         logementRepository.save(logement);
-        return logement;
+        log.info("Logement ref = " + logement.getReference() + " is saved");
+        return LogementMapper.getMapper().dto(logement);
     }
 
     public void deleteByReference(String refLgt) throws BusinessException {
-        Logement logement = getLogementByReference(refLgt);
-        log.info("Logement ref = " + logement.getReference() + " is found");
+        Logement logement = getLogementFromDatabase(refLgt);
         logementRepository.deleteByReference(refLgt);
+        log.info("Logement ref = " + logement.getReference() + " is deleted");
+    }
+
+    public Logement getLogementFromDatabase(String refLgt) throws BusinessException {
+        Logement lgt = logementRepository.findByReference(refLgt).
+                orElseThrow(() -> new BusinessException(String.format("No logement found with this ref %s", refLgt), NOT_FOUND));
+        log.info("Logement ref = " + lgt.getReference() + " is found");
+        return lgt;
     }
 
 

@@ -9,7 +9,6 @@ import com.example.exceptions.BusinessException;
 import com.example.exceptions.ValidationException;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.application.mapper.ClientDto;
-import com.example.features.user.application.mapper.ClientMapper;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.domain.services.impl.ClientService;
 import com.example.helper.ResponseHelper;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,22 +52,14 @@ public class ClientController {
     })
     @GetMapping
     public ResponseEntity<List<ClientDto>> getAllClients() {
-        List<ClientDto> dtoClients = new ArrayList<>();
-        clientAppService.getAllClient().forEach(client -> {
-                    ClientDto dto = ClientMapper.getMapper().dto(client);
-                    dtoClients.add(dto);
-                }
-        );
-        return dtoClients.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(dtoClients);
+        return ResponseEntity.ok(clientAppService.getAllClient());
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ClientDto> addNewClient(@Valid @RequestBody ClientDto dto, Errors erros) throws BusinessException {
+    public ResponseEntity<ClientDto> addNewClient(@Valid @RequestBody ClientDto clientDto, Errors erros) throws BusinessException {
         ResponseHelper.handle(erros);
-        Client client = ClientMapper.getMapper().entitie(dto);
-        clientAppService.register(client);
-        URI uri = URI.create("/users/" + client.getReference());
-        return ResponseEntity.created(uri).body(dto);
+        clientAppService.register(clientDto);
+        return ResponseEntity.created(URI.create("/users/" + clientDto.getReference())).body(clientDto);
     }
 
     @Operation(summary = "Retourne un Client", description = "Retourne un Client")
@@ -83,8 +73,7 @@ public class ClientController {
     public ResponseEntity<ClientDto> getClientByReference(
             @Parameter(description = "reference of Client")
             @NotBlank @PathVariable("reference") String reference) throws BusinessException {
-        ClientDto dto = ClientMapper.getMapper().dto(clientAppService.getClientByReference(reference));
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(clientAppService.getClientByReference(reference));
     }
 
     @GetMapping("/email/{email}")
@@ -95,18 +84,17 @@ public class ClientController {
     }
 
     @PutMapping(path = "/{reference}")
-    public ResponseEntity<ClientDto> updateClient(@RequestBody ClientDto ClientDto,
-                                                  @NotBlank @PathVariable("reference") String reference,
-                                                  Errors erros) throws ValidationException, BusinessException {
+    public ResponseEntity<ClientDto> updateClient(@RequestBody ClientDto ClientDto, Errors erros,
+
+                                                  @NotBlank @PathVariable("reference") String reference) throws ValidationException, BusinessException {
         ResponseHelper.handle(erros);
-        ClientDto dto = ClientMapper.getMapper().dto(clientAppService.update(ClientDto, reference));
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(clientAppService.update(ClientDto, reference));
     }
 
 
     @DeleteMapping(path = "/{reference}")
     public ResponseEntity<Void> deleteClient(@NotBlank @PathVariable("reference") String reference) throws BusinessException {
-        ClientDto dto = ClientMapper.getMapper().dto(clientAppService.delete(reference));
+        clientAppService.delete(reference);
         return ResponseEntity.noContent().build();
     }
 

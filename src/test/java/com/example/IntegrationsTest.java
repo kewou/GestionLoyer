@@ -74,7 +74,7 @@ public class IntegrationsTest {
     public void getAllUserTest() throws Exception {
         mockMvc.perform(get(URL).
                         contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
     }
 
     @Test
