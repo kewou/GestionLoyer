@@ -63,13 +63,26 @@ public class ClientController {
         return dtoClients.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(dtoClients);
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<ClientDto> addNewClient(@Valid @RequestBody ClientDto dto, Errors erros) throws BusinessException {
+    @PostMapping("/create-locataire")
+    public ResponseEntity<ClientDto> addNewLocataire(@Valid @RequestBody ClientDto dto, Errors erros) throws BusinessException {
+        return addNewClient(erros, dto, "LOCATAIRE");
+    }
+
+    @PostMapping("/create-bailleur")
+    public ResponseEntity<ClientDto> addNewBailleur(@Valid @RequestBody ClientDto dto, Errors erros) throws BusinessException {
+        return addNewClient(erros, dto, "BAILLEUR");
+    }
+
+    @PostMapping("/create-admin")
+    public ResponseEntity<ClientDto> addNewAdmin(@Valid @RequestBody ClientDto dto, Errors erros) throws BusinessException {
+        return addNewClient(erros, dto, "ADMIN");
+    }
+
+    private ResponseEntity<ClientDto> addNewClient(Errors erros, ClientDto dto, String clientRole) throws BusinessException {
         ResponseHelper.handle(erros);
         Client client = ClientMapper.getMapper().entitie(dto);
-        clientAppService.register(client);
-        URI uri = URI.create("/users/" + client.getReference());
-        return ResponseEntity.created(uri).body(dto);
+        clientAppService.register(client, clientRole);
+        return getClientByReference(client.getReference());
     }
 
     @Operation(summary = "Retourne un Client", description = "Retourne un Client")

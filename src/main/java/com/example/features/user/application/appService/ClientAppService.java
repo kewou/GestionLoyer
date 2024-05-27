@@ -10,7 +10,7 @@ public interface ClientAppService {
 
     public List<Client> getAllClient();
 
-    public Client register(Client client) throws BusinessException;
+    public Client register(Client client, String clientRole) throws BusinessException;
 
     public Client getClient(Long id) throws BusinessException;
 

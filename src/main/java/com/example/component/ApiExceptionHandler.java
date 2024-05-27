@@ -8,6 +8,7 @@ package com.example.component;
 import com.example.exceptions.AuthenticationException;
 import com.example.exceptions.BusinessException;
 import com.example.exceptions.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -24,6 +25,7 @@ import java.util.Map;
  * Joel NOUMIA
  */
 @ControllerAdvice
+@Slf4j
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ServletException.class)
@@ -96,6 +98,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         body.put("timestamp", LocalDateTime.now());
         body.put("message", "Une erreur interne est survenue");
         body.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
+        log.error("Error occured {}", ex.getMessage());
 
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }

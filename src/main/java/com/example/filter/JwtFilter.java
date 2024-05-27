@@ -30,7 +30,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
         if (httpServletRequest.getMethod().equals(HttpMethod.OPTIONS.name())
                 || httpServletRequest.getRequestURI().equalsIgnoreCase("/beezyApi/authenticate") // Authentification
-                || httpServletRequest.getRequestURI().equalsIgnoreCase("/beezyApi/users/create") // Inscription
+                || httpServletRequest.getRequestURI().startsWith("/beezyApi/users/create") // Inscription
                 || httpServletRequest.getRequestURI().equalsIgnoreCase("/beezyApi/") // Page d'acceuil
                 || httpServletRequest.getRequestURI().startsWith("/beezyApi/assets/")
                 || httpServletRequest.getRequestURI().endsWith(".js")

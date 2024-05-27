@@ -44,14 +44,14 @@ public class ClientService implements ClientAppService {
         return clientRepository.findAll();
     }
 
-    public Client register(Client client) throws BusinessException {
+    public Client register(Client client, String clientRole) throws BusinessException {
         if (!checkIfClientExist(client.getEmail())) {
             if (client.getReference() == null) {
                 client.setReference(GeneralUtils.generateReference());
             }
             client.setPassword(encoder.encode(client.getPassword()));
             Set<String> roles = new HashSet<>();
-            roles.add("LOCATAIRE");
+            roles.add(clientRole);
             client.setRoles(roles);
             clientRepository.save(client);
             return client;

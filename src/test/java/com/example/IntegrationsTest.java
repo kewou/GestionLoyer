@@ -88,12 +88,12 @@ public class IntegrationsTest {
                 .password("Tourneyuvbekuyb*155r14")
                 .build());
         Assertions.assertTrue(clientRepository.findAll().isEmpty());
-        this.mockMvc.perform(post(URL + "/create")
+        this.mockMvc.perform(post(URL + "/create-locataire")
                         .contentType(MediaType.APPLICATION_JSON)
 
                         .content(val))
                 .andDo(print())
-                .andExpect(status().is(HttpStatus.CREATED.value()));
+                .andExpect(status().is(HttpStatus.OK.value()));
         Assertions.assertEquals(clientRepository.findAll().size(), 1);
     }
 
@@ -108,7 +108,7 @@ public class IntegrationsTest {
                 .password("Tourneyuvbekuyb*155r14")
                 .build());
         Assertions.assertTrue(clientRepository.findAll().isEmpty());
-        this.mockMvc.perform(post(URL + "/create")
+        this.mockMvc.perform(post(URL + "/create-locataire")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(val));
         Assertions.assertEquals(clientRepository.findAll().size(), 1);
@@ -134,7 +134,7 @@ public class IntegrationsTest {
                 .password("Tourneyuvbekuyb*155r14")
                 .build());
         Assertions.assertTrue(clientRepository.findAll().isEmpty());
-        this.mockMvc.perform(post(URL + "/create")
+        this.mockMvc.perform(post(URL + "/create-locataire")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(valPost));
         Assertions.assertEquals(clientRepository.findAll().size(), 1);
@@ -167,7 +167,7 @@ public class IntegrationsTest {
                 .password("Tourneyuvbekuyb*155r14")
                 .build());
         Assertions.assertTrue(clientRepository.findAll().isEmpty());
-        this.mockMvc.perform(post(URL + "/create")
+        this.mockMvc.perform(post(URL + "/create-locataire")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(val));
         Assertions.assertEquals(clientRepository.findAll().size(), 1);
