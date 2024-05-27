@@ -8,18 +8,18 @@ import java.util.List;
 
 public interface ClientAppService {
 
-    public List<Client> getAllClient();
+    public List<ClientDto> getAllClient();
 
     public Client register(Client client, String clientRole) throws BusinessException;
 
-    public Client getClient(Long id) throws BusinessException;
-
-    public Client getClientByReference(String reference) throws BusinessException;
+    public ClientDto getClientByReference(String reference) throws BusinessException;
 
     public Client getClientByEmail(String email);
 
-    public Client update(ClientDto clientDto, String reference) throws BusinessException;
+    public ClientDto update(ClientDto clientDto, String reference) throws BusinessException;
 
-    public Client delete(String reference) throws BusinessException;
+    public void delete(String reference) throws BusinessException;
+
+    public Client getClientFromDatabase(String reference) throws BusinessException;
 
 }

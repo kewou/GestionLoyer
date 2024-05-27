@@ -1,12 +1,16 @@
 package com.example.features.transaction.domain.services.impl;
 
 import com.example.exceptions.BusinessException;
+import com.example.features.appart.application.appService.AppartAppService;
 import com.example.features.appart.domain.entities.Appart;
 import com.example.features.loyer.domain.entities.Loyer;
 import com.example.features.loyer.infra.LoyerRepository;
 import com.example.features.transaction.application.appService.TransactionAppService;
+import com.example.features.transaction.application.mapper.TransactionDto;
+import com.example.features.transaction.application.mapper.TransactionMapper;
 import com.example.features.transaction.domain.entities.Transaction;
 import com.example.features.transaction.infra.TransactionRepository;
+import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.domain.entities.Client;
 import com.example.utils.GeneralUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -24,20 +28,28 @@ import static com.example.exceptions.BusinessException.BusinessErrorType.OTHER;
 @Transactional
 public class TransactionService implements TransactionAppService {
 
+    private ClientAppService clientAppService;
+    private AppartAppService appartAppService;
     private TransactionRepository transactionRepository;
     private LoyerRepository loyerRepository;
 
     @Autowired
-    public TransactionService(TransactionRepository transactionRepository, LoyerRepository loyerRepository) {
+    public TransactionService(ClientAppService clientAppService, TransactionRepository transactionRepository,
+                              AppartAppService appartAppService, LoyerRepository loyerRepository) {
+        this.appartAppService = appartAppService;
+        this.clientAppService = clientAppService;
         this.transactionRepository = transactionRepository;
         this.loyerRepository = loyerRepository;
     }
 
 
-    public Transaction register(Client bailleur, Transaction transaction, Appart appart) throws BusinessException {
+    public TransactionDto register(String refClient, TransactionDto transactionDto, String refAppart) throws BusinessException {
+        Client bailleur = clientAppService.getClientFromDatabase(refClient);
+        Appart appart = appartAppService.getAppartFromDatabase(refAppart);
+        Transaction transaction = TransactionMapper.getMapper().entitie(transactionDto);
         int prixLoyer = appart.getPrixLoyer().intValue();
         if (transaction.getMontantVerser() < prixLoyer) {
-            throw new BusinessException("Le montant de la transaction doit etre supérieux au prix du loyer !", OTHER);
+            throw new BusinessException("Le montant de la transaction doit etre supérieux au prix du loyer : " + prixLoyer + "! ", OTHER);
         }
         // Obtenir la date actuelle
         LocalDate dateActuelle = LocalDate.now();
@@ -83,7 +95,7 @@ public class TransactionService implements TransactionAppService {
         }
         transactionRepository.save(transaction);
         log.info("Transaction du montant : " + montantTransaction + " :ok ");
-        return transaction;
+        return TransactionMapper.getMapper().dto(transaction);
     }
 
     private Loyer getLoyerLePlusAncien(List<Loyer> loyers) throws BusinessException {

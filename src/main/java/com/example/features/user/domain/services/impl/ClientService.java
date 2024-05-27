@@ -21,12 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.example.exceptions.BusinessException.BusinessErrorType.NOT_FOUND;
 import static com.example.exceptions.BusinessException.BusinessErrorType.OTHER;
 
 /**
- * @author frup73532
+ * @author kewou
  */
 @Service
 @Slf4j
@@ -40,11 +41,15 @@ public class ClientService implements ClientAppService {
         this.clientRepository = clientRepository;
     }
 
-    public List<Client> getAllClient() {
-        return clientRepository.findAll();
+    public List<ClientDto> getAllClient() {
+        return clientRepository.findAll().stream()
+                .map(ClientMapper.getMapper()::dto)
+                .collect(Collectors.toList());
     }
 
-    public Client register(Client client, String clientRole) throws BusinessException {
+
+    public ClientDto register(ClientDto clientDto,String clientRole) throws BusinessException {
+        Client client = ClientMapper.getMapper().entitie(clientDto);
         if (!checkIfClientExist(client.getEmail())) {
             if (client.getReference() == null) {
                 client.setReference(GeneralUtils.generateReference());
@@ -54,26 +59,16 @@ public class ClientService implements ClientAppService {
             roles.add(clientRole);
             client.setRoles(roles);
             clientRepository.save(client);
-            return client;
+            log.info("Client {} is created ", client.getReference());
+            return ClientMapper.getMapper().dto(client);
         } else {
             throw new BusinessException(String.format("Client with email %s is already exist on database", client.getEmail()), OTHER);
         }
     }
 
 
-    public Client getClient(Long id) throws BusinessException {
-        Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(String.format("No user found with this id %d", id), NOT_FOUND));
-        log.info("Client {} is found  ", client.getEmail());
-        return client;
-    }
-
-
-    public Client getClientByReference(String reference) throws BusinessException {
-        Client client = clientRepository.findByReference(reference)
-                .orElseThrow(() -> new BusinessException(String.format("No user found with this reference %s", reference), NOT_FOUND));
-        log.info("Client {} is found ", client.getEmail());
-        return client;
+    public ClientDto getClientByReference(String reference) throws BusinessException {
+        return ClientMapper.getMapper().dto(this.getClientFromDatabase(reference));
     }
 
     public Client getClientByEmail(String email) {
@@ -81,18 +76,25 @@ public class ClientService implements ClientAppService {
     }
 
 
-    public Client update(ClientDto clientDto, String reference) throws BusinessException {
-        Client client = getClientByReference(reference);
+    public ClientDto update(ClientDto clientDto, String reference) throws BusinessException {
+        Client client = this.getClientFromDatabase(reference);
         Client clientUpdate = ClientMapper.getMapper().entitie(clientDto);
         ClientMapper.getMapper().update(client, clientUpdate);
         clientRepository.save(client);
-        return client;
+        log.info("Client {} is update ", reference);
+        return ClientMapper.getMapper().dto(clientUpdate);
     }
 
-    public Client delete(String reference) throws BusinessException {
-        Client client = getClientByReference(reference);
-        log.info("Client {} is found ", reference);
+    public void delete(String reference) throws BusinessException {
+        Client client = this.getClientFromDatabase(reference);
         clientRepository.delete(client);
+        log.info("Client {} is delete ", reference);
+    }
+
+    public Client getClientFromDatabase(String reference) throws BusinessException {
+        Client client = clientRepository.findByReference(reference)
+                .orElseThrow(() -> new BusinessException(String.format("No user found with this reference %s", reference), NOT_FOUND));
+        log.info("Client {} is found ", client.getEmail());
         return client;
     }
 
