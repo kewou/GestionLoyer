@@ -54,7 +54,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable() // protocole de sécurité qui gère un token
                 .authorizeRequests()
-                .antMatchers("/", "/*.js", "/*.css", "/assets/**", "/users/create", "/authenticate").permitAll() // Tout le monde a accès à cette page
+                .antMatchers("/", "/*.js", "/*.css", "/assets/**", "/users/create*", "/authenticate").permitAll() // Tout le monde a accès à cette page
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/admin").hasAuthority("ADMIN")
                 .antMatchers("/bailleur").hasAnyAuthority("ADMIN", "BAILLEUR")

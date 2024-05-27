@@ -27,7 +27,7 @@ import static com.example.exceptions.BusinessException.BusinessErrorType.NOT_FOU
 import static com.example.exceptions.BusinessException.BusinessErrorType.OTHER;
 
 /**
- * @author frup73532
+ * @author kewou
  */
 @Service
 @Slf4j
@@ -47,7 +47,8 @@ public class ClientService implements ClientAppService {
                 .collect(Collectors.toList());
     }
 
-    public ClientDto register(ClientDto clientDto) throws BusinessException {
+
+    public ClientDto register(ClientDto clientDto,String clientRole) throws BusinessException {
         Client client = ClientMapper.getMapper().entitie(clientDto);
         if (!checkIfClientExist(client.getEmail())) {
             if (client.getReference() == null) {
@@ -55,7 +56,7 @@ public class ClientService implements ClientAppService {
             }
             client.setPassword(encoder.encode(client.getPassword()));
             Set<String> roles = new HashSet<>();
-            roles.add("LOCATAIRE");
+            roles.add(clientRole);
             client.setRoles(roles);
             clientRepository.save(client);
             log.info("Client {} is created ", client.getReference());

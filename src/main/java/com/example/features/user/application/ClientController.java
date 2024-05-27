@@ -55,11 +55,27 @@ public class ClientController {
         return ResponseEntity.ok(clientAppService.getAllClient());
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<ClientDto> addNewClient(@Valid @RequestBody ClientDto clientDto, Errors erros) throws BusinessException {
-        ResponseHelper.handle(erros);
-        clientAppService.register(clientDto);
+
+    @PostMapping("/create-locataire")
+    public ResponseEntity<ClientDto> addNewLocataire(@Valid @RequestBody ClientDto dto, Errors erros) throws BusinessException {
+        return addNewClient(erros, dto, "LOCATAIRE");
+    }
+
+    @PostMapping("/create-bailleur")
+    public ResponseEntity<ClientDto> addNewBailleur(@Valid @RequestBody ClientDto dto, Errors erros) throws BusinessException {
+        return addNewClient(erros, dto, "BAILLEUR");
+    }
+
+    @PostMapping("/create-admin")
+    public ResponseEntity<ClientDto> addNewAdmin(@Valid @RequestBody ClientDto dto, Errors erros) throws BusinessException {
+        return addNewClient(erros, dto, "ADMIN");
+    }
+
+    private ResponseEntity<ClientDto> addNewClient(Errors erros, ClientDto clientDto, String clientRole) throws BusinessException {
+        ResponseHelper.handle(erros);        
+        clientAppService.register(clientDto, clientRole);
         return ResponseEntity.created(URI.create("/users/" + clientDto.getReference())).body(clientDto);
+
     }
 
     @Operation(summary = "Retourne un Client", description = "Retourne un Client")
