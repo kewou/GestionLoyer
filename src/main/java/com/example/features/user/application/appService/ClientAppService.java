@@ -10,7 +10,7 @@ public interface ClientAppService {
 
     public List<ClientDto> getAllClient();
 
-    public Client register(Client client, String clientRole) throws BusinessException;
+    public ClientDto register(ClientDto clientDto, String clientRole) throws BusinessException;
 
     public ClientDto getClientByReference(String reference) throws BusinessException;
 

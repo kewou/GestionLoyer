@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import java.net.URI;
 import java.util.List;
 
 /**
@@ -72,9 +71,8 @@ public class ClientController {
     }
 
     private ResponseEntity<ClientDto> addNewClient(Errors erros, ClientDto clientDto, String clientRole) throws BusinessException {
-        ResponseHelper.handle(erros);        
-        clientAppService.register(clientDto, clientRole);
-        return ResponseEntity.created(URI.create("/users/" + clientDto.getReference())).body(clientDto);
+        ResponseHelper.handle(erros);
+        return ResponseEntity.ok(clientAppService.register(clientDto, clientRole));
 
     }
 
