@@ -12,6 +12,7 @@ import com.example.features.user.application.mapper.ClientDto;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.domain.services.impl.ClientService;
 import com.example.helper.ResponseHelper;
+import com.example.security.Role;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,6 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,6 +52,7 @@ public class ClientController {
 
     })
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<ClientDto>> getAllClients() {
         return ResponseEntity.ok(clientAppService.getAllClient());
     }
@@ -57,20 +60,20 @@ public class ClientController {
 
     @PostMapping("/create-locataire")
     public ResponseEntity<ClientDto> addNewLocataire(@Valid @RequestBody ClientDto dto, Errors erros) throws BusinessException {
-        return addNewClient(erros, dto, "LOCATAIRE");
+        return addNewClient(erros, dto, Role.LOCATAIRE);
     }
 
     @PostMapping("/create-bailleur")
     public ResponseEntity<ClientDto> addNewBailleur(@Valid @RequestBody ClientDto dto, Errors erros) throws BusinessException {
-        return addNewClient(erros, dto, "BAILLEUR");
+        return addNewClient(erros, dto, Role.BAILLEUR);
     }
 
-    @PostMapping("/create-admin")
+    @PostMapping("/admin/create-admin")
     public ResponseEntity<ClientDto> addNewAdmin(@Valid @RequestBody ClientDto dto, Errors erros) throws BusinessException {
-        return addNewClient(erros, dto, "ADMIN");
+        return addNewClient(erros, dto, Role.ADMIN);
     }
 
-    private ResponseEntity<ClientDto> addNewClient(Errors erros, ClientDto clientDto, String clientRole) throws BusinessException {
+    private ResponseEntity<ClientDto> addNewClient(Errors erros, ClientDto clientDto, Role clientRole) throws BusinessException {
         ResponseHelper.handle(erros);
         return ResponseEntity.ok(clientAppService.register(clientDto, clientRole));
 

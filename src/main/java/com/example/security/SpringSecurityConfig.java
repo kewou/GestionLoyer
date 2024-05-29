@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -21,10 +22,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
+
     @Autowired
-    AuthenticationService authenticationService;
+    private AuthenticationService authenticationService;
 
     @Autowired
     private JwtFilter jwtFilter;
@@ -56,12 +59,13 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/", "/*.js", "/*.css", "/assets/**", "/users/create*", "/authenticate").permitAll() // Tout le monde a accès à cette page
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/admin").hasAuthority("ADMIN")
-                .antMatchers("/bailleur").hasAnyAuthority("ADMIN", "BAILLEUR")
-                .antMatchers("/locataire").hasAnyAuthority("ADMIN", "LOCATAIRE")
+                .antMatchers("/admin").hasAuthority(Role.ADMIN.name())
+                .antMatchers("/bailleur").hasAnyAuthority(Role.ADMIN.name(), Role.BAILLEUR.name())
+                .antMatchers("/locataire").hasAnyAuthority(Role.ADMIN.name(), Role.LOCATAIRE.name())
                 .anyRequest().authenticated()   // toutes les requetes doivent etre authentifiées
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
         ;
 
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Ajout du Filtre

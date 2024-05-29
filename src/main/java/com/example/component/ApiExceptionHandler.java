@@ -11,6 +11,7 @@ import com.example.exceptions.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -91,6 +92,18 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(body, status);
     }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("status", HttpStatus.FORBIDDEN.value());
+        body.put("error", ex.getMessage());
+        body.put("message", "Vous n'avez pas les autorisations nécessaires pour accéder à cette ressource.");
+        log.error("Access denied: {}", ex.getMessage());
+
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
+
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Object> handleSQLErrors(RuntimeException ex) {

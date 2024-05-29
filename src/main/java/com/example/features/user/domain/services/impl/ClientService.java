@@ -11,6 +11,7 @@ import com.example.features.user.application.mapper.ClientDto;
 import com.example.features.user.application.mapper.ClientMapper;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.infra.ClientRepository;
+import com.example.security.Role;
 import com.example.utils.GeneralUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ public class ClientService implements ClientAppService {
     }
 
 
-    public ClientDto register(ClientDto clientDto,String clientRole) throws BusinessException {
+    public ClientDto register(ClientDto clientDto, Role clientRole) throws BusinessException {
         Client client = ClientMapper.getMapper().entitie(clientDto);
         if (!checkIfClientExist(client.getEmail())) {
             if (client.getReference() == null) {
@@ -56,7 +57,7 @@ public class ClientService implements ClientAppService {
             }
             client.setPassword(encoder.encode(client.getPassword()));
             Set<String> roles = new HashSet<>();
-            roles.add(clientRole);
+            roles.add(clientRole.name());
             client.setRoles(roles);
             clientRepository.save(client);
             log.info("Client {} is created ", client.getReference());
