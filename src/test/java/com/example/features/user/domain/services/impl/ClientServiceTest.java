@@ -4,6 +4,7 @@ import com.example.exceptions.BusinessException;
 import com.example.features.user.application.mapper.ClientDto;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.infra.ClientRepository;
+import com.example.security.Role;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,9 +33,10 @@ class ClientServiceTest {
         clientService = new ClientService(clientRepository);
     }
 
+
     @ParameterizedTest
-    @ValueSource(strings = {"LOCATAIRE", "BAILLEUR", "ADMIN"})
-    void should_create_client(String clientRole) throws BusinessException {
+    @ValueSource(strings = {"ADMIN", "BAILLEUR", "LOCATAIRE"})
+    void should_create_client(Role clientRole) throws BusinessException {
         //Given
         final String password = "test";
 
@@ -51,7 +53,6 @@ class ClientServiceTest {
         verify(clientRepository, times(1)).save(any(Client.class));
         Assertions.assertNotNull(clientRegistered.getReference());
         Assertions.assertNotEquals(clientRegistered.getPassword(), password);
-        //Assertions.assertTrue(clientRegistered.getRoles()).contains(clientRole);
 
     }
 }

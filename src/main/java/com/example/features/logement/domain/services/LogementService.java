@@ -24,8 +24,8 @@ import static com.example.exceptions.BusinessException.BusinessErrorType.NOT_FOU
 @Transactional
 public class LogementService implements LogementAppService {
 
-    private ClientAppService clientAppService;
-    private LogementRepository logementRepository;
+    private final ClientAppService clientAppService;
+    private final LogementRepository logementRepository;
 
     @Autowired
     public LogementService(LogementRepository logementRepository, ClientAppService clientAppService) {
@@ -42,14 +42,14 @@ public class LogementService implements LogementAppService {
 
 
     public LogementDto register(String reference, LogementDto logementDto) throws BusinessException {
-        Client bailleur = clientAppService.getClientFromDatabase(reference);
+        Client client = clientAppService.getClientFromDatabase(reference);
         Logement logement = LogementMapper.getMapper().entitie(logementDto);
         if (logement.getReference() == null) {
             logement.setReference(GeneralUtils.generateReference());
         }
-        logement.setClient(bailleur);
+        logement.setClient(client);
         logementRepository.save(logement);
-        log.info("Logement ref = " + logement.getReference() + " is created");
+        log.info(LOGEMENT_LOG + logement.getReference() + " is created");
         return logementDto;
     }
 
@@ -71,22 +71,24 @@ public class LogementService implements LogementAppService {
         Logement logementUpdate = LogementMapper.getMapper().entitie(logementDto);
         LogementMapper.getMapper().update(logement, logementUpdate);
         logementRepository.save(logement);
-        log.info("Logement ref = " + logement.getReference() + " is saved");
+        log.info(LOGEMENT_LOG + logement.getReference() + " is saved");
         return LogementMapper.getMapper().dto(logement);
     }
 
     public void deleteByReference(String refLgt) throws BusinessException {
         Logement logement = getLogementFromDatabase(refLgt);
         logementRepository.deleteByReference(refLgt);
-        log.info("Logement ref = " + logement.getReference() + " is deleted");
+        log.info(LOGEMENT_LOG + logement.getReference() + " is deleted");
     }
 
     public Logement getLogementFromDatabase(String refLgt) throws BusinessException {
         Logement lgt = logementRepository.findByReference(refLgt).
                 orElseThrow(() -> new BusinessException(String.format("No logement found with this ref %s", refLgt), NOT_FOUND));
-        log.info("Logement ref = " + lgt.getReference() + " is found");
+        log.info(LOGEMENT_LOG + lgt.getReference() + " is found");
         return lgt;
     }
 
+
+    private static final String LOGEMENT_LOG = "Logement ref = ";
 
 }

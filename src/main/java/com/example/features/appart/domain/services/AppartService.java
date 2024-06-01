@@ -28,9 +28,9 @@ import static com.example.exceptions.BusinessException.BusinessErrorType.NOT_FOU
 @Transactional
 public class AppartService implements AppartAppService {
 
-    private LogementAppService logementAppService;
-    private AppartRepository appartRepository;
-    private LoyerRepository loyerRepository;
+    private final LogementAppService logementAppService;
+    private final AppartRepository appartRepository;
+    private final LoyerRepository loyerRepository;
 
     @Autowired
     public AppartService(LogementAppService logementAppService, AppartRepository appartRepository, LoyerRepository loyerRepository) {
@@ -61,7 +61,7 @@ public class AppartService implements AppartAppService {
         }
         appartRepository.save(appart);
         loyerRepository.save(newLoyerVide);
-        log.info("Appart ref = " + logement.getReference() + " is created");
+        log.info(APPART_LOG + logement.getReference() + " is created");
         return appart;
     }
 
@@ -84,14 +84,14 @@ public class AppartService implements AppartAppService {
         Appart appartUpdate = AppartMapper.getMapper().entitie(appartDto);
         AppartMapper.getMapper().update(appart, appartUpdate);
         appartRepository.save(appart);
-        log.info("Appart ref = " + appart.getReference() + " is updated");
+        log.info(APPART_LOG + appart.getReference() + " is updated");
         return AppartMapper.getMapper().dto(appart);
     }
 
     public void deleteByRef(String refAppart) throws BusinessException {
         Appart appart = this.getAppartFromDatabase(refAppart);
         appartRepository.deleteByReference(refAppart);
-        log.info("Appartement reference = " + appart.getReference() + " is deleted");
+        log.info(APPART_LOG + appart.getReference() + " is deleted");
     }
 
 
@@ -104,7 +104,7 @@ public class AppartService implements AppartAppService {
         Client locataire = logementAppService.getLogementFromDatabase(refLgt).getClient();
         appart.setLocataire(locataire);
         appartRepository.save(appart);
-        log.info("Appart ref = " + appart.getReference() + " is updated");
+        log.info(APPART_LOG + appart.getReference() + " is updated");
         return AppartMapper.getMapper().dto(appart);
     }
 
@@ -113,7 +113,7 @@ public class AppartService implements AppartAppService {
         Appart appart = this.getAppartFromDatabase(refAppart);
         appart.setLocataire(null);
         appartRepository.save(appart);
-        log.info("Appart ref = " + appart.getReference() + " is updated");
+        log.info(APPART_LOG + appart.getReference() + " is updated");
         return AppartMapper.getMapper().dto(appart);
     }
 
@@ -121,7 +121,9 @@ public class AppartService implements AppartAppService {
         Appart appart = appartRepository.findByReference(refAppart).
                 orElseThrow(() -> new BusinessException(String.format("No appart found with this reference %s", refAppart),
                         NOT_FOUND));
-        log.info("Appart ref = " + appart.getReference() + " is found");
+        log.info(APPART_LOG + appart.getReference() + " is found");
         return appart;
     }
+
+    private static final String APPART_LOG = "Appart ref = ";
 }

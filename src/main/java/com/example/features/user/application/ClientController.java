@@ -7,12 +7,14 @@ package com.example.features.user.application;
 
 import com.example.exceptions.BusinessException;
 import com.example.exceptions.ValidationException;
+import com.example.features.accueil.domain.services.AuthenticationService;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.application.mapper.ClientDto;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.domain.services.impl.ClientService;
 import com.example.helper.ResponseHelper;
 import com.example.security.Role;
+import com.example.security.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,34 +29,21 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import java.util.List;
 
 /**
- * @author frup73532
+ * @author Joel NOUMIA
  */
 @RestController
 @RequestMapping("/users")
 public class ClientController {
 
-    private ClientAppService clientAppService;
+    protected ClientAppService clientAppService;
+    protected AuthenticationService authenticationService;
 
     @Autowired
-    public ClientController(ClientService clientAppService) {
+    public ClientController(ClientService clientAppService, AuthenticationService authenticationService) {
         this.clientAppService = clientAppService;
-    }
-
-
-    @Operation(summary = "Tous les Clients", description = "Tous les Clients")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = Client.class))),
-            @ApiResponse(responseCode = "404", description = "Erreur de saisie", content = @Content),
-            @ApiResponse(responseCode = "500", description = "An Internal Server Error occurred", content = @Content)
-
-    })
-    @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<List<ClientDto>> getAllClients() {
-        return ResponseEntity.ok(clientAppService.getAllClient());
+        this.authenticationService = authenticationService;
     }
 
 
@@ -73,7 +62,7 @@ public class ClientController {
         return addNewClient(erros, dto, Role.ADMIN);
     }
 
-    private ResponseEntity<ClientDto> addNewClient(Errors erros, ClientDto clientDto, Role clientRole) throws BusinessException {
+    protected ResponseEntity<ClientDto> addNewClient(Errors erros, ClientDto clientDto, Role clientRole) throws BusinessException {
         ResponseHelper.handle(erros);
         return ResponseEntity.ok(clientAppService.register(clientDto, clientRole));
 
@@ -87,32 +76,20 @@ public class ClientController {
 
     })
     @GetMapping("/{reference}")
+    @PreAuthorize(SecurityRule.CONNECTED_OR_ADMIN)
     public ResponseEntity<ClientDto> getClientByReference(
             @Parameter(description = "reference of Client")
             @NotBlank @PathVariable("reference") String reference) throws BusinessException {
         return ResponseEntity.ok(clientAppService.getClientByReference(reference));
     }
 
-    @GetMapping("/email/{email}")
-    public Client getClientByEmail(
-            @Parameter(description = "email of Client")
-            @NotBlank @PathVariable("email") String email) {
-        return clientAppService.getClientByEmail(email);
-    }
 
     @PutMapping(path = "/{reference}")
+    @PreAuthorize(SecurityRule.CONNECTED_OR_ADMIN)
     public ResponseEntity<ClientDto> updateClient(@RequestBody ClientDto ClientDto, Errors erros,
-
                                                   @NotBlank @PathVariable("reference") String reference) throws ValidationException, BusinessException {
         ResponseHelper.handle(erros);
         return ResponseEntity.ok(clientAppService.update(ClientDto, reference));
-    }
-
-
-    @DeleteMapping(path = "/{reference}")
-    public ResponseEntity<Void> deleteClient(@NotBlank @PathVariable("reference") String reference) throws BusinessException {
-        clientAppService.delete(reference);
-        return ResponseEntity.noContent().build();
     }
 
 

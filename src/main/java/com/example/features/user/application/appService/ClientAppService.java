@@ -2,6 +2,7 @@ package com.example.features.user.application.appService;
 
 import com.example.exceptions.BusinessException;
 import com.example.features.user.application.mapper.ClientDto;
+import com.example.features.user.application.mapper.UserInfoDto;
 import com.example.features.user.domain.entities.Client;
 import com.example.security.Role;
 
@@ -22,5 +23,7 @@ public interface ClientAppService {
     public void delete(String reference) throws BusinessException;
 
     public Client getClientFromDatabase(String reference) throws BusinessException;
+
+    public UserInfoDto getUserRole(UserInfoDto userInfoDto) throws BusinessException;
 
 }

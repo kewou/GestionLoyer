@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -71,8 +72,9 @@ public class IntegrationsTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ADMIN")
     public void getAllUserTest() throws Exception {
-        mockMvc.perform(get(URL).
+        mockMvc.perform(get("/admin/users").
                         contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -98,6 +100,7 @@ public class IntegrationsTest {
     }
 
     @Test
+    @WithMockUser(authorities = "ADMIN")
     public void getUserByReferenceTest() throws Exception {
         String val = mapper.writeValueAsString(ClientDto.builder()
                 .reference("test_id")
@@ -124,6 +127,7 @@ public class IntegrationsTest {
 
 
     @Test
+    @WithMockUser(authorities = "ADMIN")
     public void updateUserTest() throws Exception {
         String valPost = mapper.writeValueAsString(ClientDto.builder()
                 .reference("test_id")
@@ -157,6 +161,7 @@ public class IntegrationsTest {
 
     @Test
     @Transactional
+    @WithMockUser(authorities = "ADMIN")
     public void deleteUserTest() throws Exception {
         String val = mapper.writeValueAsString(ClientDto.builder()
                 .reference("test_id")
@@ -172,7 +177,7 @@ public class IntegrationsTest {
                 .content(val));
         Assertions.assertEquals(clientRepository.findAll().size(), 1);
         String ref = clientRepository.findAll().iterator().next().getReference();
-        this.mockMvc.perform(delete(URL + "/" + ref))
+        this.mockMvc.perform(delete("/admin/users/" + ref))
                 .andExpect(status().is(HttpStatus.NO_CONTENT.value()));
         Assertions.assertTrue(clientRepository.findAll().isEmpty());
 
@@ -180,6 +185,7 @@ public class IntegrationsTest {
 
 
     @Test
+    @WithMockUser(authorities = "ADMIN")
     public void createLogementTest() throws Exception {
         this.createUserTest();
         String logement = mapper.writeValueAsString(LogementDto.builder()
@@ -189,7 +195,7 @@ public class IntegrationsTest {
                 .build());
         Assertions.assertTrue(logementRepository.findAll().isEmpty());
 
-        mockMvc.perform(post(URL + "/refUser/logements/create")
+        mockMvc.perform(post("/bailleur/users/refUser/logements/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(logement))
                 .andDo(print())
@@ -199,6 +205,7 @@ public class IntegrationsTest {
 
 
     @Test
+    @WithMockUser(authorities = "ADMIN")
     public void createAppartTest() throws Exception {
         this.createLogementTest();
         String appart = mapper.writeValueAsString(AppartDto.builder()
@@ -219,6 +226,7 @@ public class IntegrationsTest {
 
 
     @Test
+    @WithMockUser(authorities = "ADMIN")
     public void createTransactionTest() throws Exception {
         this.createAppartTest();
         String transaction = mapper.writeValueAsString(TransactionDto.builder()

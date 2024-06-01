@@ -1,8 +1,8 @@
 package com.example.filter;
 
 import com.example.exceptions.BusinessException;
-import com.example.features.logement.domain.services.LogementService;
-import com.example.features.user.domain.services.impl.ClientService;
+import com.example.features.logement.application.appService.LogementAppService;
+import com.example.features.user.application.appService.ClientAppService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,22 +20,25 @@ import java.time.LocalDateTime;
 @Component
 public class ClientPreFilter extends OncePerRequestFilter {
 
-    @Autowired
-    ClientService clientService;
+    private ClientAppService clientAppService;
+    private LogementAppService logementAppService;
 
     @Autowired
-    LogementService logementService;
+    public ClientPreFilter(ClientAppService clientAppService, LogementAppService logementAppService) {
+        this.clientAppService = clientAppService;
+        this.logementAppService = logementAppService;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest,
                                     HttpServletResponse httpServletResponse,
                                     FilterChain filterChain) throws ServletException, IOException {
-        if (httpServletRequest.getRequestURI().matches("(?s).*\\/users\\/(.)+\\/logements(\\/\\d+|.*)")) {
+        if (httpServletRequest.getRequestURI().matches("(?s).*\\/bailleur/users\\/(.)+\\/logements(\\/\\d+|.*)")) {
             String pathInfo = httpServletRequest.getRequestURI();
             String[] parts = pathInfo.split("/");
-            String reference = parts[3];
+            String reference = parts[4];
             try {
-                clientService.getClientByReference(reference);
+                clientAppService.getClientByReference(reference);
             } catch (BusinessException e) {
                 sendErrorResponse(httpServletResponse, e.getMessage());
             }
@@ -44,11 +47,11 @@ public class ClientPreFilter extends OncePerRequestFilter {
         if (httpServletRequest.getRequestURI().matches("(?s).*\\/users\\/(.)+\\/logements\\/(\\d+)\\/apparts(\\/\\d+|.*)")) {
             String pathInfo = httpServletRequest.getRequestURI();
             String[] parts = pathInfo.split("/");
-            String reference = parts[3];
-            String logementRef = parts[5];
+            String reference = parts[4];
+            String logementRef = parts[6];
             try {
-                clientService.getClientByReference(reference);
-                logementService.getLogementByReference(logementRef);
+                clientAppService.getClientByReference(reference);
+                logementAppService.getLogementByReference(logementRef);
             } catch (BusinessException e) {
                 sendErrorResponse(httpServletResponse, e.getMessage());
             }

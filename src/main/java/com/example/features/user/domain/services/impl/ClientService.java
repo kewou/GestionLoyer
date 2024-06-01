@@ -9,6 +9,7 @@ import com.example.exceptions.BusinessException;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.application.mapper.ClientDto;
 import com.example.features.user.application.mapper.ClientMapper;
+import com.example.features.user.application.mapper.UserInfoDto;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.infra.ClientRepository;
 import com.example.security.Role;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,7 +37,7 @@ import static com.example.exceptions.BusinessException.BusinessErrorType.OTHER;
 @Transactional
 public class ClientService implements ClientAppService {
 
-    private ClientRepository clientRepository;
+    private final ClientRepository clientRepository;
 
     @Autowired
     public ClientService(ClientRepository clientRepository) {
@@ -95,15 +97,23 @@ public class ClientService implements ClientAppService {
     public Client getClientFromDatabase(String reference) throws BusinessException {
         Client client = clientRepository.findByReference(reference)
                 .orElseThrow(() -> new BusinessException(String.format("No user found with this reference %s", reference), NOT_FOUND));
-        log.info("Client {} is found ", client.getEmail());
+        log.info("Client {} is found ", reference);
         return client;
     }
 
-    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    @Override
+    public UserInfoDto getUserRole(UserInfoDto userInfoDto) throws BusinessException {
+        Set<String> roles = getClientByEmail(userInfoDto.getEmail()).getRoles();
+        Iterator<String> iterator = roles.iterator();
+        userInfoDto.setRole(iterator.next());
+        return userInfoDto;
+    }
+
+
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     private boolean checkIfClientExist(String email) {
         return clientRepository.findByEmail(email) != null;
     }
-
 
 }

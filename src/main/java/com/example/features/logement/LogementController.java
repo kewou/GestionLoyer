@@ -5,10 +5,12 @@ import com.example.exceptions.ValidationException;
 import com.example.features.logement.application.appService.LogementAppService;
 import com.example.features.logement.application.mapper.LogementDto;
 import com.example.helper.ResponseHelper;
+import com.example.security.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,10 +20,10 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users/{reference}/logements")
+@RequestMapping("/bailleur/users/{reference}/logements")
 public class LogementController {
 
-    private LogementAppService logementAppService;
+    private final LogementAppService logementAppService;
 
     @Autowired
     public LogementController(LogementAppService logementAppService) {
@@ -29,6 +31,7 @@ public class LogementController {
     }
 
     @GetMapping("")
+    @PreAuthorize(SecurityRule.CONNECTED_OR_ADMIN)
     @Operation(description = "Get list of all logement by user")
     public ResponseEntity<List<LogementDto>> getAllLogementByUser(@NotBlank @PathVariable("reference") String reference) throws BusinessException {
         return ResponseEntity.ok(logementAppService.getAllLogementByUser(reference));
@@ -36,6 +39,7 @@ public class LogementController {
 
 
     @PostMapping("/create")
+    @PreAuthorize(SecurityRule.CONNECTED_OR_ADMIN)
     public ResponseEntity<LogementDto> addNewLogement(@Valid @RequestBody LogementDto logementDto, Errors erros,
                                                       @NotBlank @PathVariable("reference") String reference) throws BusinessException {
         ResponseHelper.handle(erros);
@@ -45,6 +49,7 @@ public class LogementController {
 
 
     @GetMapping("/{refLgt}")
+    @PreAuthorize(SecurityRule.OWNER_LOGEMENT_OR_ADMIN)
     public ResponseEntity<LogementDto> getUserLogementByRef(
             @Parameter(description = "refLgt of Logement") @NotBlank @PathVariable("reference") String refUser,
             @NotBlank @PathVariable("refLgt") String refLgt) throws BusinessException {
@@ -52,6 +57,7 @@ public class LogementController {
     }
 
     @PutMapping("/{refLgt}")
+    @PreAuthorize(SecurityRule.OWNER_LOGEMENT_OR_ADMIN)
     public ResponseEntity<LogementDto> updateLogementByRef(@RequestBody LogementDto logementDto, Errors erros,
                                                            @Parameter(description = "reference of Logement")
                                                            @NotBlank @PathVariable("refLgt") String refLgt)
@@ -61,6 +67,7 @@ public class LogementController {
     }
 
     @DeleteMapping(path = "/{refLgt}")
+    @PreAuthorize(SecurityRule.ADMIN)
     public ResponseEntity<Void> deleteLogementByRef(@NotBlank @PathVariable("refLgt") String refLgt) throws BusinessException {
         logementAppService.deleteByReference(refLgt);
         return ResponseEntity.noContent().build();

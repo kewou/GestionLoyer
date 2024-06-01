@@ -11,7 +11,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -57,11 +56,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable() // protocole de sécurité qui gère un token
                 .authorizeRequests()
-                .antMatchers("/", "/*.js", "/*.css", "/assets/**", "/users/create*", "/authenticate").permitAll() // Tout le monde a accès à cette page
+                .antMatchers("/", "/assets/**", "/users/create*", "/authenticate", "/user-roles").permitAll() // Tout le monde a accès à cette page
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/admin").hasAuthority(Role.ADMIN.name())
-                .antMatchers("/bailleur").hasAnyAuthority(Role.ADMIN.name(), Role.BAILLEUR.name())
-                .antMatchers("/locataire").hasAnyAuthority(Role.ADMIN.name(), Role.LOCATAIRE.name())
+                .antMatchers("/admin/**").hasAuthority(Role.ADMIN.name())
+                .antMatchers("/bailleur/**").hasAnyAuthority(Role.ADMIN.name(), Role.BAILLEUR.name())
+                .antMatchers("/locataire/**").hasAnyAuthority(Role.ADMIN.name(), Role.LOCATAIRE.name())
                 .anyRequest().authenticated()   // toutes les requetes doivent etre authentifiées
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -72,7 +71,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterAfter(clientPreFilter, JwtFilter.class);
     }
 
-
+    /*
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
@@ -81,5 +80,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/swagger-ui-custom.html", "/swagger-ui.html", "/api-docs", "/actuator", "/index.html")
                 .antMatchers();
     }
+    */
 
 }

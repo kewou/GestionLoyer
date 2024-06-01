@@ -28,10 +28,10 @@ import static com.example.exceptions.BusinessException.BusinessErrorType.OTHER;
 @Transactional
 public class TransactionService implements TransactionAppService {
 
-    private ClientAppService clientAppService;
-    private AppartAppService appartAppService;
-    private TransactionRepository transactionRepository;
-    private LoyerRepository loyerRepository;
+    private final ClientAppService clientAppService;
+    private final AppartAppService appartAppService;
+    private final TransactionRepository transactionRepository;
+    private final LoyerRepository loyerRepository;
 
     @Autowired
     public TransactionService(ClientAppService clientAppService, TransactionRepository transactionRepository,
