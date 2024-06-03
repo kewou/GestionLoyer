@@ -10,6 +10,7 @@ import com.example.features.logement.application.appService.LogementAppService;
 import com.example.features.logement.domain.entities.Logement;
 import com.example.features.loyer.domain.entities.Loyer;
 import com.example.features.loyer.infra.LoyerRepository;
+import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.domain.entities.Client;
 import com.example.utils.GeneralUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +32,15 @@ public class AppartService implements AppartAppService {
     private final LogementAppService logementAppService;
     private final AppartRepository appartRepository;
     private final LoyerRepository loyerRepository;
+    private final ClientAppService clientAppService;
 
     @Autowired
-    public AppartService(LogementAppService logementAppService, AppartRepository appartRepository, LoyerRepository loyerRepository) {
+    public AppartService(LogementAppService logementAppService, AppartRepository appartRepository,
+                         LoyerRepository loyerRepository, ClientAppService clientAppService) {
         this.logementAppService = logementAppService;
         this.appartRepository = appartRepository;
         this.loyerRepository = loyerRepository;
+        this.clientAppService = clientAppService;
     }
 
     public List<AppartDto> getAllAppartByLogement(String refLgt) throws BusinessException {
@@ -99,9 +103,9 @@ public class AppartService implements AppartAppService {
         return appartRepository.findSuggestionsByNomStartingWithIgnoreCase(term);
     }
 
-    public AppartDto updateAppartAssigneLocataire(String refAppart, String refLgt) throws BusinessException {
+    public AppartDto updateAppartAssigneLocataire(String refAppart, String refUser) throws BusinessException {
         Appart appart = this.getAppartFromDatabase(refAppart);
-        Client locataire = logementAppService.getLogementFromDatabase(refLgt).getClient();
+        Client locataire = clientAppService.getClientFromDatabase(refUser);
         appart.setLocataire(locataire);
         appartRepository.save(appart);
         log.info(APPART_LOG + appart.getReference() + " is updated");

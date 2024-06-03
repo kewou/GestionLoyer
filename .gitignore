@@ -45,3 +45,4 @@ release.properties
 pom.xml.releaseBackup
 Jenkinsfile
 src/main/resources/static/*
+BasicApplication.run.xml
