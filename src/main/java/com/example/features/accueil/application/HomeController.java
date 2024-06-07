@@ -2,7 +2,10 @@ package com.example.features.accueil.application;
 
 import com.example.exceptions.AuthenticationException;
 import com.example.exceptions.BusinessException;
+import com.example.features.accueil.application.dto.MessageCreateDto;
 import com.example.features.accueil.domain.services.AuthenticationService;
+import com.example.features.common.mail.application.MessageService;
+import com.example.features.common.mail.dto.MessageDto;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.application.mapper.UserInfoDto;
 import com.example.features.user.domain.entities.Client;
@@ -10,6 +13,7 @@ import com.example.helper.ResponseHelper;
 import com.example.utils.JWTUtils;
 import com.example.utils.jwt.JwtRequest;
 import com.example.utils.jwt.JwtResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,7 +25,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+import java.util.List;
+
 @RestController
+@Slf4j
 public class HomeController {
 
     @Autowired
@@ -35,6 +43,8 @@ public class HomeController {
 
     @Autowired
     private ClientAppService clientAppService;
+    @Autowired
+    private MessageService messageService;
 
 
     @PostMapping("/authenticate")
@@ -70,5 +80,18 @@ public class HomeController {
     @GetMapping("/locataire")
     public String homePrivee() {
         return "Welcome to your Perso Page Locataire";
+    }
+
+    @PostMapping("/contact")
+    public void contact(@Valid @RequestBody MessageCreateDto messageCreateDto, Errors errors) {
+        ResponseHelper.handle(errors);
+        log.info("Message envoyé {} - {}", messageCreateDto.getSenderName(), messageCreateDto.getMessage());
+        MessageDto messageDto = MessageDto.builder()
+                .sender(messageCreateDto.getSenderMail())
+                .message(messageCreateDto.getMessage())
+                .subject("Contact utilisateur")
+                .recipients(List.of("cnantchouang-ext@nexity.fr"))
+                .build();
+        messageService.sendMessage(messageDto);
     }
 }

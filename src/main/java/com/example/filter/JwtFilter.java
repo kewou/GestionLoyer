@@ -31,6 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
         if (httpServletRequest.getMethod().equals(HttpMethod.OPTIONS.name())
                 || httpServletRequest.getRequestURI().equalsIgnoreCase("/beezyApi/authenticate") // Authentification
                 || httpServletRequest.getRequestURI().equalsIgnoreCase("/beezyApi/user-roles") // Profil user
+                || httpServletRequest.getRequestURI().equalsIgnoreCase("/beezyApi/contact") // Profil user
                 || httpServletRequest.getRequestURI().startsWith("/beezyApi/users/create") // Inscription
                 || httpServletRequest.getRequestURI().equalsIgnoreCase("/beezyApi/") // Page d'acceuil
                 || httpServletRequest.getRequestURI().startsWith("/beezyApi/assets/")
