@@ -23,11 +23,13 @@ public class ValidationException extends ConstraintDeclarationException {
         this.errors = errors;
     }
 
-    public List<String> errorCodes() {
+    public List<ObjectError> getErrors() {
+        return errors;
+    }
+
+    public List<ErrorCode> errorCodes() {
         return Objects.requireNonNull(errors).stream()
-                .map(ObjectError::getCodes)
-                .filter(Objects::nonNull)
-                .map(data -> data[0])
+                .map(objectError -> new ErrorCode(objectError.getCode(), objectError.getObjectName(), objectError.getDefaultMessage()))
                 .collect(Collectors.toList());
     }
 }
