@@ -11,6 +11,7 @@ import com.example.features.user.domain.services.impl.ClientService;
 import com.example.features.user.infra.ClientRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.IntNode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -295,6 +296,13 @@ public class IntegrationsTest {
         JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res).get(0);
         String nom = resNode.get("nom").asText();
         Assertions.assertEquals(nom, "beezyAppart");
+        // test génération automatique du premier loyer
+        JsonNode loyers = resNode.get("loyers");
+        Assertions.assertEquals(loyers.size(), 1);
+        JsonNode loyer = loyers.get(0);
+        Assertions.assertEquals(loyer.get("solde"), new IntNode(-500)); // 500 étant le prix du loyer de l'appart créer
+
+
     }
 
     @Test
@@ -372,6 +380,24 @@ public class IntegrationsTest {
                 .andDo(print())
                 .andExpect(status().is(HttpStatus.CREATED.value()));
         Assertions.assertEquals(transactionRepository.findAll().size(), 1);
+
+        // Test de l'effet de la transaction sur l'appartement
+
+        String res = mockMvc.perform(get("/users/refUser/logements/refLgt/apparts")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn().getResponse().getContentAsString();
+
+        JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res).get(0);
+        String nom = resNode.get("nom").asText();
+        Assertions.assertEquals(nom, "beezyAppart");
+        // test génération automatique du premier loyer
+        JsonNode loyers = resNode.get("loyers");
+        Assertions.assertEquals(loyers.size(), 1);
+        JsonNode loyer = loyers.get(0);
+        Assertions.assertEquals(loyer.get("solde"), new IntNode(0));
+
+
     }
 
 }
