@@ -1,5 +1,6 @@
 package com.example.utils;
 
+import com.example.features.user.domain.entities.UserDetailsCustom;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -58,8 +59,9 @@ public class JWTUtils implements Serializable {
 
 
     //generate token for user
-    public String generateToken(UserDetails userDetails) throws UnsupportedEncodingException {
+    public String generateToken(UserDetailsCustom userDetails) throws UnsupportedEncodingException {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("reference", userDetails.getReference());
         return doGenerateToken(claims, URLEncoder.encode(userDetails.getUsername(), StandardCharsets.UTF_8));
     }
 

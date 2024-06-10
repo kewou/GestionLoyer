@@ -59,6 +59,7 @@ public class LogementController {
     @PutMapping("/{refLgt}")
     @PreAuthorize(SecurityRule.OWNER_LOGEMENT_OR_ADMIN)
     public ResponseEntity<LogementDto> updateLogementByRef(@RequestBody LogementDto logementDto, Errors erros,
+                                                           @Parameter(description = "refLgt of Logement") @NotBlank @PathVariable("reference") String refUser,
                                                            @Parameter(description = "reference of Logement")
                                                            @NotBlank @PathVariable("refLgt") String refLgt)
             throws ValidationException, BusinessException {

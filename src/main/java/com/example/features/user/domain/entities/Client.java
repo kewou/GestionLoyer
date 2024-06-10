@@ -13,7 +13,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -28,7 +27,7 @@ import java.util.Set;
 @Setter
 @Builder
 @AllArgsConstructor
-public class Client implements UserDetails {
+public class Client implements UserDetailsCustom {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -110,4 +109,8 @@ public class Client implements UserDetails {
 
     }
 
+    @Override
+    public String getReference() {
+        return this.reference;
+    }
 }

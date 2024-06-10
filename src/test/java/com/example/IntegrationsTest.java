@@ -11,6 +11,7 @@ import com.example.features.user.domain.services.impl.ClientService;
 import com.example.features.user.infra.ClientRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.IntNode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -203,6 +204,64 @@ public class IntegrationsTest {
         Assertions.assertEquals(logementRepository.findAll().size(), 1);
     }
 
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    public void getLogementsByUserTest() throws Exception {
+        createLogementTest();
+
+
+        String res = mockMvc.perform(get("/bailleur/users/refUser/logements")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn().getResponse().getContentAsString();
+        Assertions.assertEquals(logementRepository.findAll().size(), 1);
+        JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res).get(0);
+        String idRef = resNode.get("description").asText();
+        Assertions.assertEquals(idRef, "immeuble");
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    public void getOneLogementByUserTest() throws Exception {
+        createLogementTest();
+
+
+        String res = mockMvc.perform(get("/bailleur/users/refUser/logements/refLgt")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn().getResponse().getContentAsString();
+        Assertions.assertEquals(logementRepository.findAll().size(), 1);
+        JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res);
+        String description = resNode.get("description").asText();
+        Assertions.assertEquals(description, "immeuble");
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    public void updateOneLogementByUserTest() throws Exception {
+        createLogementTest();
+
+        HashMap<String, Object> m = new HashMap<String, Object>();
+        m.put("description", "Duplex");
+        String valPut = mapper.writeValueAsString(m);
+
+        mockMvc.perform(put("/bailleur/users/refUser/logements/refLgt")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(valPut))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn().getResponse().getContentAsString();
+
+        String res = mockMvc.perform(get("/bailleur/users/refUser/logements/refLgt")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn().getResponse().getContentAsString();
+
+
+        JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res);
+        String description = resNode.get("description").asText();
+        Assertions.assertEquals(description, "Duplex");
+    }
+
 
     @Test
     @WithMockUser(authorities = "ADMIN")
@@ -224,6 +283,87 @@ public class IntegrationsTest {
         Assertions.assertEquals(appartRepository.findAll().size(), 1);
     }
 
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    public void getListAppartByLogementTest() throws Exception {
+        createAppartTest();
+
+        String res = mockMvc.perform(get("/users/refUser/logements/refLgt/apparts")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn().getResponse().getContentAsString();
+
+        JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res).get(0);
+        String nom = resNode.get("nom").asText();
+        Assertions.assertEquals(nom, "beezyAppart");
+        // test génération automatique du premier loyer
+        JsonNode loyers = resNode.get("loyers");
+        Assertions.assertEquals(loyers.size(), 1);
+        JsonNode loyer = loyers.get(0);
+        Assertions.assertEquals(loyer.get("solde"), new IntNode(-500)); // 500 étant le prix du loyer de l'appart créer
+
+
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    public void getOneAppartByLogementTest() throws Exception {
+        createAppartTest();
+
+        String res = mockMvc.perform(get("/users/refUser/logements/refLgt/apparts/refAppart")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn().getResponse().getContentAsString();
+
+        JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res);
+        String nom = resNode.get("nom").asText();
+        Assertions.assertEquals(nom, "beezyAppart");
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    public void updateOneAppartByLogementTest() throws Exception {
+        createAppartTest();
+
+        HashMap<String, Object> m = new HashMap<String, Object>();
+        m.put("nom", "JoelAppart");
+        String valPut = mapper.writeValueAsString(m);
+
+        mockMvc.perform(put("/users/refUser/logements/refLgt/apparts/refAppart")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(valPut))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn().getResponse().getContentAsString();
+
+        String res = mockMvc.perform(get("/users/refUser/logements/refLgt/apparts/refAppart")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn().getResponse().getContentAsString();
+
+        JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res);
+        String nom = resNode.get("nom").asText();
+        Assertions.assertEquals(nom, "JoelAppart");
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    public void mettreLocataireDansAppartTest() throws Exception {
+        createAppartTest();
+
+        mockMvc.perform(patch("/users/refUser/logements/refLgt/apparts/refAppart/nouveau-locataire/refUser")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn().getResponse().getContentAsString();
+
+        String res = mockMvc.perform(get("/users/refUser/logements/refLgt/apparts/refAppart")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn().getResponse().getContentAsString();
+
+        JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res);
+        Assertions.assertNotNull(resNode);
+    }
+
 
     @Test
     @WithMockUser(authorities = "ADMIN")
@@ -240,6 +380,24 @@ public class IntegrationsTest {
                 .andDo(print())
                 .andExpect(status().is(HttpStatus.CREATED.value()));
         Assertions.assertEquals(transactionRepository.findAll().size(), 1);
+
+        // Test de l'effet de la transaction sur l'appartement
+
+        String res = mockMvc.perform(get("/users/refUser/logements/refLgt/apparts")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn().getResponse().getContentAsString();
+
+        JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res).get(0);
+        String nom = resNode.get("nom").asText();
+        Assertions.assertEquals(nom, "beezyAppart");
+        // test génération automatique du premier loyer
+        JsonNode loyers = resNode.get("loyers");
+        Assertions.assertEquals(loyers.size(), 1);
+        JsonNode loyer = loyers.get(0);
+        Assertions.assertEquals(loyer.get("solde"), new IntNode(0));
+
+
     }
 
 }

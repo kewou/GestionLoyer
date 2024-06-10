@@ -7,6 +7,7 @@ import com.example.features.appart.application.mapper.AppartDto;
 import com.example.helper.ResponseHelper;
 import com.example.security.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,9 +31,11 @@ public class AppartController {
     }
 
     @GetMapping("")
-    @PreAuthorize(SecurityRule.OWNER_BAILLEUR_APPART_OR_ADMIN)
+    @PreAuthorize(SecurityRule.OWNER_LOGEMENT_OR_ADMIN)
     @Operation(description = "Get list of all appart by logement")
-    public ResponseEntity<List<AppartDto>> getAllAppartByLogement(@NotBlank @PathVariable("refLgt") String refLgt) throws BusinessException {
+    public ResponseEntity<List<AppartDto>> getAllAppartOfLogement(
+            @Parameter(description = "refUser of User") @NotBlank @PathVariable("reference") String refUser,
+            @NotBlank @PathVariable("refLgt") String refLgt) throws BusinessException {
         return ResponseEntity.ok(appartAppService.getAllAppartByLogement(refLgt));
     }
 
@@ -48,7 +51,8 @@ public class AppartController {
 
     @GetMapping("/{refAppart}")
     @PreAuthorize(SecurityRule.OWNER_BAILLEUR_APPART_OR_ADMIN + "or" + SecurityRule.OWNER_LOCATAIRE_APPART_OR_ADMIN)
-    public ResponseEntity<AppartDto> getAppartLogementByRef(
+    public ResponseEntity<AppartDto> getOneAppartOfLogements(
+            @Parameter(description = "refUser of User") @NotBlank @PathVariable("reference") String refUser,
             @NotBlank @PathVariable("refLgt") String refLgt,
             @NotBlank @PathVariable("refAppart") String refAppart) throws BusinessException {
         return ResponseEntity.ok(appartAppService.getLogementApprtByRef(refLgt, refAppart));
@@ -58,6 +62,7 @@ public class AppartController {
     @PreAuthorize(SecurityRule.OWNER_BAILLEUR_APPART_OR_ADMIN)
     public ResponseEntity<AppartDto> updateAppartLogementByRef(
             @RequestBody AppartDto appartDto, Errors erros,
+            @Parameter(description = "refUser of User") @NotBlank @PathVariable("reference") String refUser,
             @NotBlank @PathVariable("refAppart") String refAppart) throws ValidationException, BusinessException {
         ResponseHelper.handle(erros);
         return ResponseEntity.ok(appartAppService.updateLogementByRef(appartDto, refAppart));
@@ -73,6 +78,7 @@ public class AppartController {
     @PatchMapping("/{refAppart}/nouveau-locataire/{referenceLocataire}")
     @PreAuthorize(SecurityRule.OWNER_BAILLEUR_APPART_OR_ADMIN)
     public ResponseEntity<AppartDto> updateAppartAssigneLocataire(
+            @Parameter(description = "refUser of User") @NotBlank @PathVariable("reference") String refUser,
             @NotBlank @PathVariable("referenceLocataire") String referenceLocataire,
             @NotBlank @PathVariable("refAppart") String refAppart) throws ValidationException, BusinessException {
         return ResponseEntity.ok(appartAppService.updateAppartAssigneLocataire(refAppart, referenceLocataire));
@@ -81,6 +87,7 @@ public class AppartController {
     @PatchMapping("/{refAppart}/sortir-locataire/{referenceLocataire}")
     @PreAuthorize(SecurityRule.OWNER_BAILLEUR_APPART_OR_ADMIN)
     public ResponseEntity<AppartDto> updateAppartSortLocataire(
+            @Parameter(description = "refUser of User") @NotBlank @PathVariable("reference") String refUser,
             @NotBlank @PathVariable("refAppart") String refAppart) throws ValidationException, BusinessException {
         return ResponseEntity.ok(appartAppService.updateAppartSortirLocataire(refAppart));
     }

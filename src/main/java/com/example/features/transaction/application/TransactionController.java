@@ -29,11 +29,11 @@ public class TransactionController {
     @PostMapping("/{refAppart}/nouvelle-transaction")
     @PreAuthorize(SecurityRule.OWNER_BAILLEUR_APPART_OR_ADMIN + "or" + SecurityRule.OWNER_LOCATAIRE_APPART_OR_ADMIN)
     public ResponseEntity<TransactionDto> addNewTransaction(@Valid @RequestBody TransactionDto transactionDto, Errors erros,
-                                                            @NotBlank @PathVariable("reference") String reference,
+                                                            @NotBlank @PathVariable("reference") String refUser,
                                                             @NotBlank @PathVariable("refAppart") String refAppart) throws BusinessException {
         URI uri = URI.create("/users/" + "/ref/" + "/apparts");
         ResponseHelper.handle(erros);
-        return ResponseEntity.created(uri).body(transactionAppService.register(reference, transactionDto, refAppart));
+        return ResponseEntity.created(uri).body(transactionAppService.register(refUser, transactionDto, refAppart));
     }
 
 
