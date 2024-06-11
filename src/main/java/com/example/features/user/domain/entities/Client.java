@@ -51,6 +51,9 @@ public class Client implements UserDetailsCustom {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "isEnabled")
+    private Boolean isEnabled = false;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "client_id"))
     @Column(name = "role")
@@ -86,7 +89,7 @@ public class Client implements UserDetailsCustom {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
     }
 
     @Override
