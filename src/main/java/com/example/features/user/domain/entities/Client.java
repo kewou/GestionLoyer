@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -52,7 +53,15 @@ public class Client implements UserDetailsCustom {
     private String password;
 
     @Column(name = "isEnabled")
-    private Boolean isEnabled = false;
+    private Boolean isEnabled = Boolean.FALSE;
+
+    private String verificationToken;
+
+    @PostPersist
+    private void generateVerificationToken() {
+        int desiredLength = 30;
+        verificationToken = RandomStringUtils.randomAlphanumeric(desiredLength);
+    }
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "client_id"))
