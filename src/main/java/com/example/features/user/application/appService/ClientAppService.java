@@ -26,4 +26,6 @@ public interface ClientAppService {
 
     public UserInfoDto getUserRole(UserInfoDto userInfoDto) throws BusinessException;
 
+    void validateToken(Client client);
+
 }

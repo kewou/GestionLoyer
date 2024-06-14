@@ -10,17 +10,21 @@ import com.example.exceptions.ValidationException;
 import com.example.features.accueil.domain.services.AuthenticationService;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.application.mapper.ClientDto;
+import com.example.features.user.application.mapper.VerificationUserInscriptionDto;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.domain.services.impl.ClientService;
 import com.example.helper.ResponseHelper;
 import com.example.security.Role;
 import com.example.security.SecurityRule;
+import com.example.utils.JWTUtils;
+import com.example.utils.jwt.JwtResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,21 +33,26 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import java.io.UnsupportedEncodingException;
 
 /**
  * @author Joel NOUMIA
  */
 @RestController
+@Slf4j
 @RequestMapping("/users")
 public class ClientController {
 
     protected ClientAppService clientAppService;
     protected AuthenticationService authenticationService;
 
+    protected JWTUtils jwtUtils;
+
     @Autowired
-    public ClientController(ClientService clientAppService, AuthenticationService authenticationService) {
+    public ClientController(ClientService clientAppService, AuthenticationService authenticationService, JWTUtils jwtUtils) {
         this.clientAppService = clientAppService;
         this.authenticationService = authenticationService;
+        this.jwtUtils = jwtUtils;
     }
 
 
@@ -90,6 +99,19 @@ public class ClientController {
                                                   @NotBlank @PathVariable("reference") String reference) throws ValidationException, BusinessException {
         ResponseHelper.handle(erros);
         return ResponseEntity.ok(clientAppService.update(ClientDto, reference));
+    }
+
+    @PostMapping(path="/verify-account")
+    public JwtResponse verifyAccount(@RequestBody VerificationUserInscriptionDto verificationUserInscriptionDto) throws BusinessException, UnsupportedEncodingException {
+        final Client client = clientAppService.getClientFromDatabase(verificationUserInscriptionDto.getReference());
+        log.warn("Token values {}-{}", client.getVerificationToken(), verificationUserInscriptionDto.getVerificationToken());
+        if (verificationUserInscriptionDto.getVerificationToken() != null
+                && !verificationUserInscriptionDto.getVerificationToken().equals(client.getVerificationToken())) {
+            throw new BusinessException("invalid operation");
+        }
+        clientAppService.validateToken(client);
+        final String token = jwtUtils.generateToken(client);
+        return new JwtResponse(token);
     }
 
 

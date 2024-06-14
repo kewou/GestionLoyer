@@ -46,7 +46,7 @@ public class ClientService implements ClientAppService {
     @Value("${inscription.message}")
     private String inscriptionMessage;
 
-    @Value("${uri.site:https://beezyweb.net}")
+    @Value("${inscription.validation.uri:https://beezyweb.net/login}")
     private String uriSite;
 
     @Value("${inscription.sender}")
@@ -91,7 +91,7 @@ public class ClientService implements ClientAppService {
                         client.getReference(),
                         verificationToken),
                 "https://beezyweb.net") : "Vous êtes bien inscrits";
-        log.info("Mail {}", message);
+        log.debug("Mail {}", message);
         messageService.sendMessage(
                 MessageDto.builder()
                         .subject("Beezyweb : Validation de votre compte")
@@ -140,6 +140,13 @@ public class ClientService implements ClientAppService {
         Iterator<String> iterator = roles.iterator();
         userInfoDto.setRole(iterator.next());
         return userInfoDto;
+    }
+
+    @Override
+    public void validateToken(Client client) {
+        client.setVerificationToken(null);
+        client.setIsEnabled(true);
+        clientRepository.save(client);
     }
 
 

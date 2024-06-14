@@ -53,7 +53,7 @@ public class Client implements UserDetailsCustom {
     private String password;
 
     @Column(name = "isEnabled")
-    private Boolean isEnabled = Boolean.FALSE;
+    private Boolean isEnabled;
 
     private String verificationToken;
 
@@ -61,6 +61,7 @@ public class Client implements UserDetailsCustom {
     private void generateVerificationToken() {
         int desiredLength = 30;
         verificationToken = RandomStringUtils.randomAlphanumeric(desiredLength);
+        isEnabled = Boolean.FALSE;
     }
 
     @ElementCollection(fetch = FetchType.EAGER)
