@@ -2,6 +2,7 @@ package com.example;
 
 import com.example.features.appart.application.mapper.AppartDto;
 import com.example.features.appart.infra.AppartRepository;
+import com.example.features.common.mail.application.MessageService;
 import com.example.features.logement.application.mapper.LogementDto;
 import com.example.features.logement.infra.LogementRepository;
 import com.example.features.transaction.application.mapper.TransactionDto;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -59,6 +61,10 @@ public class IntegrationsTest {
     @Autowired
     MockMvc mockMvc;
 
+    @Autowired
+    @Qualifier("loggingMailService")
+    MessageService messageService;
+
 
     @BeforeEach
     public void setUp() {
@@ -68,7 +74,7 @@ public class IntegrationsTest {
         transactionRepository.deleteAll();
     }
 
-    @Test
+
     void contextLoads() {
     }
 

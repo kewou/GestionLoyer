@@ -2,8 +2,6 @@ package com.example.config;
 
 
 import com.example.config.properties.InfoProperties;
-import com.example.features.common.mail.application.MessageService;
-import com.example.features.common.mail.domain.SimpleMailService;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
@@ -23,11 +21,9 @@ public class ApplicationConfiguration {
         SpringDocUtils.getConfig().replaceWithClass(org.springframework.data.domain.Pageable.class, SpringDataWebProperties.Pageable.class);
     }
 
-    @Autowired
-    InfoProperties infoProperties;
 
     @Bean
-    public OpenAPI openApi() {
+    public OpenAPI openApi(InfoProperties infoProperties) {
         return new OpenAPI().addServersItem(new Server().url(infoProperties.getServerUrl()))
                 .info(new Info().title(infoProperties.getTitle()).description(infoProperties.getDescription())
                         .version(infoProperties.getVersion()));
@@ -46,10 +42,5 @@ public class ApplicationConfiguration {
 
 
         return new CorsFilter(source);
-    }
-
-    @Bean
-    public MessageService messageService() {
-        return new SimpleMailService();
     }
 }
