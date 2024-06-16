@@ -6,6 +6,8 @@
 package com.example.features.user.domain.services.impl;
 
 import com.example.exceptions.BusinessException;
+import com.example.features.common.mail.application.MessageService;
+import com.example.features.common.mail.dto.MessageDto;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.application.mapper.ClientDto;
 import com.example.features.user.application.mapper.ClientMapper;
@@ -15,7 +17,7 @@ import com.example.features.user.infra.ClientRepository;
 import com.example.security.Role;
 import com.example.utils.GeneralUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,9 +41,20 @@ public class ClientService implements ClientAppService {
 
     private final ClientRepository clientRepository;
 
-    @Autowired
-    public ClientService(ClientRepository clientRepository) {
+    private final MessageService messageService;
+
+    @Value("${inscription.message}")
+    private String inscriptionMessage;
+
+    @Value("${inscription.validation.uri:https://beezyweb.net/login}")
+    private String uriSite;
+
+    @Value("${inscription.sender}")
+    private String inscriptionSender;
+
+    public ClientService(ClientRepository clientRepository, MessageService messageService) {
         this.clientRepository = clientRepository;
+        this.messageService = messageService;
     }
 
     public List<ClientDto> getAllClient() {
@@ -63,10 +76,30 @@ public class ClientService implements ClientAppService {
             client.setRoles(roles);
             clientRepository.save(client);
             log.info("Client {} is created ", client.getReference());
+            sendInscriptionMail(client);
             return ClientMapper.getMapper().dto(client);
         } else {
             throw new BusinessException(String.format("Client with email %s is already exist on database", client.getEmail()), OTHER);
         }
+    }
+
+    private void sendInscriptionMail(Client client) {
+        final String verificationToken = client.getVerificationToken() != null ? client.getVerificationToken() : "token_generated";
+        final String message = inscriptionMessage != null ? String.format(inscriptionMessage,
+                String.format("%s %s", client.getLastName(), client.getName()),
+                String.format("%s#%s/%s", uriSite,
+                        client.getReference(),
+                        verificationToken),
+                "https://beezyweb.net") : "Vous êtes bien inscrits";
+        log.debug("Mail {}", message);
+        messageService.sendMessage(
+                MessageDto.builder()
+                        .subject("Beezyweb : Validation de votre compte")
+                        .sender(inscriptionSender)
+                        .recipients(List.of(client.getEmail()))
+                        .message(message)
+                        .build()
+        );
     }
 
 
@@ -107,6 +140,13 @@ public class ClientService implements ClientAppService {
         Iterator<String> iterator = roles.iterator();
         userInfoDto.setRole(iterator.next());
         return userInfoDto;
+    }
+
+    @Override
+    public void validateToken(Client client) {
+        client.setVerificationToken(null);
+        client.setIsEnabled(true);
+        clientRepository.save(client);
     }
 
 

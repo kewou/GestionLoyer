@@ -7,6 +7,7 @@ import com.example.features.user.application.mapper.ClientDto;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.domain.services.impl.ClientService;
 import com.example.security.SecurityRule;
+import com.example.utils.JWTUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -29,8 +30,8 @@ import java.util.List;
 public class ClientAdminController extends ClientController {
 
     @Autowired
-    public ClientAdminController(ClientService clientAppService, AuthenticationService authenticationService) {
-        super(clientAppService, authenticationService);
+    public ClientAdminController(ClientService clientAppService, AuthenticationService authenticationService, JWTUtils jwtUtils) {
+        super(clientAppService, authenticationService, jwtUtils);
     }
 
 
