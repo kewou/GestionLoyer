@@ -86,7 +86,7 @@ public class ClientService implements ClientAppService {
     private void sendInscriptionMail(Client client) {
         final String verificationToken = client.getVerificationToken() != null ? client.getVerificationToken() : "token_generated";
         final String message = inscriptionMessage != null ? String.format(inscriptionMessage,
-                String.format("%s %s", client.getLastName(), client.getName()),
+                String.format("%s %s", client.getName(), client.getLastName()),
                 String.format("%s#%s/%s", uriSite,
                         client.getReference(),
                         verificationToken),
