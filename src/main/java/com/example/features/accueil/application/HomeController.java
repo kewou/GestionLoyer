@@ -59,11 +59,7 @@ public class HomeController {
         } catch (BadCredentialsException e) {
             throw new AuthenticationException("INVALID CREDENTIAL");
         }
-        // Identifiants user + pass ok => On cree le token JWT
-        /*
-        final Client userDetails = authenticationService.loadUserByUsername(jwtRequest.getUsername());
-        final String token = jwtUtils.generateToken(userDetails);
-        */
+
         Client client = clientAppService.getClientByEmail(jwtRequest.getUsername());
         final String token = jwtUtils.generateToken(client);
         return new JwtResponse(token);
@@ -90,7 +86,7 @@ public class HomeController {
                 .sender(messageCreateDto.getSenderMail())
                 .message(messageCreateDto.getMessage())
                 .subject("Contact utilisateur")
-                .recipients(List.of("cnantchouang-ext@nexity.fr"))
+                .recipients(List.of("kewou.noumia@gmail.com"))
                 .build();
         messageService.sendMessage(messageDto);
     }
