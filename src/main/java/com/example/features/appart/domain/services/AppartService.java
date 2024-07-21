@@ -57,7 +57,7 @@ public class AppartService implements AppartAppService {
         appart.setBailleur(logement.getClient());
         Loyer newLoyerVide = new Loyer(appart);
         newLoyerVide.setDateLoyer(LocalDate.now());
-        if (newLoyerVide.getReference() == null) {
+        if (newLoyerVide.getReference() == "" || newLoyerVide.getReference() == null) {
             newLoyerVide.setReference(GeneralUtils.generateReference());
         }
         if (appart.getReference() == null) {

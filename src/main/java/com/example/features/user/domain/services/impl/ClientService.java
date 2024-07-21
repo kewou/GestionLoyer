@@ -67,7 +67,7 @@ public class ClientService implements ClientAppService {
     public ClientDto register(ClientDto clientDto, Role clientRole) throws BusinessException {
         Client client = ClientMapper.getMapper().entitie(clientDto);
         if (!checkIfClientExist(client.getEmail())) {
-            if (client.getReference() == null) {
+            if (client.getReference() == "" || client.getReference() == null) {
                 client.setReference(GeneralUtils.generateReference());
             }
             client.setPassword(encoder.encode(client.getPassword()));

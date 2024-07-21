@@ -74,7 +74,7 @@ public class IntegrationsTest {
         transactionRepository.deleteAll();
     }
 
-
+    @Test
     void contextLoads() {
     }
 
@@ -196,7 +196,8 @@ public class IntegrationsTest {
     public void createLogementTest() throws Exception {
         this.createUserTest();
         String logement = mapper.writeValueAsString(LogementDto.builder()
-                .address("Nkomkana")
+                .quartier("Nkomkana")
+                .ville("Yaoundé")
                 .description("immeuble")
                 .reference("refLgt")
                 .build());

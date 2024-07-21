@@ -44,13 +44,13 @@ public class LogementService implements LogementAppService {
     public LogementDto register(String reference, LogementDto logementDto) throws BusinessException {
         Client client = clientAppService.getClientFromDatabase(reference);
         Logement logement = LogementMapper.getMapper().entitie(logementDto);
-        if (logement.getReference() == null) {
+        if (logement.getReference() == "" || logement.getReference() == null) {
             logement.setReference(GeneralUtils.generateReference());
         }
         logement.setClient(client);
         logementRepository.save(logement);
         log.info(LOGEMENT_LOG + logement.getReference() + " is created");
-        return logementDto;
+        return LogementMapper.getMapper().dto(logement);
     }
 
 

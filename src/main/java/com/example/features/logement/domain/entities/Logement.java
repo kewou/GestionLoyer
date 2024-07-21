@@ -23,8 +23,11 @@ public class Logement implements Serializable {
     @Column(name = "reference", unique = true)
     private String reference;
 
-    @Column(name = "address", unique = true)
-    private String address;
+    @Column(name = "quartier")
+    private String quartier;
+
+    @Column(name = "ville")
+    private String ville;
 
     @Column(name = "description")
     private String description;
@@ -40,8 +43,8 @@ public class Logement implements Serializable {
     public Logement() {
     }
 
-    public Logement(String address) {
-        this.address = address;
+    public Logement(String quartier) {
+        this.quartier = quartier;
     }
 
 

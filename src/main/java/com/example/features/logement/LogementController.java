@@ -43,8 +43,8 @@ public class LogementController {
     public ResponseEntity<LogementDto> addNewLogement(@Valid @RequestBody LogementDto logementDto, Errors erros,
                                                       @NotBlank @PathVariable("reference") String reference) throws BusinessException {
         ResponseHelper.handle(erros);
-        logementAppService.register(reference, logementDto);
-        return ResponseEntity.created(URI.create("/users/" + reference + "/logements/")).body(logementDto);
+        LogementDto logementDtoReponse = logementAppService.register(reference, logementDto);
+        return ResponseEntity.created(URI.create("/users/" + reference + "/logements/")).body(logementDtoReponse);
     }
 
 
