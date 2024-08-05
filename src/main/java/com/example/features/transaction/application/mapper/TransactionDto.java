@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -16,6 +17,7 @@ public class TransactionDto {
 
     private String reference;
 
+    @Max(10000000)
     @NotNull(message = "Entrer un montant svp")
     private Integer montantVerser;
 

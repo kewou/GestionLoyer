@@ -275,14 +275,14 @@ public class IntegrationsTest {
     public void createAppartTest() throws Exception {
         this.createLogementTest();
         String appart = mapper.writeValueAsString(AppartDto.builder()
-                .nom("beezyAppart")
+                .numero(355)
                 .reference("refAppart")
                 .prixLoyer(500)
                 .prixCaution(200)
                 .build());
         Assertions.assertTrue(appartRepository.findAll().isEmpty());
 
-        mockMvc.perform(post(URL + "/refUser/logements/refLgt/apparts/create")
+        mockMvc.perform(post("/bailleur/users/refUser/logements/refLgt/apparts/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(appart))
                 .andDo(print())
@@ -295,14 +295,14 @@ public class IntegrationsTest {
     public void getListAppartByLogementTest() throws Exception {
         createAppartTest();
 
-        String res = mockMvc.perform(get("/users/refUser/logements/refLgt/apparts")
+        String res = mockMvc.perform(get("/bailleur/users/refUser/logements/refLgt/apparts")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn().getResponse().getContentAsString();
 
         JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res).get(0);
-        String nom = resNode.get("nom").asText();
-        Assertions.assertEquals(nom, "beezyAppart");
+        Integer numero = resNode.get("numero").asInt();
+        Assertions.assertEquals(numero, 355);
         // test génération automatique du premier loyer
         JsonNode loyers = resNode.get("loyers");
         Assertions.assertEquals(loyers.size(), 1);
@@ -317,14 +317,14 @@ public class IntegrationsTest {
     public void getOneAppartByLogementTest() throws Exception {
         createAppartTest();
 
-        String res = mockMvc.perform(get("/users/refUser/logements/refLgt/apparts/refAppart")
+        String res = mockMvc.perform(get("/bailleur/users/refUser/logements/refLgt/apparts/refAppart")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn().getResponse().getContentAsString();
 
         JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res);
-        String nom = resNode.get("nom").asText();
-        Assertions.assertEquals(nom, "beezyAppart");
+        Integer numero = resNode.get("numero").asInt();
+        Assertions.assertEquals(numero, 355);
     }
 
     @Test
@@ -333,23 +333,23 @@ public class IntegrationsTest {
         createAppartTest();
 
         HashMap<String, Object> m = new HashMap<String, Object>();
-        m.put("nom", "JoelAppart");
+        m.put("numero", 400);
         String valPut = mapper.writeValueAsString(m);
 
-        mockMvc.perform(put("/users/refUser/logements/refLgt/apparts/refAppart")
+        mockMvc.perform(put("/bailleur//users/refUser/logements/refLgt/apparts/refAppart")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(valPut))
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn().getResponse().getContentAsString();
 
-        String res = mockMvc.perform(get("/users/refUser/logements/refLgt/apparts/refAppart")
+        String res = mockMvc.perform(get("/bailleur//users/refUser/logements/refLgt/apparts/refAppart")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn().getResponse().getContentAsString();
 
         JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res);
-        String nom = resNode.get("nom").asText();
-        Assertions.assertEquals(nom, "JoelAppart");
+        Integer numero = resNode.get("numero").asInt();
+        Assertions.assertEquals(numero, 400);
     }
 
     @Test
@@ -357,12 +357,12 @@ public class IntegrationsTest {
     public void mettreLocataireDansAppartTest() throws Exception {
         createAppartTest();
 
-        mockMvc.perform(patch("/users/refUser/logements/refLgt/apparts/refAppart/nouveau-locataire/refUser")
+        mockMvc.perform(patch("/bailleur/users/refUser/logements/refLgt/apparts/refAppart/nouveau-locataire/refUser")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn().getResponse().getContentAsString();
 
-        String res = mockMvc.perform(get("/users/refUser/logements/refLgt/apparts/refAppart")
+        String res = mockMvc.perform(get("/bailleur/users/refUser/logements/refLgt/apparts/refAppart")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn().getResponse().getContentAsString();
@@ -381,7 +381,7 @@ public class IntegrationsTest {
                 .build());
         Assertions.assertTrue(transactionRepository.findAll().isEmpty());
 
-        mockMvc.perform(post(URL + "/refUser/apparts/refAppart/nouvelle-transaction")
+        mockMvc.perform(post("/bailleur/users/refUser/apparts/refAppart/nouvelle-transaction")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(transaction))
                 .andDo(print())
@@ -390,14 +390,14 @@ public class IntegrationsTest {
 
         // Test de l'effet de la transaction sur l'appartement
 
-        String res = mockMvc.perform(get("/users/refUser/logements/refLgt/apparts")
+        String res = mockMvc.perform(get("/bailleur/users/refUser/logements/refLgt/apparts")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn().getResponse().getContentAsString();
 
         JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res).get(0);
-        String nom = resNode.get("nom").asText();
-        Assertions.assertEquals(nom, "beezyAppart");
+        Integer numero = resNode.get("numero").asInt();
+        Assertions.assertEquals(numero, 355);
         // test génération automatique du premier loyer
         JsonNode loyers = resNode.get("loyers");
         Assertions.assertEquals(loyers.size(), 1);

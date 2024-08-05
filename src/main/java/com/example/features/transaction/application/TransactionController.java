@@ -16,7 +16,7 @@ import javax.validation.constraints.NotBlank;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/users/{reference}/apparts")
+@RequestMapping("/bailleur/users/{reference}/apparts")
 public class TransactionController {
 
     private TransactionAppService transactionAppService;

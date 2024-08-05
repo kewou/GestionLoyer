@@ -10,7 +10,7 @@ public interface AppartAppService {
 
     public List<AppartDto> getAllAppartByLogement(String refLgt) throws BusinessException;
 
-    public Appart register(String refLgt, AppartDto appartDto) throws BusinessException;
+    public AppartDto register(String refLgt, AppartDto appartDto) throws BusinessException;
 
     public AppartDto getLogementApprtByRef(String refLgt, String refAppart) throws BusinessException;
 

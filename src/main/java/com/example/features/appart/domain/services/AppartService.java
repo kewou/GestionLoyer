@@ -50,7 +50,7 @@ public class AppartService implements AppartAppService {
                 .collect(Collectors.toList());
     }
 
-    public Appart register(String refLgt, AppartDto appartDto) throws BusinessException {
+    public AppartDto register(String refLgt, AppartDto appartDto) throws BusinessException {
         Logement logement = logementAppService.getLogementFromDatabase(refLgt);
         Appart appart = AppartMapper.getMapper().entitie(appartDto);
         appart.setLogement(logement);
@@ -60,13 +60,13 @@ public class AppartService implements AppartAppService {
         if (newLoyerVide.getReference() == "" || newLoyerVide.getReference() == null) {
             newLoyerVide.setReference(GeneralUtils.generateReference());
         }
-        if (appart.getReference() == null) {
+        if (appart.getReference() == "" || appart.getReference() == null) {
             appart.setReference(GeneralUtils.generateReference());
         }
         appartRepository.save(appart);
         loyerRepository.save(newLoyerVide);
         log.info(APPART_LOG + logement.getReference() + " is created");
-        return appart;
+        return AppartMapper.getMapper().dto(appart);
     }
 
 
@@ -98,10 +98,6 @@ public class AppartService implements AppartAppService {
         log.info(APPART_LOG + appart.getReference() + " is deleted");
     }
 
-
-    public List<AppartDto> rechercherSuggestionsParNom(String term) {
-        return appartRepository.findSuggestionsByNomStartingWithIgnoreCase(term);
-    }
 
     public AppartDto updateAppartAssigneLocataire(String refAppart, String refUser) throws BusinessException {
         Appart appart = this.getAppartFromDatabase(refAppart);

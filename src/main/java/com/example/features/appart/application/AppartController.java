@@ -20,7 +20,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users/{reference}/logements/{refLgt}/apparts")
+@RequestMapping("/bailleur/users/{reference}/logements/{refLgt}/apparts")
 public class AppartController {
 
     private final AppartAppService appartAppService;
@@ -45,8 +45,9 @@ public class AppartController {
     public ResponseEntity<AppartDto> addNewAppartement(@Valid @RequestBody AppartDto appartDto, Errors erros,
                                                        @NotBlank @PathVariable("refLgt") String refLgt) throws BusinessException {
         ResponseHelper.handle(erros);
-        appartAppService.register(refLgt, appartDto);
-        return ResponseEntity.created(URI.create("/users/" + "/logements/" + refLgt + "/apparts")).body(appartDto);
+        AppartDto appartDtoResponse = appartAppService.register(refLgt, appartDto);
+
+        return ResponseEntity.created(URI.create("/users/" + "/logements/" + refLgt + "/apparts")).body(appartDtoResponse);
     }
 
     @GetMapping("/{refAppart}")

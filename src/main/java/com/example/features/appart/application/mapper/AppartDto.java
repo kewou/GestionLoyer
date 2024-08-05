@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
@@ -20,12 +20,15 @@ public class AppartDto {
 
     private String reference;
 
-    @NotBlank(message = "Entrer un nom pour le distinguer")
-    private String nom;
+    @Max(1000)
+    @NotNull(message = "Entrer un numéro pour le distinguer")
+    private Integer numero;
 
+    @Max(1000000)
     @NotNull(message = "Entrer un montant svp")
     private Integer prixLoyer;
 
+    @Max(1000000)
     @NotNull(message = "Entrer un montant svp")
     private Integer prixCaution;
 
