@@ -40,6 +40,8 @@ public class LoyerAutomatiqueService {
         // Calculer le mois précédent
         int moisPrecedent = (moisActuel == 1) ? 12 : moisActuel - 1;
 
+        // Version avec possibilité de mettre des locataires
+        /*
         for (Appart appart : apparts) {
             //  L'appatement est vide : Créer un Loyer vide
             if (appart.getLocataire() == null) {
@@ -57,12 +59,27 @@ public class LoyerAutomatiqueService {
                     newLoyerImpayer.setDateLoyer(dateActuelle);
                     int newSolde = precedentLoyer.getSolde() - appart.getPrixLoyer();
                     newLoyerImpayer.setSolde(newSolde);
-
+                    loyerRepository.save(newLoyerImpayer);
                 }
                 // On ne fait rien, le loyer du mois a été payé par une transaction
             }
+        }*/
+        // Version sans les locataires
+        for (Appart appart : apparts) {
+            // Check si le loyer a été payé via une Transaction
+            Optional<Loyer> loyer = loyerRepository.findByMonthAndAppart(moisActuel, appart);
+            if (loyer.isEmpty()) {
+                // Loyer du mois non payé : mise à jour du solde.
+                Loyer precedentLoyer = loyerRepository.findByMonthAndAppart(moisPrecedent, appart).get();
+                // il ya forcément un précédent car la création d'un appart se fait au premier paiement du loyer
+                Loyer newLoyerImpayer = new Loyer(precedentLoyer.getAppart());
+                newLoyerImpayer.setDateLoyer(dateActuelle);
+                int newSolde = precedentLoyer.getSolde() - appart.getPrixLoyer();
+                newLoyerImpayer.setSolde(newSolde);
+                loyerRepository.save(newLoyerImpayer);
+            }
+            // On ne fait rien, le loyer du mois a été payé par une transaction
         }
-
 
     }
 }
