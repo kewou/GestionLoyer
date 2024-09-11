@@ -28,16 +28,22 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
+        String path = httpServletRequest.getRequestURI();
         if (httpServletRequest.getMethod().equals(HttpMethod.OPTIONS.name())
-                || httpServletRequest.getRequestURI().equalsIgnoreCase("/beezyApi/authenticate") // Authentification
-                || httpServletRequest.getRequestURI().equalsIgnoreCase("/beezyApi/user-roles") // Profil user
-                || httpServletRequest.getRequestURI().equalsIgnoreCase("/beezyApi/contact") // Profil user
-                || httpServletRequest.getRequestURI().equalsIgnoreCase("/beezyApi/users/verify-account") // Profil user
-                || httpServletRequest.getRequestURI().startsWith("/beezyApi/users/create") // Inscription
-                || httpServletRequest.getRequestURI().equalsIgnoreCase("/beezyApi/") // Page d'acceuil
-                || httpServletRequest.getRequestURI().startsWith("/beezyApi/assets/")
-                || httpServletRequest.getRequestURI().endsWith(".js")
-                || httpServletRequest.getRequestURI().endsWith(".css")) {
+                || path.equalsIgnoreCase("/beezyApi/authenticate") // Authentification
+                || path.equalsIgnoreCase("/beezyApi/login") // Authentification
+                || path.equalsIgnoreCase("/beezyApi/a-propos") // Authentification
+                || path.equalsIgnoreCase("/beezyApi/user-roles") // Profil user
+                || path.equalsIgnoreCase("/beezyApi/contact") // Profil user
+                || path.equalsIgnoreCase("/beezyApi/users/verify-account") // Profil user
+                || path.startsWith("/beezyApi/users/create") // Inscription
+                || path.equalsIgnoreCase("/beezyApi/") // Page d'accueil
+                || path.startsWith("/beezyApi/assets/")
+                || path.endsWith(".js")
+                || path.endsWith(".css")
+                || path.endsWith(".html") // Fichiers HTML
+                || path.endsWith(".jpg") // Images
+                || path.endsWith(".png")) {
             filterChain.doFilter(httpServletRequest, httpServletResponse);
             return;
         }

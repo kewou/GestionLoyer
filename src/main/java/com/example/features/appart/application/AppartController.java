@@ -70,8 +70,9 @@ public class AppartController {
     }
 
     @DeleteMapping(path = "/{refAppart}")
-    @PreAuthorize(SecurityRule.ADMIN)
-    public ResponseEntity<Void> deleteAppartById(@NotBlank @PathVariable("refAppart") String refAppart) throws BusinessException {
+    @PreAuthorize(SecurityRule.OWNER_BAILLEUR_APPART_OR_ADMIN)
+    public ResponseEntity<Void> deleteAppartById(@NotBlank @PathVariable("refAppart") String refAppart,
+                                                 @Parameter(description = "refUser of User") @NotBlank @PathVariable("reference") String refUser) throws BusinessException {
         appartAppService.deleteByRef(refAppart);
         return ResponseEntity.noContent().build();
     }

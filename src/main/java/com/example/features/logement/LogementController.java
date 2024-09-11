@@ -67,9 +67,10 @@ public class LogementController {
         return ResponseEntity.ok(logementAppService.updateLogementByReference(logementDto, refLgt));
     }
 
-    @DeleteMapping(path = "/{refLgt}")
-    @PreAuthorize(SecurityRule.ADMIN)
-    public ResponseEntity<Void> deleteLogementByRef(@NotBlank @PathVariable("refLgt") String refLgt) throws BusinessException {
+    @DeleteMapping("/{refLgt}")
+    @PreAuthorize(SecurityRule.OWNER_LOGEMENT_OR_ADMIN)
+    public ResponseEntity<Void> deleteLogementByRef(@NotBlank @PathVariable("refLgt") String refLgt,
+                                                    @Parameter(description = "refLgt of Logement") @NotBlank @PathVariable("reference") String refUser) throws BusinessException {
         logementAppService.deleteByReference(refLgt);
         return ResponseEntity.noContent().build();
     }
