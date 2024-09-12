@@ -85,7 +85,7 @@ public class HomeController {
         MessageDto messageDto = MessageDto.builder()
                 .sender(messageCreateDto.getSenderMail())
                 .message(messageCreateDto.getMessage())
-                .subject("Contact utilisateur")
+                .subject("Nouveau message de contact de l'utilisateur : " + messageCreateDto.getSenderName())
                 .recipients(List.of("kewou.noumia@gmail.com"))
                 .build();
         messageService.sendMessage(messageDto);

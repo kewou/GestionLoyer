@@ -19,6 +19,7 @@ public class MessageCreateDto {
     String senderName;
     @NotBlank(message = "L'adresse email ne peut etre vide")
     @Email(message = "Entrer une adresse email valide")
+    @Size(max = 150)
     String senderMail;
     @NotBlank(message = "Un message doit être fourni")
     @Size(min = 10)

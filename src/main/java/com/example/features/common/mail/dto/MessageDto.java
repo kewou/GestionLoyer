@@ -1,6 +1,8 @@
 package com.example.features.common.mail.dto;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.experimental.FieldDefaults;
 import org.springframework.mail.SimpleMailMessage;
 
@@ -22,6 +24,7 @@ public class MessageDto {
         simpleMailMessage.setText(message);
         simpleMailMessage.setSubject(subject);
         simpleMailMessage.setFrom(sender);
+        simpleMailMessage.setReplyTo(sender);
         String to = String.join(",", recipients);
         simpleMailMessage.setTo(to);
         return simpleMailMessage;
