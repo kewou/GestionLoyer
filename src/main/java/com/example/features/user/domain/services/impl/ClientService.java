@@ -22,6 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.MessagingException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -92,14 +93,18 @@ public class ClientService implements ClientAppService {
                         verificationToken),
                 "https://beezyweb.net") : "Vous êtes bien inscrits";
         log.debug("Mail {}", message);
-        messageService.sendMessage(
-                MessageDto.builder()
-                        .subject("Beezyweb : Validation de votre compte")
-                        .sender(inscriptionSender)
-                        .recipients(List.of(client.getEmail()))
-                        .message(message)
-                        .build()
-        );
+        try {
+            messageService.sendHtmlMessage(
+                    MessageDto.builder()
+                            .subject("Beezyweb : Validation de votre compte")
+                            .sender(inscriptionSender)
+                            .recipients(List.of(client.getEmail()))
+                            .message(message)
+                            .build()
+            );
+        } catch (MessagingException e) {
+            log.error("Error sendind email", e);
+        }
     }
 
 
