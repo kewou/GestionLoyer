@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+
 @Slf4j
 @Profile("test")
 @Service
@@ -13,5 +15,10 @@ public class LoggingMailService implements MessageService {
     @Override
     public void sendMessage(MessageDto messageDto) {
         log.info("Fake mail to ");
+    }
+
+    @Override
+    public void sendHtmlMessage(MessageDto messageDto) throws MessagingException {
+
     }
 }
