@@ -56,7 +56,7 @@ jobs:
       - name: Push Docker image
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)          
-          docker image push ${{ env.DOCKER_IMAGE_NAME }}/${{ secrets.DOCKER_REPO_NAME }}:$VERSION
+          docker image push ${{ env.DOCKER_IMAGE_NAME }}:$VERSION
       
       
       
