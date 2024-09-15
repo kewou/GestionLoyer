@@ -46,11 +46,9 @@ jobs:
       # Step 6: Taguer et pousser l'image dans Docker Hub
       - name: Push Docker image
         run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          DOCKER_IMAGE_NAME=$(echo "${{ secrets.DOCKER_IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)          
           
-          docker tag ${DOCKER_IMAGE_NAME}:${VERSION} ${{ secrets.DOCKER_USERNAME }}/${DOCKER_IMAGE_NAME}:${VERSION}
-          docker push ${{ secrets.DOCKER_USERNAME }}/${DOCKER_IMAGE_NAME}:${VERSION}
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO_NAME}}:${VERSION}
 
 
       # Step 7: Déploie de l'image docker sur l'EC2 d'AWS
