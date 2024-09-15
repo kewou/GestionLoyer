@@ -46,8 +46,7 @@ jobs:
       # Step 6: Taguer et pousser l'image dans Docker Hub
       - name: Push Docker image
         run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)          
-          
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)                
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO_NAME}}:${VERSION}
 
 
