@@ -41,17 +41,17 @@ jobs:
       - name: Build Docker image
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          docker build -t ${{ secrets.DOCKER_IMAGE_NAME }}:$VERSION . 
+          docker build -t ${{ env.DOCKER_IMAGE_NAME }}:$VERSION . 
 
       # Step 5: Afficher le nom et la version de l'image
       - name: Show Docker image name and version
-        run: echo "docker image" ${{ secrets.DOCKER_IMAGE_NAME }}:$VERSION
+        run: echo "docker image" ${{ env.DOCKER_IMAGE_NAME }}:$VERSION
 
       # Step 6: Taguer et pousser l'image dans Docker Hub
       - name: Push Docker image
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout) 
-          docker tag ${{ secrets.DOCKER_IMAGE_NAME }}:$VERSION ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO_NAME }}:$VERSION
+          docker tag ${{ env.DOCKER_IMAGE_NAME }}:$VERSION ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO_NAME }}:$VERSION
 
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO_NAME }}:$VERSION
       
@@ -66,3 +66,4 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          DOCKER_IMAGE_NAME: gestionloyer-app
