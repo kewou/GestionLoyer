@@ -47,14 +47,14 @@ jobs:
       - name: Push Docker image
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)                
-          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO_NAME}}:${VERSION}
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO_NAME }}:$VERSION
 
 
       # Step 7: Déploie de l'image docker sur l'EC2 d'AWS
       - name: Deploy to AWS EC2
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          terraform apply -auto-approve -var="docker_image_name=${{ secrets.DOCKER_IMAGE_NAME }}" -var="docker_image_version=${VERSION}"
+          terraform apply -auto-approve -var="docker_image_name=${{ secrets.DOCKER_IMAGE_NAME }}" -var="docker_image_version=$VERSION"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
