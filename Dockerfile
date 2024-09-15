@@ -1,15 +1,14 @@
 FROM adoptopenjdk/openjdk11:alpine-jre
 
-ARG JAR_FILE=target/basic-0.0.1-SNAPSHOT.jar
+WORKDIR /app
 
-# cd /usr/local/runme
-WORKDIR /usr/local/springboot
+ARG JAR_FILE=target/basic-1.0.0.jar
 
-# copy target/find-links.jar /usr/local/runme/app.jar
-COPY ${JAR_FILE} app.jar
+
+COPY ${JAR_FILE} /app/app.jar
 
 # Exposition
-EXPOSE 8090
+EXPOSE 8080
 
 # java -jar /usr/local/runme/app.jar
 ENTRYPOINT ["java","-jar","app.jar"]
