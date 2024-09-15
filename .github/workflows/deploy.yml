@@ -16,7 +16,10 @@ jobs:
 
     env:
       DOCKER_IMAGE_NAME: gestionloyer-app  # Nom de l'image Docker
+      DOCKER_USERNAME: kewou
+      DOCKER_REPO_NAME: gestionloyer-repo
 
+    
     steps:
       # Step 1: Checkout le code source
       - name: Checkout repository
@@ -37,7 +40,7 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
+          username: ${{ env.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       # Step 5: Construire l'image Docker
@@ -56,17 +59,17 @@ jobs:
       - name: Push Docker image
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          docker tag ${{ env.DOCKER_IMAGE_NAME }}:$VERSION ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO_NAME }}:$VERSION
-          docker image push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO_NAME }}:$VERSION
+          docker tag ${{ env.DOCKER_IMAGE_NAME }}:$VERSION ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:$VERSION
+          docker image push ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:$VERSION
       
       
       
-
+      
       # Step 7: Déploie de l'image docker sur l'EC2 d'AWS
       - name: Deploy to AWS EC2
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          terraform apply -auto-approve -var="docker_image_name=${{ secrets.DOCKER_IMAGE_NAME }}" -var="docker_image_version=$VERSION"
+          terraform apply -auto-approve -var="docker_image_name=${{ env.DOCKER_IMAGE_NAME }}" -var="docker_image_version=$VERSION"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
