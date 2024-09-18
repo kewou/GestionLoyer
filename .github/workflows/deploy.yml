@@ -61,16 +61,20 @@ jobs:
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           docker tag ${{ env.DOCKER_IMAGE_NAME }}:$VERSION ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:$VERSION
           docker image push ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:$VERSION
-      
-      
-      
-      
-      # Step 7: Déploie de l'image docker sur l'EC2 d'AWS
+
+      # Step 7: Configuration ssh
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      # Step 7: Déploiement de l'image docker sur l'EC2 d'AWS
       - name: Deploy to AWS EC2
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          terraform apply -auto-approve -var="docker_image_name=${{ env.DOCKER_IMAGE_NAME }}" -var="docker_image_version=$VERSION"
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@ec2-35-180-192-201.eu-west-3.compute.amazonaws.com << 'EOF'
+            docker rmi -f ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:$VERSION
+            docker stop BACKEND_container || true
+            docker rm BACKEND_container || true
+            docker run -d --name BACKEND_container -p 8080:8080 ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:$VERSION
+          EOF
