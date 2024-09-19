@@ -18,7 +18,7 @@ jobs:
       DOCKER_IMAGE_NAME: gestionloyer-app  # Nom de l'image Docker
       DOCKER_USERNAME: kewou
       DOCKER_REPO_NAME: gestionloyer-repo
-
+    
     
     steps:
       # Step 1: Checkout le code source
@@ -68,13 +68,12 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      # Step 8: Declaration de variable d'env
-      - name: Set environment variables
-        env:
-          spring:
-            mail:
-              username: ${{ secrets.SMTP_USERNAME }}
-              password: ${{ secrets.SMTP_PASSWORD }}
+      # Step 8: Modification de propertis
+      - name: Modify application.properties
+        run: |
+          sed -i "s/spring.mail.username=.*/spring.mail.username=${{ secrets.SMTP_USERNAME }}/" src/main/resources/application.properties
+          sed -i "s/spring.mail.password=.*/spring.mail.password=${{ secrets.SMTP_PASSWORD }}/" src/main/resources/application.properties
+
 
       # Step 7: Déploiement de l'image docker sur l'EC2 d'AWS
       #- name: Deploy to AWS EC2
