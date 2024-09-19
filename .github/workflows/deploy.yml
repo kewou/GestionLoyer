@@ -32,6 +32,12 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
+      # Step 8: Modification de propertis
+      - name: Modify application.properties
+        run: |
+          sed -i "s/spring.mail.username=.*/spring.mail.username=${{ secrets.SMTP_USERNAME }}/" src/main/resources/application.properties
+          sed -i "s/spring.mail.password=.*/spring.mail.password=${{ secrets.SMTP_PASSWORD }}/" src/main/resources/application.properties          
+
       # Step 3: Construire le projet avec Maven
       - name: Build with Maven
         run: mvn clean package
@@ -67,12 +73,6 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
-
-      # Step 8: Modification de propertis
-      - name: Modify application.properties
-        run: |
-          sed -i "s/spring.mail.username=.*/spring.mail.username=${{ secrets.SMTP_USERNAME }}/" src/main/resources/application.properties
-          sed -i "s/spring.mail.password=.*/spring.mail.password=${{ secrets.SMTP_PASSWORD }}/" src/main/resources/application.properties
 
 
       # Step 7: Déploiement de l'image docker sur l'EC2 d'AWS
