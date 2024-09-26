@@ -78,17 +78,17 @@ jobs:
 
       # Step 8: SSH
       - name: Add SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-passphrase: ${{ secrets.SSH_PASSPHRASE }}
 
 
       # Step 9: Déploiement de l'image docker sur l'EC2 d'AWS
       - name: Deploy to AWS EC2
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@ec2-35-180-192-201.eu-west-3.compute.amazonaws.com << 'EOF'
+          ssh -o StrictHostKeyChecking=no ubuntu@ec2-13-37-244-5.eu-west-3.compute.amazonaws.com  << 'EOF'
           docker stop BACKEND_container || true
           docker rm BACKEND_container || true
           docker rmi -f ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:$VERSION
