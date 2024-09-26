@@ -82,7 +82,7 @@ jobs:
           eval "$(ssh-agent -s)"
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
           chmod 600 private_key.pem
-          ssh-add private_key.pem
+          sshpass -p "${{ secrets.SSH_PASSPHRASE }}" ssh-add private_key.pem
 
 
       # Step 9: Déploiement de l'image docker sur l'EC2 d'AWS
