@@ -77,11 +77,12 @@ jobs:
           aws-region: eu-west-3
 
       # Step 8: SSH
-      - name: Add SSH key
-        uses: webfactory/ssh-agent@v0.8.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          ssh-passphrase: ${{ secrets.SSH_PASSPHRASE }}
+      - name: SSh Agent
+        run: |
+          eval "$(ssh-agent -s)"
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+          ssh-add private_key.pem
 
 
       # Step 9: Déploiement de l'image docker sur l'EC2 d'AWS
