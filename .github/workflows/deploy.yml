@@ -88,7 +88,7 @@ jobs:
       - name: Deploy to AWS EC2
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@ec2-35-180-192-201 << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@ec2-35-180-192-201.eu-west-3.compute.amazonaws.com << 'EOF'
           docker stop BACKEND_container || true
           docker rm BACKEND_container || true
           docker rmi -f ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:$VERSION
