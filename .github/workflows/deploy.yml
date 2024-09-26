@@ -76,23 +76,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-3
 
-      # Step 8: SSH
-      - name: SSh Agent
-        run: |
-          eval "$(ssh-agent -s)"
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
-          chmod 600 private_key.pem
-          sshpass -p "${{ secrets.SSH_PASSPHRASE }}" ssh-add private_key.pem
 
 
       # Step 9: Déploiement de l'image docker sur l'EC2 d'AWS
       - name: Deploy to AWS EC2
-        run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          ssh -o StrictHostKeyChecking=no ubuntu@ec2-13-37-244-5.eu-west-3.compute.amazonaws.com  << 'EOF'
-          docker stop BACKEND_container || true
-          docker rm BACKEND_container || true
-          docker rmi -f ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:$VERSION
-          docker pull ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:$VERSION
-          docker run -d --name BACKEND_container -p 8080:8080 ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:$VERSION
-          EOF
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ec2-13-37-244-5.eu-west-3.compute.amazonaws.com
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)          
+            docker stop BACKEND || true
+            docker rm BACKEND || true
+            docker rmi -f ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:$VERSION
+            docker pull ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:$VERSION
+            docker run -d --name BACKEND -p 8080:8080 ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:$VERSION
