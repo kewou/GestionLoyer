@@ -32,47 +32,47 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
-      # Step 8: Configuration SMTP
+      # Step 3: Configuration SMTP
       - name: Configuration SMTP
         run: |
           sed -i "s/spring.mail.username=.*/spring.mail.username=${{ secrets.SMTP_USERNAME }}/" src/main/resources/application.properties
           sed -i "s/spring.mail.password=.*/spring.mail.password=${{ secrets.SMTP_PASSWORD }}/" src/main/resources/application.properties          
 
-      # Step 3: Construire le projet avec Maven
+      # Step 4: Construire le projet avec Maven
       - name: Build with Maven
         run: mvn clean package
 
-      # Step 3: Obetenir la version du pom
+      # Step 5: Obetenir la version du pom
       - name: Get version from Maven
         id: get_version
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "VERSION=${VERSION}" >> $GITHUB_ENV      
 
-      # Step 4: Se connecter à Docker Hub
+      # Step 6: Se connecter à Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ env.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Step 5: Construire l'image Docker
+      # Step 7: Construire l'image Docker
       - name: Build Docker image
         run: |
           docker build -t ${{ env.DOCKER_IMAGE_NAME }}:$VERSION . 
 
-      # Step 5: Afficher le nom et la version de l'image
+      # Step 8: Afficher le nom et la version de l'image
       - name: Show Docker image name and version
         run: |
           echo "docker image" ${{ env.DOCKER_IMAGE_NAME }}:$VERSION
 
-      # Step 6: Taguer et pousser l'image dans Docker Hub
+      # Step 9: Taguer et pousser l'image dans Docker Hub
       - name: Push Docker image
         run: |
           docker tag ${{ env.DOCKER_IMAGE_NAME }}:$VERSION ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:$VERSION
           docker image push ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:$VERSION
 
-      # Step 7: Configuration credentials
+      # Step 10: Configuration credentials
       - name: Set up credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -82,7 +82,7 @@ jobs:
 
 
 
-      # Step 9: Déploiement de l'image docker sur l'EC2 d'AWS
+      # Step 11: Déploiement de l'image docker sur l'EC2 d'AWS
       - name: Deploy to AWS EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
