@@ -275,7 +275,7 @@ public class IntegrationsTest {
     public void createAppartTest() throws Exception {
         this.createLogementTest();
         String appart = mapper.writeValueAsString(AppartDto.builder()
-                .numero(355)
+                .nom("355")
                 .reference("refAppart")
                 .prixLoyer(500)
                 .prixCaution(200)
@@ -301,8 +301,8 @@ public class IntegrationsTest {
                 .andReturn().getResponse().getContentAsString();
 
         JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res).get(0);
-        Integer numero = resNode.get("numero").asInt();
-        Assertions.assertEquals(numero, 355);
+        String nom = resNode.get("nom").asText();
+        Assertions.assertEquals(nom, "355");
         // test génération automatique du premier loyer
         JsonNode loyers = resNode.get("loyers");
         Assertions.assertEquals(loyers.size(), 1);
@@ -323,8 +323,8 @@ public class IntegrationsTest {
                 .andReturn().getResponse().getContentAsString();
 
         JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res);
-        Integer numero = resNode.get("numero").asInt();
-        Assertions.assertEquals(numero, 355);
+        String nom = resNode.get("nom").asText();
+        Assertions.assertEquals(nom, "355");
     }
 
     @Test
@@ -333,7 +333,7 @@ public class IntegrationsTest {
         createAppartTest();
 
         HashMap<String, Object> m = new HashMap<String, Object>();
-        m.put("numero", 400);
+        m.put("nom", 400);
         String valPut = mapper.writeValueAsString(m);
 
         mockMvc.perform(put("/bailleur//users/refUser/logements/refLgt/apparts/refAppart")
@@ -348,8 +348,8 @@ public class IntegrationsTest {
                 .andReturn().getResponse().getContentAsString();
 
         JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res);
-        Integer numero = resNode.get("numero").asInt();
-        Assertions.assertEquals(numero, 400);
+        String nom = resNode.get("nom").asText();
+        Assertions.assertEquals(nom, "400");
     }
 
     @Test
@@ -396,8 +396,8 @@ public class IntegrationsTest {
                 .andReturn().getResponse().getContentAsString();
 
         JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res).get(0);
-        Integer numero = resNode.get("numero").asInt();
-        Assertions.assertEquals(numero, 355);
+        String nom = resNode.get("nom").asText();
+        Assertions.assertEquals(nom, "355");
         // test génération automatique du premier loyer
         JsonNode loyers = resNode.get("loyers");
         Assertions.assertEquals(loyers.size(), 1);

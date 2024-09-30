@@ -24,8 +24,8 @@ public class Appart {
     @Column(name = "reference", unique = true)
     private String reference;
 
-    @Column(name = "numero", unique = true)
-    private Integer numero;
+    @Column(name = "nom")
+    private String nom;
 
     @Column(name = "prixLoyer")
     private Integer prixLoyer;
