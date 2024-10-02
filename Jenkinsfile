@@ -40,13 +40,13 @@ pipeline{
 
         stage("Build image"){
             steps {
-                sh 'docker build -t ${env.DOCKER_IMAGE_NAME}:${env.VERSION} .'
+                sh "docker build -t ${env.DOCKER_IMAGE_NAME}:${env.VERSION} ."
             }
         }
 
         stage("Run image"){
             steps {
-                sh 'docker run -d --name BACKEND -p 8090:8090 --network JavaNetwork ${env.DOCKER_IMAGE_NAME}:${env.VERSION}'
+                sh "docker run -d --name BACKEND -p 8090:8090 --network JavaNetwork ${env.DOCKER_IMAGE_NAME}:${env.VERSION}"
             }
         }
 
