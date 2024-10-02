@@ -3,7 +3,7 @@ pipeline{
         registry = "http://localhost:8081/repository/DockerNexus/"
         registryCredential = 'DockerNexus'
         MAVEN_VERSION = ''
-        DOCKER_IMAGE_NAME: gestionloyer-app
+        DOCKER_IMAGE_NAME: 'gestionloyer-app'
       }
     agent any
     tools {
