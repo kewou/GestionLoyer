@@ -20,9 +20,8 @@ public class AppartDto {
 
     private String reference;
 
-    @Max(1000)
-    @NotNull(message = "Entrer un numéro pour le distinguer")
-    private Integer numero;
+    @NotNull(message = "Entrer un nom pour votre logement")
+    private String nom;
 
     @Max(1000000)
     @NotNull(message = "Entrer un montant svp")

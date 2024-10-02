@@ -10,28 +10,10 @@ pipeline{
     }
 
     stages {
-        stage("Test") {
 
-            steps {
-                sh 'mvn clean install'
-            }
-        }
-
-        stage("Sonar Analysis") {
-            steps {
-                script {
-                    withSonarQubeEnv('sonar') {
-
-                        sh "mvn sonar:sonar -Dsonar.projectKey=gestionLoyer -Dsonar.projectName=gestionLoyer -Dsonar.sources=src/main -Dsonar.language=java -Dsonar.java.binaries=target/classes -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml"
-
-                    }
-                }
-            }
-        }  
-              
-        stage('Deploy to Nexus') {
+        stage('Prepare Release') {
             steps {             
-                sh 'mvn deploy -Dmaven.test.skip=true -P my-nexus --settings /var/jenkins_home/settings.xml'
+                sh "mvn release:prepare --settings /var/jenkins_home/settings.xml -P my-nexus"
             }
         }
 

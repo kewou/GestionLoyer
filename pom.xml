@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.example</groupId>
     <artifactId>basic</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
 
     <name>basic</name>
     <description>Demo project for Spring Boot</description>
@@ -195,6 +195,7 @@
                 <configuration>
                     <localCheckout>true</localCheckout>
                     <pushChanges>false</pushChanges>
+                    <goals>deploy</goals>
                 </configuration>
             </plugin>
             <plugin>

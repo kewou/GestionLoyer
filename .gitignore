@@ -44,5 +44,6 @@ secrets.yml
 release.properties
 pom.xml.releaseBackup
 Jenkinsfile
+Dockerfile
 src/main/resources/static/*
 BasicApplication.run.xml
