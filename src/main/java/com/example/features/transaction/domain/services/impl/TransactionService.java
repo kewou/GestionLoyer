@@ -75,7 +75,6 @@ public class TransactionService implements TransactionAppService {
             loyerPlusAncien.setSolde(loyerPlusAncien.getSolde() + montantTransaction);
             montantTransaction = montantTransaction - prixLoyer;
             nbLoyerImpayer--;
-            int indiceNewLoyer = 1;
             while (montantTransaction > 0) { // on paye les impayés tant qu'il ya l'argent
                 while (nbLoyerImpayer > 0) {
                     loyerCourant = getLoyerMoisSuivant(loyerImpayerList, loyerPlusAncien);
@@ -88,14 +87,13 @@ public class TransactionService implements TransactionAppService {
                 }
                 // On a fini de payer les impayés, maintenant on paye de nouveaux loyers
                 Loyer newLoyer = new Loyer();
-                newLoyer.setDateLoyer(loyerCourant.getDateLoyer().plusMonths(indiceNewLoyer));
+                newLoyer.setDateLoyer(loyerCourant.getDateLoyer().plusMonths(1));
                 newLoyer.setAppart(appart);
                 newLoyer.setIsOk(true);
                 newLoyer.setSolde(loyerCourant.getSolde() - prixLoyer);
                 loyerRepository.save(newLoyer);
                 loyerCourant = newLoyer;
                 montantTransaction = montantTransaction - prixLoyer;
-                indiceNewLoyer++;
             }
         } else {
             // Le loyer est payé,obtenir le dernier loyer payé afin de payer les suivants
