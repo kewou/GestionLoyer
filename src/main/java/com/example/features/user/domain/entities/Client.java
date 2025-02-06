@@ -126,4 +126,8 @@ public class Client implements UserDetailsCustom {
     public String getReference() {
         return this.reference;
     }
+
+    public void setEnabled(Boolean enabled) {
+        isEnabled = enabled;
+    }
 }
