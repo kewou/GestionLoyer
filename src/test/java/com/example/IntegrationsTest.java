@@ -93,7 +93,6 @@ public class IntegrationsTest {
                 .name("NOUMIA")
                 .lastName("joel")
                 .email("kewou.noumia@gmail.com")
-                .phone("0615664758")
                 .password("Tourneyuvbekuyb*155r14")
                 .build());
         Assertions.assertTrue(clientRepository.findAll().isEmpty());

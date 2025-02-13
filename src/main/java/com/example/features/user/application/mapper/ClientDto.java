@@ -30,8 +30,6 @@ public class ClientDto {
     @Email(message = "Entrer une adresse email valide")
     private String email;
 
-    @NotBlank(message = "Entrer un numéro de téléphone")
-    @Pattern(regexp = "(\\d)+")
     private String phone;
 
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}$", message = "Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, un chiffre et un caractère spécial")

@@ -62,6 +62,7 @@ public class JWTUtils implements Serializable {
     public String generateToken(UserDetailsCustom userDetails) throws UnsupportedEncodingException {
         Map<String, Object> claims = new HashMap<>();
         claims.put("reference", userDetails.getReference());
+        claims.put("roles", userDetails.getAuthorities());
         return doGenerateToken(claims, URLEncoder.encode(userDetails.getUsername(), StandardCharsets.UTF_8));
     }
 
