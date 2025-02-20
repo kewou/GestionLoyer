@@ -14,5 +14,8 @@ public class SecurityRule {
 
     public static final String CONNECTED_OR_ADMIN = "@authenticationService.isUserConnected(#reference) || hasAuthority('ADMIN')";
 
+    public static final String CONNECTED_BAILLEUR_OR_ADMIN = "(@authenticationService.isUserConnected(#reference) && hasAuthority('BAILLEUR') )" +
+            "|| hasAuthority('ADMIN')";
+
 
 }

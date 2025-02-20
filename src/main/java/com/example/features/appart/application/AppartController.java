@@ -20,7 +20,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/bailleur/users/{reference}/logements/{refLgt}/apparts")
+@RequestMapping("/bailleur/users/{reference}/logements")
 public class AppartController {
 
     private final AppartAppService appartAppService;
@@ -30,8 +30,8 @@ public class AppartController {
         this.appartAppService = appartAppService;
     }
 
-    @GetMapping("")
-    @PreAuthorize(SecurityRule.OWNER_LOGEMENT_OR_ADMIN)
+    @GetMapping("/{refLgt}/apparts")
+    @PreAuthorize(SecurityRule.CONNECTED_BAILLEUR_OR_ADMIN)
     @Operation(description = "Get list of all appart by logement")
     public ResponseEntity<List<AppartDto>> getAllAppartOfLogement(
             @Parameter(description = "refUser of User") @NotBlank @PathVariable("reference") String refUser,
@@ -40,7 +40,7 @@ public class AppartController {
     }
 
 
-    @PostMapping("/create")
+    @PostMapping("/{refLgt}/apparts/create")
     @PreAuthorize(SecurityRule.OWNER_APPART_OR_ADMIN)
     public ResponseEntity<AppartDto> addNewAppartement(@Valid @RequestBody AppartDto appartDto, Errors erros,
                                                        @NotBlank @PathVariable("refLgt") String refLgt) throws BusinessException {
@@ -50,7 +50,7 @@ public class AppartController {
         return ResponseEntity.created(URI.create("/users/" + "/logements/" + refLgt + "/apparts")).body(appartDtoResponse);
     }
 
-    @GetMapping("/{refAppart}")
+    @GetMapping("/{refLgt}/apparts/{refAppart}")
     @PreAuthorize(SecurityRule.OWNER_BAILLEUR_APPART_OR_ADMIN + "or" + SecurityRule.OWNER_LOCATAIRE_APPART_OR_ADMIN)
     public ResponseEntity<AppartDto> getOneAppartOfLogements(
             @Parameter(description = "refUser of User") @NotBlank @PathVariable("reference") String refUser,
@@ -59,7 +59,7 @@ public class AppartController {
         return ResponseEntity.ok(appartAppService.getLogementApprtByRef(refLgt, refAppart));
     }
 
-    @PutMapping("/{refAppart}")
+    @PutMapping("/{refLgt}/apparts/{refAppart}")
     @PreAuthorize(SecurityRule.OWNER_BAILLEUR_APPART_OR_ADMIN)
     public ResponseEntity<AppartDto> updateAppartLogementByRef(
             @RequestBody AppartDto appartDto, Errors erros,
@@ -69,7 +69,7 @@ public class AppartController {
         return ResponseEntity.ok(appartAppService.updateLogementByRef(appartDto, refAppart));
     }
 
-    @DeleteMapping(path = "/{refAppart}")
+    @DeleteMapping(path = "/{refLgt}/apparts/{refAppart}")
     @PreAuthorize(SecurityRule.OWNER_BAILLEUR_APPART_OR_ADMIN)
     public ResponseEntity<Void> deleteAppartById(@NotBlank @PathVariable("refAppart") String refAppart,
                                                  @Parameter(description = "refUser of User") @NotBlank @PathVariable("reference") String refUser) throws BusinessException {
@@ -77,7 +77,7 @@ public class AppartController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{refAppart}/nouveau-locataire/{referenceLocataire}")
+    @PatchMapping("/{refLgt}/apparts/{refAppart}/nouveau-locataire/{referenceLocataire}")
     @PreAuthorize(SecurityRule.OWNER_BAILLEUR_APPART_OR_ADMIN)
     public ResponseEntity<AppartDto> updateAppartAssigneLocataire(
             @Parameter(description = "refUser of User") @NotBlank @PathVariable("reference") String refUser,
@@ -86,12 +86,22 @@ public class AppartController {
         return ResponseEntity.ok(appartAppService.updateAppartAssigneLocataire(refAppart, referenceLocataire));
     }
 
-    @PatchMapping("/{refAppart}/sortir-locataire/{referenceLocataire}")
+    @PatchMapping("/{refLgt}/apparts/{refAppart}/sortir-locataire/{referenceLocataire}")
     @PreAuthorize(SecurityRule.OWNER_BAILLEUR_APPART_OR_ADMIN)
     public ResponseEntity<AppartDto> updateAppartSortLocataire(
             @Parameter(description = "refUser of User") @NotBlank @PathVariable("reference") String refUser,
             @NotBlank @PathVariable("refAppart") String refAppart) throws ValidationException, BusinessException {
         return ResponseEntity.ok(appartAppService.updateAppartSortirLocataire(refAppart));
+    }
+
+
+    @GetMapping("/{refLgt}/{refAppart}")
+    @PreAuthorize(SecurityRule.OWNER_LOCATAIRE_APPART_OR_ADMIN)
+    public ResponseEntity<AppartDto> getAppartOfLocataire(
+            @Parameter(description = "refUser of User") @NotBlank @PathVariable("reference") String refUser,
+            @NotBlank @PathVariable("refLgt") String refLgt,
+            @NotBlank @PathVariable("refAppart") String refAppart) throws BusinessException {
+        return ResponseEntity.ok(appartAppService.getLogementApprtByRef(refLgt, refAppart));
     }
 
 

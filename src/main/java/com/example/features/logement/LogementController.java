@@ -31,7 +31,7 @@ public class LogementController {
     }
 
     @GetMapping("")
-    @PreAuthorize(SecurityRule.CONNECTED_OR_ADMIN)
+    @PreAuthorize(SecurityRule.CONNECTED_BAILLEUR_OR_ADMIN)
     @Operation(description = "Get list of all logement by user")
     public ResponseEntity<List<LogementDto>> getAllLogementByUser(@NotBlank @PathVariable("reference") String reference) throws BusinessException {
         return ResponseEntity.ok(logementAppService.getAllLogementByUser(reference));
@@ -39,7 +39,7 @@ public class LogementController {
 
 
     @PostMapping("/create")
-    @PreAuthorize(SecurityRule.CONNECTED_OR_ADMIN)
+    @PreAuthorize(SecurityRule.CONNECTED_BAILLEUR_OR_ADMIN)
     public ResponseEntity<LogementDto> addNewLogement(@Valid @RequestBody LogementDto logementDto, Errors erros,
                                                       @NotBlank @PathVariable("reference") String reference) throws BusinessException {
         ResponseHelper.handle(erros);
