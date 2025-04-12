@@ -14,6 +14,8 @@ public interface ClientAppService {
 
     public ClientDto register(ClientDto clientDto, Role role) throws BusinessException;
 
+    public ClientDto register(ClientDto clientDto) throws BusinessException;
+
     public ClientDto getClientByReference(String reference) throws BusinessException;
 
     public Client getClientByEmail(String email);
