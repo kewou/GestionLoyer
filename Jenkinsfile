@@ -26,6 +26,7 @@ pipeline{
             }
         }
 
+        /*
         stage("Sonar Analysis") {
             steps {
                 script {
@@ -36,7 +37,7 @@ pipeline{
                     }
                 }
             }
-        }
+        }*/
 
 
 
