@@ -53,7 +53,6 @@ class ClientServiceTest {
                 .email("test@client.fr")
                 .lastName("Test")
                 .name("Client")
-                .phone("0654768954")
                 .password(password)
                 .build(), clientRole);
 
