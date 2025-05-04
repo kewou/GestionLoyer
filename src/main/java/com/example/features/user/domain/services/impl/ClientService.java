@@ -23,10 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.example.exceptions.BusinessException.BusinessErrorType.NOT_FOUND;
@@ -68,7 +65,7 @@ public class ClientService implements ClientAppService {
     public ClientDto register(ClientDto clientDto, Role clientRole) throws BusinessException {
         Client client = ClientMapper.getMapper().entitie(clientDto);
         if (!checkIfClientExist(client.getEmail())) {
-            if (client.getReference() == "" || client.getReference() == null) {
+            if (Objects.equals(client.getReference(), "") || client.getReference() == null) {
                 client.setReference(GeneralUtils.generateReference());
             }
             client.setPassword(encoder.encode(client.getPassword()));
@@ -77,7 +74,26 @@ public class ClientService implements ClientAppService {
             client.setRoles(roles);
             clientRepository.save(client);
             log.info("Client {} is created ", client.getReference());
-            sendInscriptionMail(client);
+            //sendInscriptionMail(client);
+            return ClientMapper.getMapper().dto(client);
+        } else {
+            throw new BusinessException(String.format("Client with email %s is already exist on database", client.getEmail()), OTHER);
+        }
+    }
+
+    public ClientDto register(ClientDto clientDto) throws BusinessException {
+        Client client = ClientMapper.getMapper().entitie(clientDto);
+        if (!checkIfClientExist(client.getEmail())) {
+            if (Objects.equals(client.getReference(), "") || client.getReference() == null) {
+                client.setReference(GeneralUtils.generateReference());
+            }
+            Set<String> roles = new HashSet<>();
+            roles.add(Role.BAILLEUR.name());
+            client.setRoles(roles);
+            client.setIsEnabled(true);
+            clientRepository.save(client);
+            log.info("Client {} is created ", client.getReference());
+            //sendInscriptionMail(client);
             return ClientMapper.getMapper().dto(client);
         } else {
             throw new BusinessException(String.format("Client with email %s is already exist on database", client.getEmail()), OTHER);

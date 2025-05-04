@@ -31,6 +31,8 @@ public class JwtFilter extends OncePerRequestFilter {
         String path = httpServletRequest.getRequestURI();
         if (httpServletRequest.getMethod().equals(HttpMethod.OPTIONS.name())
                 || path.equalsIgnoreCase("/beezyApi/authenticate") // Authentification
+                || path.equalsIgnoreCase("/beezyApi/oauth2/authorize/google") // Authentification
+                || path.equalsIgnoreCase("/beezyApi/oauth2/callback/google") // Authentification
                 || path.equalsIgnoreCase("/beezyApi/login") // Authentification
                 || path.equalsIgnoreCase("/beezyApi/a-propos") // Authentification
                 || path.equalsIgnoreCase("/beezyApi/user-roles") // Profil user
