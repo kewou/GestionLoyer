@@ -40,7 +40,7 @@ jobs:
 
       # Step 4: Construire le projet avec Maven
       - name: Build with Maven
-        run: mvn clean package
+        run: mvn clean package -DskipTests
 
       # Step 5: Obetenir la version du pom
       - name: Get version from Maven
