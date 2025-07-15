@@ -16,7 +16,6 @@ public class GoogleOAuth2Provider implements OAuth2Provider {
 
     private static final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
     private static final String GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
-    private static final String REDIRECT_URI = "http://localhost:8090/beezyApi/oauth2/callback/google";
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String clientId;
@@ -24,13 +23,16 @@ public class GoogleOAuth2Provider implements OAuth2Provider {
     @Value("${spring.security.oauth2.client.registration.google.client-secret}")
     private String clientSecret;
 
+    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+    private String redirectUri;
+
 
     @Override
     public String getAuthorizationUrl(String frontendRedirect) {
         return UriComponentsBuilder
                 .fromUriString(GOOGLE_AUTH_URL)
                 .queryParam("client_id", clientId)
-                .queryParam("redirect_uri", REDIRECT_URI)
+                .queryParam("redirect_uri", redirectUri)
                 .queryParam("response_type", "code")
                 .queryParam("scope", "openid profile email")
                 .queryParam("state", frontendRedirect)
@@ -47,7 +49,7 @@ public class GoogleOAuth2Provider implements OAuth2Provider {
         formData.add("code", code);
         formData.add("client_id", clientId);
         formData.add("client_secret", clientSecret);
-        formData.add("redirect_uri", REDIRECT_URI);
+        formData.add("redirect_uri", redirectUri);
         formData.add("grant_type", "authorization_code");
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
