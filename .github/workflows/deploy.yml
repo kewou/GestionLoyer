@@ -32,11 +32,13 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
-      # Step 3: Configuration SMTP
-      - name: Configuration SMTP
+      # Step 3: Configuration SMTP & GOOGLE
+      - name: Configuration SMTP & GOOGLE
         run: |
           sed -i "s/spring.mail.username=.*/spring.mail.username=${{ secrets.SMTP_USERNAME }}/" src/main/resources/application.properties
-          sed -i "s/spring.mail.password=.*/spring.mail.password=${{ secrets.SMTP_PASSWORD }}/" src/main/resources/application.properties          
+          sed -i "s/spring.mail.password=.*/spring.mail.password=${{ secrets.SMTP_PASSWORD }}/" src/main/resources/application.properties
+          sed -i "s/spring.security.oauth2.client.registration.google.client-id=.*/spring.security.oauth2.client.registration.google.client-id=${{ secrets.GOOGLE_CLIENT_ID }}/" src/main/resources/application.properties
+          sed -i "s/spring.security.oauth2.client.registration.google.client-secret=.*/spring.security.oauth2.client.registration.google.client-secret=${{ secrets.GOOGLE_CLIENT_SECRET }}/" src/main/resources/application.properties   
 
       # Step 4: Construire le projet avec Maven
       - name: Build with Maven
