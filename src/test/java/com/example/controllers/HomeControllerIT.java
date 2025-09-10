@@ -71,7 +71,7 @@ public class HomeControllerIT {
                         .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                // on vérifie que le token est présent dans la réponse
+                // verify that the token is present in the response
                 .andExpect(jsonPath("$.jwtToken").value("dummy.jwt.token"));
     }
 
