@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.example.exceptions.BusinessException.BusinessErrorType.OTHER;
 
@@ -40,6 +41,13 @@ public class TransactionService implements TransactionAppService {
         this.clientAppService = clientAppService;
         this.transactionRepository = transactionRepository;
         this.loyerRepository = loyerRepository;
+    }
+
+    public List<TransactionDto> getAllTransactionByAppart(String refAppart) throws BusinessException {
+        Appart appart = appartAppService.getAppartFromDatabase(refAppart);
+        return transactionRepository.findByAppart(appart).stream()
+                .map(TransactionMapper.getMapper()::dto)
+                .collect(Collectors.toList());
     }
 
 

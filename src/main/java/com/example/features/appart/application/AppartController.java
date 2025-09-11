@@ -4,6 +4,8 @@ import com.example.exceptions.BusinessException;
 import com.example.exceptions.ValidationException;
 import com.example.features.appart.application.appService.AppartAppService;
 import com.example.features.appart.application.mapper.AppartDto;
+import com.example.features.transaction.application.mapper.TransactionDto;
+import com.example.features.transaction.domain.services.impl.TransactionService;
 import com.example.helper.ResponseHelper;
 import com.example.security.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,10 +26,12 @@ import java.util.List;
 public class AppartController {
 
     private final AppartAppService appartAppService;
+    private final TransactionService transactionService;
 
     @Autowired
-    public AppartController(AppartAppService appartAppService) {
+    public AppartController(AppartAppService appartAppService, TransactionService transactionService) {
         this.appartAppService = appartAppService;
+        this.transactionService = transactionService;
     }
 
     @GetMapping("")
@@ -57,6 +61,15 @@ public class AppartController {
             @NotBlank @PathVariable("refLgt") String refLgt,
             @NotBlank @PathVariable("refAppart") String refAppart) throws BusinessException {
         return ResponseEntity.ok(appartAppService.getLogementApprtByRef(refLgt, refAppart));
+    }
+
+    @GetMapping("/{refAppart}/transactions")
+    @PreAuthorize(SecurityRule.OWNER_BAILLEUR_APPART_OR_ADMIN + "or" + SecurityRule.OWNER_LOCATAIRE_APPART_OR_ADMIN)
+    public ResponseEntity<List<TransactionDto>> getTransactionOfOneAppartOf(
+            @Parameter(description = "refUser of User") @NotBlank @PathVariable("reference") String refUser,
+            @NotBlank @PathVariable("refLgt") String refLgt,
+            @NotBlank @PathVariable("refAppart") String refAppart) throws BusinessException {
+        return ResponseEntity.ok(transactionService.getAllTransactionByAppart(refAppart));
     }
 
     @PutMapping("/{refAppart}")
