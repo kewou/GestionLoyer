@@ -7,11 +7,11 @@ package com.example.features.user.domain.entities;
 
 
 import com.example.features.logement.Logement;
+import com.example.utils.GeneralUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -59,8 +59,7 @@ public class Client implements UserDetailsCustom {
 
     @PostPersist
     private void generateVerificationToken() {
-        int desiredLength = 30;
-        verificationToken = RandomStringUtils.randomAlphanumeric(desiredLength);
+        verificationToken = GeneralUtils.generateVerificationToken();
         isEnabled = Boolean.FALSE;
     }
 

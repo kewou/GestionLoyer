@@ -38,6 +38,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 || path.equalsIgnoreCase("/beezyApi/user-roles") // Profil user
                 || path.equalsIgnoreCase("/beezyApi/contact") // Profil user
                 || path.equalsIgnoreCase("/beezyApi/users/verify-account") // Profil user
+                || path.equalsIgnoreCase("/beezyApi/users/reset-password") // Profil user
+                || path.equalsIgnoreCase("/beezyApi/users/update-password") // Profil user
                 || path.startsWith("/beezyApi/users/create") // Inscription
                 || path.equalsIgnoreCase("/beezyApi/") // Page d'accueil
                 || path.startsWith("/beezyApi/assets/")
