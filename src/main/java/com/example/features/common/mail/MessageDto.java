@@ -1,9 +1,6 @@
 package com.example.features.common.mail;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.mail.SimpleMailMessage;
 
@@ -13,6 +10,7 @@ import java.util.List;
 @Builder
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@ToString
 public class MessageDto {
 
     String message;
