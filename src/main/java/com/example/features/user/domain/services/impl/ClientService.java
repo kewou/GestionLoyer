@@ -158,9 +158,10 @@ public class ClientService implements ClientAppService {
     }
 
     @Override
-    public void updatePasswordClient(UpdatePasswordDto updatePasswordDto, Client client) throws BusinessException {
-        if (updatePasswordDto.getPassword().equals(client.getPassword())) {
-            throw new BusinessException("Invalid action - change password");
+    public void updatePasswordClient(UpdatePasswordDto updatePasswordDto) throws BusinessException {
+        Client client = clientRepository.findByEmail(updatePasswordDto.getEmail());
+        if (client == null) {
+            throw new BusinessException("Client not found");
         }
         client.setPassword(encoder.encode(updatePasswordDto.getPassword()));
         clientRepository.save(client);

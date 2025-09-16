@@ -128,7 +128,7 @@ public class ClientController {
             throw new BusinessException("Client not found");
         }
         verifyAndValidateAccount(client, updatePasswordDto.getVerificationToken());
-        clientAppService.updatePasswordClient(updatePasswordDto, client);
+        clientAppService.updatePasswordClient(updatePasswordDto);
         return ResponseEntity.ok().build();
     }
 
