@@ -11,6 +11,7 @@ import com.example.features.common.mail.dto.MessageDto;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.application.mapper.ClientDto;
 import com.example.features.user.application.mapper.ClientMapper;
+import com.example.features.user.application.mapper.UpdatePasswordDto;
 import com.example.features.user.application.mapper.UserInfoDto;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.infra.ClientRepository;
@@ -44,11 +45,14 @@ public class ClientService implements ClientAppService {
     @Value("${inscription.message}")
     private String inscriptionMessage;
 
-    @Value("${inscription.validation.uri:https://beezyweb.net/login}")
+    @Value("${inscription.validation.uri:https://beezyweb.net}")
     private String uriSite;
 
     @Value("${inscription.sender}")
     private String inscriptionSender;
+
+    @Value("${resetPassword.message}")
+    private String resetPasswordMessage;
 
     public ClientService(ClientRepository clientRepository, MessageService messageService) {
         this.clientRepository = clientRepository;
@@ -74,7 +78,7 @@ public class ClientService implements ClientAppService {
             client.setRoles(roles);
             clientRepository.save(client);
             log.info("Client {} is created ", client.getReference());
-            //sendInscriptionMail(client);
+            sendInscriptionMail(client);
             return ClientMapper.getMapper().dto(client);
         } else {
             throw new BusinessException(String.format("Client with email %s is already exist on database", client.getEmail()), OTHER);
@@ -93,21 +97,21 @@ public class ClientService implements ClientAppService {
             client.setIsEnabled(true);
             clientRepository.save(client);
             log.info("Client {} is created ", client.getReference());
-            //sendInscriptionMail(client);
+            sendInscriptionMail(client);
             return ClientMapper.getMapper().dto(client);
         } else {
             throw new BusinessException(String.format("Client with email %s is already exist on database", client.getEmail()), OTHER);
         }
     }
 
-    private void sendInscriptionMail(Client client) {
+    public void sendInscriptionMail(Client client) {
         final String verificationToken = client.getVerificationToken() != null ? client.getVerificationToken() : "token_generated";
         final String message = inscriptionMessage != null ? String.format(inscriptionMessage,
                 String.format("%s %s", client.getName(), client.getLastName()),
-                String.format("%s#%s/%s", uriSite,
+                String.format("%s/login#%s/%s", uriSite,
                         client.getReference(),
                         verificationToken),
-                "https://beezyweb.net") : "Vous êtes bien inscrits";
+                uriSite) : "Vous êtes bien inscrits";
         log.debug("Mail {}", message);
         try {
             messageService.sendHtmlMessage(
@@ -121,6 +125,46 @@ public class ClientService implements ClientAppService {
         } catch (MessagingException e) {
             log.error("Error sendind email", e);
         }
+    }
+
+    @Override
+    public void sendResetPasswordMail(Client client) {
+        final String email = client.getEmail();
+        final String message;
+        String verificationToken = GeneralUtils.generateVerificationToken();
+        client.setVerificationToken(verificationToken);
+        if (resetPasswordMessage != null) {
+            message = String.format(resetPasswordMessage,
+                    String.format("%s %s", client.getName(), client.getLastName()),
+                    String.format("%s/password-reset?email=%s#%s", uriSite,
+                            email,
+                            verificationToken),
+                    uriSite);
+        } else {
+            message = "Mot de passe oublié";
+        }
+        try {
+            messageService.sendHtmlMessage(
+                    MessageDto.builder()
+                            .subject("BeezyWeb : Réinitialisation de mot de passe")
+                            .sender(inscriptionSender)
+                            .recipients(List.of(email))
+                            .message(message)
+                            .build()
+            );
+        } catch (MessagingException e) {
+            log.error("Error sending email", e);
+        }
+    }
+
+    @Override
+    public void updatePasswordClient(UpdatePasswordDto updatePasswordDto) throws BusinessException {
+        Client client = clientRepository.findByEmail(updatePasswordDto.getEmail());
+        if (client == null) {
+            throw new BusinessException("Client not found");
+        }
+        client.setPassword(encoder.encode(updatePasswordDto.getPassword()));
+        clientRepository.save(client);
     }
 
 

@@ -2,6 +2,7 @@ package com.example.features.user.application.appService;
 
 import com.example.exceptions.BusinessException;
 import com.example.features.user.application.mapper.ClientDto;
+import com.example.features.user.application.mapper.UpdatePasswordDto;
 import com.example.features.user.application.mapper.UserInfoDto;
 import com.example.features.user.domain.entities.Client;
 import com.example.security.Role;
@@ -30,4 +31,9 @@ public interface ClientAppService {
 
     void validateToken(Client client);
 
+    void sendInscriptionMail(Client client);
+
+    void sendResetPasswordMail(Client client);
+
+    void updatePasswordClient(UpdatePasswordDto updatePasswordDto) throws BusinessException;
 }
