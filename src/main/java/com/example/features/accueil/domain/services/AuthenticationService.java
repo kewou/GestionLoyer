@@ -3,8 +3,8 @@ package com.example.features.accueil.domain.services;
 import com.example.exceptions.BusinessException;
 import com.example.features.appart.application.appService.AppartAppService;
 import com.example.features.appart.domain.entities.Appart;
-import com.example.features.logement.application.appService.LogementAppService;
-import com.example.features.logement.domain.entities.Logement;
+import com.example.features.logement.Logement;
+import com.example.features.logement.LogementAppService;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.domain.entities.Client;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,11 +76,12 @@ public class AuthenticationService implements UserDetailsService {
         return isUserConnected(refUser) && client.equals(appart.getBailleur());
     }
 
+/*
     public boolean isOwnerLcataireAppart(String refUser, String refAppart) throws BusinessException {
         Client client = clientAppService.getClientFromDatabase(refUser);
         Appart appart = appartAppService.getAppartFromDatabase(refAppart);
-        return isUserConnected(refUser) && client.equals(appart.getLocataire());
-    }
+        return isUserConnected(refUser) && client.equals(appart.getB);
+    }*/
 
 
 }

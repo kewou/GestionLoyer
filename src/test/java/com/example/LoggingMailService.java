@@ -1,7 +1,7 @@
 package com.example;
 
-import com.example.features.common.mail.application.MessageService;
-import com.example.features.common.mail.dto.MessageDto;
+import com.example.features.common.mail.MessageDto;
+import com.example.features.common.mail.MessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;

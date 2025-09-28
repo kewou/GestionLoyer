@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 /**
  * @author Joel NOUMIA
@@ -101,7 +102,7 @@ public class ClientController {
         return ResponseEntity.ok(clientAppService.update(ClientDto, reference));
     }
 
-    @PostMapping(path="/verify-account")
+    @PostMapping(path = "/verify-account")
     public JwtResponse verifyAccount(@RequestBody VerificationUserInscriptionDto verificationUserInscriptionDto) throws BusinessException, UnsupportedEncodingException {
         final Client client = clientAppService.getClientFromDatabase(verificationUserInscriptionDto.getReference());
         log.warn("Token values {}-{}", client.getVerificationToken(), verificationUserInscriptionDto.getVerificationToken());
@@ -112,6 +113,14 @@ public class ClientController {
         clientAppService.validateToken(client);
         final String token = jwtUtils.generateToken(client);
         return new JwtResponse(token);
+    }
+
+    @GetMapping("/{reference}/search")
+    @PreAuthorize("hasAuthority('BAILLEUR') or hasAuthority('ADMIN')")
+    public ResponseEntity<List<ClientDto>> searchLocataires(
+            @RequestParam String name
+    ) {
+        return ResponseEntity.ok(clientAppService.searchLocatairesByName(name));
     }
 
 

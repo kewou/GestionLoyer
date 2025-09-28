@@ -6,7 +6,7 @@
 package com.example.features.user.domain.entities;
 
 
-import com.example.features.logement.domain.entities.Logement;
+import com.example.features.logement.Logement;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
