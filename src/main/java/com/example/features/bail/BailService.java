@@ -149,6 +149,10 @@ public class BailService {
         Bail bail = bailRepository.findById(bailId)
                 .orElseThrow(() -> new IllegalArgumentException("Bail introuvable"));
 
+        if (montant % montant != 0) {
+            throw new IllegalArgumentException("Le montant doit être un multiple du loyer (" + montant + ")");
+        }
+
         // 1. Créer et sauvegarder la transaction
         Transaction tx = new Transaction();
         tx.setBail(bail);
