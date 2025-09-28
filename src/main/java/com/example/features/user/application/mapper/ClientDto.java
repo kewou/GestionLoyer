@@ -35,5 +35,12 @@ public class ClientDto {
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}$", message = "Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, un chiffre et un caractère spécial")
     private String password;
 
+    public ClientDto(String name, String lastName, String email, String phone) {
+        this.name = name;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.email = email;
+    }
+
 
 }

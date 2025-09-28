@@ -30,4 +30,5 @@ public interface ClientAppService {
 
     void validateToken(Client client);
 
+    List<ClientDto> searchLocatairesByName(String name);
 }

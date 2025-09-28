@@ -64,6 +64,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/**").hasAuthority(Role.ADMIN.name())
                 .antMatchers("/bailleur/**").hasAnyAuthority(Role.ADMIN.name(), Role.BAILLEUR.name())
                 .antMatchers("/locataire/**").hasAnyAuthority(Role.ADMIN.name(), Role.LOCATAIRE.name())
+                .antMatchers("**/users/**").hasAnyAuthority(Role.ADMIN.name(), Role.BAILLEUR.name())
                 .anyRequest().authenticated()   // toutes les requetes doivent etre authentifiées
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

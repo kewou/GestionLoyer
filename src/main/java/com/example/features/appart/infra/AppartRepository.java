@@ -1,7 +1,7 @@
 package com.example.features.appart.infra;
 
 import com.example.features.appart.domain.entities.Appart;
-import com.example.features.logement.domain.entities.Logement;
+import com.example.features.logement.Logement;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

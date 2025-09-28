@@ -1,8 +1,8 @@
 package com.example.features.user.domain.services.impl;
 
 import com.example.exceptions.BusinessException;
-import com.example.features.common.mail.application.MessageService;
-import com.example.features.common.mail.dto.MessageDto;
+import com.example.features.common.mail.MessageDto;
+import com.example.features.common.mail.MessageService;
 import com.example.features.user.application.mapper.ClientDto;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.infra.ClientRepository;

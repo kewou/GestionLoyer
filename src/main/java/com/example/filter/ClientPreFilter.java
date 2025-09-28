@@ -1,7 +1,7 @@
 package com.example.filter;
 
 import com.example.exceptions.BusinessException;
-import com.example.features.logement.application.appService.LogementAppService;
+import com.example.features.logement.LogementAppService;
 import com.example.features.user.application.appService.ClientAppService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

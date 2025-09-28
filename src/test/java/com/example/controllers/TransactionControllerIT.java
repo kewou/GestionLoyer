@@ -2,8 +2,8 @@ package com.example.controllers;
 
 import com.example.exceptions.BusinessException;
 import com.example.features.accueil.domain.services.AuthenticationService;
-import com.example.features.transaction.application.mapper.TransactionDto;
-import com.example.features.transaction.domain.services.impl.TransactionService;
+import com.example.features.transaction.TransactionDto;
+import com.example.features.transaction.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
