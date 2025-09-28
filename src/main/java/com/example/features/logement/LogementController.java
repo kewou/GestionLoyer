@@ -2,8 +2,6 @@ package com.example.features.logement;
 
 import com.example.exceptions.BusinessException;
 import com.example.exceptions.ValidationException;
-import com.example.features.logement.application.appService.LogementAppService;
-import com.example.features.logement.application.mapper.LogementDto;
 import com.example.helper.ResponseHelper;
 import com.example.security.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;

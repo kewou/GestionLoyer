@@ -22,7 +22,4 @@ public interface AppartAppService {
 
     public Appart getAppartFromDatabase(String refAppart) throws BusinessException;
 
-    public AppartDto updateAppartAssigneLocataire(String refAppart, String refLgt) throws BusinessException;
-
-    public AppartDto updateAppartSortirLocataire(String refAppart) throws BusinessException;
 }

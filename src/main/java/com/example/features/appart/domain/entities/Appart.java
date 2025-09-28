@@ -1,8 +1,7 @@
 package com.example.features.appart.domain.entities;
 
-import com.example.features.logement.domain.entities.Logement;
-import com.example.features.loyer.domain.entities.Loyer;
-import com.example.features.transaction.domain.entities.Transaction;
+import com.example.features.bail.Bail;
+import com.example.features.logement.Logement;
 import com.example.features.user.domain.entities.Client;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
@@ -38,31 +37,29 @@ public class Appart {
     private Client bailleur;
 
     @ManyToOne
-    @JoinColumn(name = "locataire")
-    private Client locataire;
-
-    @ManyToOne
     @JoinColumn(name = "logement", nullable = false)
     private Logement logement;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "appart", orphanRemoval = true)
-    private Set<Loyer> loyers = new HashSet<>();
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "appart", orphanRemoval = true)
-    private Set<Transaction> transactions = new HashSet<>();
+    @OneToMany(mappedBy = "appart", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("dateEntree DESC")
+    private Set<Bail> baux = new HashSet<>();
 
     @JsonIgnore
     public Client getBailleur() {
         return this.bailleur;
     }
 
-    @JsonIgnore
-    public Client getLocataire() {
-        return this.locataire;
-    }
 
     @JsonIgnore
     public Logement getLogement() {
         return this.logement;
     }
+
+
+    @JsonIgnore
+    public Set<Bail> getBaux() {
+        return this.baux;
+    }
+
+
 }

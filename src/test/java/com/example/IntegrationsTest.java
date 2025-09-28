@@ -2,11 +2,11 @@ package com.example;
 
 import com.example.features.appart.application.mapper.AppartDto;
 import com.example.features.appart.infra.AppartRepository;
-import com.example.features.common.mail.application.MessageService;
-import com.example.features.logement.application.mapper.LogementDto;
-import com.example.features.logement.infra.LogementRepository;
-import com.example.features.transaction.application.mapper.TransactionDto;
-import com.example.features.transaction.infra.TransactionRepository;
+import com.example.features.common.mail.MessageService;
+import com.example.features.logement.LogementDto;
+import com.example.features.logement.LogementRepository;
+import com.example.features.transaction.TransactionDto;
+import com.example.features.transaction.TransactionRepository;
 import com.example.features.user.application.mapper.ClientDto;
 import com.example.features.user.domain.services.impl.ClientService;
 import com.example.features.user.infra.ClientRepository;
@@ -376,7 +376,7 @@ public class IntegrationsTest {
     public void createTransactionTest() throws Exception {
         this.createAppartTest();
         String transaction = mapper.writeValueAsString(TransactionDto.builder()
-                .montantVerser(500)
+                .montant(500)
                 .build());
         Assertions.assertTrue(transactionRepository.findAll().isEmpty());
 
