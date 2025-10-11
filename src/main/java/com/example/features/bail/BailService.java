@@ -7,6 +7,8 @@ import com.example.features.appart.infra.AppartRepository;
 import com.example.features.bail.dto.BailDto;
 import com.example.features.bail.dto.CreateBailRequestDto;
 import com.example.features.transaction.Transaction;
+import com.example.features.transaction.TransactionDto;
+import com.example.features.transaction.TransactionMapper;
 import com.example.features.transaction.TransactionRepository;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.infra.ClientRepository;
@@ -36,6 +38,8 @@ public class BailService {
     private TransactionRepository transactionRepository;
 
     private final BailMapper bailMapper;
+    @Autowired
+    private TransactionMapper transactionMapper;
 
     public BailService(BailMapper bailMapper) {
         this.bailMapper = bailMapper;
@@ -58,7 +62,6 @@ public class BailService {
         return bailRepository.findByAppartAndDateSortieIsNull(appart);
     }
 
-
     public List<LoyerDto> getHistoriqueLoyers(Long bailId) {
         Bail bail = bailRepository.findById(bailId)
                 .orElseThrow(() -> new IllegalArgumentException("Bail introuvable"));
@@ -66,7 +69,8 @@ public class BailService {
         List<LoyerDto> loyers = new ArrayList<>();
 
         LocalDate start = bail.getDateEntree().withDayOfMonth(1);
-        LocalDate end = bail.getDateSortie() != null ? bail.getDateSortie().withDayOfMonth(1) : LocalDate.now().withDayOfMonth(1);
+        LocalDate end = bail.getDateSortie() != null ? bail.getDateSortie().withDayOfMonth(1)
+                : LocalDate.now().withDayOfMonth(1);
 
         // Récupère toutes les transactions
         List<Transaction> transactions = transactionRepository.findByBail(bail);
@@ -79,7 +83,8 @@ public class BailService {
         int montantLoyer = bail.getAppart().getPrixLoyer();
         LocalDate current = start;
 
-        // Distribuer les loyers jusqu'à la fin du bail ou jusqu'à ce qu'on dépasse aujourd'hui
+        // Distribuer les loyers jusqu'à la fin du bail ou jusqu'à ce qu'on dépasse
+        // aujourd'hui
         while (!current.isAfter(end) || totalVerse >= montantLoyer) {
             int montantAttendu = montantLoyer;
 
@@ -117,6 +122,14 @@ public class BailService {
         return loyers;
     }
 
+    public List<TransactionDto> getTransactions(Long bailId) {
+        Bail bail = bailRepository.findById(bailId)
+                .orElseThrow(() -> new IllegalArgumentException("Bail introuvable"));
+        return transactionRepository.findByBail(bail)
+                .stream()
+                .map(transaction -> transactionMapper.dto(transaction))
+                .collect(java.util.stream.Collectors.toList());
+    }
 
     public BailDto assignLocataire(String refAppart, CreateBailRequestDto request) throws BusinessException {
         Appart appart = appartRepository.findByReference(refAppart)
@@ -175,6 +188,5 @@ public class BailService {
         Bail saved = bailRepository.save(bail);
         return bailMapper.dto(saved);
     }
-
 
 }

@@ -21,6 +21,8 @@ public class BailController {
     @Autowired
     private BailService bailService;
 
+    // no need for TransactionService here
+
     @PostMapping("/apparts/{refAppart}")
     @PreAuthorize("hasAuthority('BAILLEUR') or hasAuthority('ADMIN')")
     public ResponseEntity<BailDto> assignLocataire(
@@ -43,6 +45,12 @@ public class BailController {
 
         List<LoyerDto> loyers = bailService.createTransaction(bailId, request.getMontant());
         return ResponseEntity.ok(loyers);
+    }
+
+    @GetMapping("/{bailId}/transactions")
+    public ResponseEntity<List<TransactionDto>> listTransactions(@PathVariable Long bailId) {
+        List<TransactionDto> transactions = bailService.getTransactions(bailId);
+        return ResponseEntity.ok(transactions);
     }
 
     @PutMapping("/{bailId}/sortie")
