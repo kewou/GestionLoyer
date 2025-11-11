@@ -36,4 +36,6 @@ public interface ClientAppService {
     void sendResetPasswordMail(Client client);
 
     void updatePasswordClient(UpdatePasswordDto updatePasswordDto) throws BusinessException;
+
+    List<ClientDto> searchLocatairesByName(String name);
 }
