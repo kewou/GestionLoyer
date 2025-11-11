@@ -103,7 +103,7 @@ public class ClientController {
         return ResponseEntity.ok(clientAppService.update(ClientDto, reference));
     }
 
-    @PostMapping(path="/verify-account")
+    @PostMapping(path = "/verify-account")
     public JwtResponse verifyAccount(@RequestBody VerificationUserInscriptionDto verificationUserInscriptionDto) throws BusinessException, UnsupportedEncodingException {
         final Client client = clientAppService.getClientFromDatabase(verificationUserInscriptionDto.getReference());
         verifyAndValidateAccount(client, verificationUserInscriptionDto.getVerificationToken());
@@ -137,6 +137,14 @@ public class ClientController {
             throw new BusinessException("invalid operation");
         }
         clientAppService.validateToken(client);
+    }
+
+    @GetMapping("/{reference}/search")
+    @PreAuthorize("hasAuthority('BAILLEUR') or hasAuthority('ADMIN')")
+    public ResponseEntity<List<ClientDto>> searchLocataires(
+            @RequestParam String name
+    ) {
+        return ResponseEntity.ok(clientAppService.searchLocatairesByName(name));
     }
 
 
