@@ -5,7 +5,7 @@
  */
 package com.example.features.user.domain.entities;
 
-
+import com.example.features.bail.Bail;
 import com.example.features.logement.Logement;
 import com.example.utils.GeneralUtils;
 import lombok.AllArgsConstructor;
@@ -18,7 +18,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Sbeezy
@@ -70,6 +72,9 @@ public class Client implements UserDetailsCustom {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "client", orphanRemoval = true)
     private Set<Logement> logements = new HashSet<>();
+
+    @OneToMany(mappedBy = "locataire", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Bail> baux = new HashSet<>();
 
     @Override
     public String getPassword() {
@@ -128,5 +133,16 @@ public class Client implements UserDetailsCustom {
 
     public void setEnabled(Boolean enabled) {
         isEnabled = enabled;
+    }
+
+    /**
+     * Récupère les baux actifs du locataire
+     *
+     * @return Liste des baux actifs
+     */
+    public List<Bail> getBauxActifs() {
+        return baux.stream()
+                .filter(bail -> Boolean.TRUE.equals(bail.getActif()))
+                .collect(Collectors.toList());
     }
 }

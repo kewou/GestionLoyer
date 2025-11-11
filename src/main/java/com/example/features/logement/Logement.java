@@ -32,10 +32,12 @@ public class Logement implements Serializable {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "adresse")
+    private String adresse;
+
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
-
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "logement", orphanRemoval = true)
     private Set<Appart> apparts = new HashSet<>();
@@ -47,11 +49,9 @@ public class Logement implements Serializable {
         this.quartier = quartier;
     }
 
-
     @JsonIgnore
     public Client getClient() {
         return this.client;
     }
-
 
 }

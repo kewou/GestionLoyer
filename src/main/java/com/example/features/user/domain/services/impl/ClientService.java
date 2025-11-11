@@ -65,7 +65,6 @@ public class ClientService implements ClientAppService {
                 .collect(Collectors.toList());
     }
 
-
     public ClientDto register(ClientDto clientDto, Role clientRole) throws BusinessException {
         Client client = ClientMapper.getMapper().entitie(clientDto);
         if (!checkIfClientExist(client.getEmail())) {
@@ -78,10 +77,11 @@ public class ClientService implements ClientAppService {
             client.setRoles(roles);
             clientRepository.save(client);
             log.info("Client {} is created ", client.getReference());
-            sendInscriptionMail(client);
+            // sendInscriptionMail(client);
             return ClientMapper.getMapper().dto(client);
         } else {
-            throw new BusinessException(String.format("Client with email %s is already exist on database", client.getEmail()), OTHER);
+            throw new BusinessException(
+                    String.format("Client with email %s is already exist on database", client.getEmail()), OTHER);
         }
     }
 
@@ -100,12 +100,14 @@ public class ClientService implements ClientAppService {
             sendInscriptionMail(client);
             return ClientMapper.getMapper().dto(client);
         } else {
-            throw new BusinessException(String.format("Client with email %s is already exist on database", client.getEmail()), OTHER);
+            throw new BusinessException(
+                    String.format("Client with email %s is already exist on database", client.getEmail()), OTHER);
         }
     }
 
     public void sendInscriptionMail(Client client) {
-        final String verificationToken = client.getVerificationToken() != null ? client.getVerificationToken() : "token_generated";
+        final String verificationToken = client.getVerificationToken() != null ? client.getVerificationToken()
+                : "token_generated";
         final String message = inscriptionMessage != null ? String.format(inscriptionMessage,
                 String.format("%s %s", client.getName(), client.getLastName()),
                 String.format("%s/login#%s/%s", uriSite,
@@ -120,8 +122,7 @@ public class ClientService implements ClientAppService {
                             .sender(inscriptionSender)
                             .recipients(List.of(client.getEmail()))
                             .message(message)
-                            .build()
-            );
+                            .build());
         } catch (MessagingException e) {
             log.error("Error sendind email", e);
         }
@@ -150,8 +151,7 @@ public class ClientService implements ClientAppService {
                             .sender(inscriptionSender)
                             .recipients(List.of(email))
                             .message(message)
-                            .build()
-            );
+                            .build());
         } catch (MessagingException e) {
             log.error("Error sending email", e);
         }
@@ -167,7 +167,6 @@ public class ClientService implements ClientAppService {
         clientRepository.save(client);
     }
 
-
     public ClientDto getClientByReference(String reference) throws BusinessException {
         return ClientMapper.getMapper().dto(this.getClientFromDatabase(reference));
     }
@@ -175,7 +174,6 @@ public class ClientService implements ClientAppService {
     public Client getClientByEmail(String email) {
         return clientRepository.findByEmail(email);
     }
-
 
     public ClientDto update(ClientDto clientDto, String reference) throws BusinessException {
         Client client = this.getClientFromDatabase(reference);
@@ -194,7 +192,8 @@ public class ClientService implements ClientAppService {
 
     public Client getClientFromDatabase(String reference) throws BusinessException {
         Client client = clientRepository.findByReference(reference)
-                .orElseThrow(() -> new BusinessException(String.format("No user found with this reference %s", reference), NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(
+                        String.format("No user found with this reference %s", reference), NOT_FOUND));
         log.info("Client {} is found ", reference);
         return client;
     }
@@ -219,7 +218,6 @@ public class ClientService implements ClientAppService {
                 .map(ClientMapper.getMapper()::dto)
                 .collect(Collectors.toList());
     }
-
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
