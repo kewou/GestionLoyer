@@ -39,7 +39,6 @@ public class TransactionRepositoryIT {
         client.setReference("CLI-001");
         client = clientRepository.save(client);
 
-
         Logement logement = new Logement();
         logement.setReference("LGT-001");
         logement.setDescription("Immeuble Paris 15");
@@ -54,15 +53,17 @@ public class TransactionRepositoryIT {
 
         // Création transaction liée à l'appart
         Transaction tx = new Transaction();
-        tx.setMontantVerser(250);
-        //tx.setAppart(appart);
+        tx.setMontant(250);
+        // tx.setBail(bail); // TODO: Créer un bail si nécessaire
 
         transactionRepository.save(tx);
 
         // Vérification avec findByAppart
-        /*List<Transaction> results = transactionRepository.findByAppart(appart);
-
-        assertThat(results).isNotEmpty();
-        assertThat(results.get(0).getAppart().getReference()).isEqualTo("APP-1001");*/
+        /*
+         * List<Transaction> results = transactionRepository.findByAppart(appart);
+         *
+         * assertThat(results).isNotEmpty();
+         * assertThat(results.get(0).getAppart().getReference()).isEqualTo("APP-1001");
+         */
     }
 }
