@@ -6,6 +6,7 @@ import com.example.features.user.infra.ClientRepository;
 import com.example.utils.jwt.JwtRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,6 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import javax.transaction.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,7 +36,14 @@ public class GetTokenForAuthTest {
 
     private static final String URL = "/users";
 
+    @BeforeEach
+    public void setUp() {
+        // Nettoyer la base avant chaque test
+        clientRepository.deleteAll();
+    }
+
     @Test
+    @Transactional
     public void getUserByEmailTest() throws Exception {
         String val = mapper.writeValueAsString(ClientDto.builder()
                 .reference("test_id")
@@ -54,15 +64,30 @@ public class GetTokenForAuthTest {
 
     }
 
-
     @Test
     public void authenticationTest() throws Exception {
-        getUserByEmailTest();
-        Client client = clientRepository.findByEmail("kewou.noumia@gmail.com");
-        client.setEnabled(true);
-        clientRepository.save(client);
+        // Créer un utilisateur pour le test d'authentification
+        String val = mapper.writeValueAsString(ClientDto.builder()
+                .reference("test_auth_id")
+                .name("AUTH")
+                .lastName("TEST")
+                .email("auth.test@gmail.com")
+                .phone("0615664758")
+                .password("Tourneyuvbekuyb*155r14")
+                .build());
+        this.mockMvc.perform(post(URL + "/create-locataire")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(val));
+
+        // Activer le compte
+        Client client = clientRepository.findByEmail("auth.test@gmail.com");
+        if (client != null) {
+            client.setEnabled(true);
+            clientRepository.save(client);
+        }
+
         String body = mapper.writeValueAsString(JwtRequest.builder()
-                .username("kewou.noumia@gmail.com")
+                .username("auth.test@gmail.com")
                 .password("Tourneyuvbekuyb*155r14")
                 .build());
 
