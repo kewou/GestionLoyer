@@ -103,7 +103,7 @@ public class Client implements UserDetailsCustom {
 
     @Override
     public boolean isEnabled() {
-        return isEnabled;
+        return isEnabled != null && isEnabled;
     }
 
     @Override
@@ -111,8 +111,10 @@ public class Client implements UserDetailsCustom {
         Set<GrantedAuthority> authorities = new HashSet<>();
 
         // Ajoutez les rôles de l'utilisateur en tant qu'objets GrantedAuthority
-        for (String role : this.getRoles()) {
-            authorities.add(new SimpleGrantedAuthority(role));
+        if (this.getRoles() != null) {
+            for (String role : this.getRoles()) {
+                authorities.add(new SimpleGrantedAuthority(role));
+            }
         }
 
         return authorities;
@@ -141,6 +143,9 @@ public class Client implements UserDetailsCustom {
      * @return Liste des baux actifs
      */
     public List<Bail> getBauxActifs() {
+        if (baux == null) {
+            return List.of();
+        }
         return baux.stream()
                 .filter(bail -> Boolean.TRUE.equals(bail.getActif()))
                 .collect(Collectors.toList());

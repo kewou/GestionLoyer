@@ -27,6 +27,8 @@ public class OAuth2Controller {
     @Autowired
     private ClientAppService clientAppService;
 
+    @Autowired
+    private ClientMapper clientMapper;
 
     @GetMapping("/authorize/{provider}")
     public void redirect(@PathVariable String provider,
@@ -48,7 +50,7 @@ public class OAuth2Controller {
             clientDto.setEmail(userInfo.getEmail());
             clientDto.setName(userInfo.getName());
             clientDto.setLastName(userInfo.getLastName());
-            ClientMapper.getMapper().entitie(clientAppService.register(clientDto));
+            clientMapper.entitie(clientAppService.register(clientDto));
             client = clientAppService.getClientByEmail(userInfo.getEmail());
         }
         final String token = jwtUtils.generateToken(client);

@@ -4,6 +4,7 @@ import com.example.exceptions.BusinessException;
 import com.example.features.common.mail.MessageDto;
 import com.example.features.common.mail.MessageService;
 import com.example.features.user.application.mapper.ClientDto;
+import com.example.features.user.application.mapper.ClientMapper;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.infra.ClientRepository;
 import com.example.security.Role;
@@ -13,10 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -38,20 +36,21 @@ class ClientServiceTest {
     @MockBean
     MessageService messageService;
 
+    @MockBean
+    ClientMapper clientMapper;
 
     @BeforeEach
     void setUp() {
-        clientService = new ClientService(clientRepository, messageService);
+        clientService = new ClientService(clientRepository, messageService, clientMapper);
     }
-
 
     @ParameterizedTest
     @ValueSource(strings = {"ADMIN", "BAILLEUR", "LOCATAIRE"})
     void should_create_client_and_send_mail(Role clientRole) throws BusinessException, MessagingException {
-        //Given
+        // Given
         final String password = "test";
 
-        //When
+        // When
         final ClientDto clientRegistered = clientService.register(ClientDto.builder()
                 .email("test@client.fr")
                 .lastName("Test")
@@ -59,13 +58,16 @@ class ClientServiceTest {
                 .password(password)
                 .build(), clientRole);
 
-        //Then
+        // Then
         verify(clientRepository, times(1)).save(any(Client.class));
         final MessageDto inscriptionMessage = MessageDto.builder()
                 .subject("Beezyweb : Validation de votre compte")
-                .message(String.format("Bonjour %s, \n\n Merci de vous être inscrit sur notre site. Veuillez cliquer sur le lien suivant pour valider votre inscription : \n %s \n\n. " +
+                .message(String.format(
+                        "Bonjour %s, \n\n Merci de vous être inscrit sur notre site. Veuillez cliquer sur le lien suivant pour valider votre inscription : \n %s \n\n. "
+                                +
                                 "Si vous n'avez pas créé de compte, veuillez ignorer cet email \n\n. Cordialement,\n L'équipe <a href='%s'>BeezyWeb </a>",
-                        "Client Test", "localhost:4200/token_generated", "https://beezyweb.net"))
+                        "Client Test", "localhost:4200/token_generated",
+                        "https://beezyweb.net"))
                 .sender("beezyweb@beezyweb.net")
                 .recipients(List.of("test@client.fr"))
                 .build();
@@ -77,27 +79,26 @@ class ClientServiceTest {
 
     @Test
     void should_send_reset_password_mail_when_client_really_exists() throws MessagingException {
-        //Given
+        // Given
         String mail = "test@client.fr";
         Client client = Client.builder()
                 .email(mail)
                 .reference("AXXXXX")
                 .build();
         when(clientService.getClientByEmail(mail)).thenReturn(
-                client
-        );
+                client);
 
-        //When
+        // When
         clientService.sendResetPasswordMail(client);
 
-        //Then
+        // Then
         verify(messageService, times(1)).sendHtmlMessage(any(MessageDto.class));
 
     }
 
     @Test
     void should_send_reset_password_mail_with_this_exact_message() throws MessagingException {
-        //Given
+        // Given
         String mail = "test@client.fr";
         Client client = Client.builder()
                 .email(mail)
@@ -106,12 +107,11 @@ class ClientServiceTest {
                 .name("Client")
                 .build();
 
-        //When
+        // When
         clientService.sendResetPasswordMail(client);
 
-        //Then
+        // Then
         verify(messageService, times(1)).sendHtmlMessage(
-                any(MessageDto.class)
-        );
+                any(MessageDto.class));
     }
 }

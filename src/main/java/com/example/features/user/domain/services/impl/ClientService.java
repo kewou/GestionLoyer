@@ -42,6 +42,8 @@ public class ClientService implements ClientAppService {
 
     private final MessageService messageService;
 
+    private final ClientMapper clientMapper;
+
     @Value("${inscription.message}")
     private String inscriptionMessage;
 
@@ -54,19 +56,21 @@ public class ClientService implements ClientAppService {
     @Value("${resetPassword.message}")
     private String resetPasswordMessage;
 
-    public ClientService(ClientRepository clientRepository, MessageService messageService) {
+    public ClientService(ClientRepository clientRepository, MessageService messageService, ClientMapper clientMapper) {
         this.clientRepository = clientRepository;
         this.messageService = messageService;
+        this.clientMapper = clientMapper;
     }
 
     public List<ClientDto> getAllClient() {
         return clientRepository.findAll().stream()
-                .map(ClientMapper.getMapper()::dto)
+                .map(clientMapper::dto)
                 .collect(Collectors.toList());
     }
 
     public ClientDto register(ClientDto clientDto, Role clientRole) throws BusinessException {
-        Client client = ClientMapper.getMapper().entitie(clientDto);
+        Client client = clientMapper.entitie(clientDto);
+        initializeClientCollections(client);
         if (!checkIfClientExist(client.getEmail())) {
             if (Objects.equals(client.getReference(), "") || client.getReference() == null) {
                 client.setReference(GeneralUtils.generateReference());
@@ -78,7 +82,7 @@ public class ClientService implements ClientAppService {
             clientRepository.save(client);
             log.info("Client {} is created ", client.getReference());
             // sendInscriptionMail(client);
-            return ClientMapper.getMapper().dto(client);
+            return clientMapper.dto(client);
         } else {
             throw new BusinessException(
                     String.format("Client with email %s is already exist on database", client.getEmail()), OTHER);
@@ -86,7 +90,8 @@ public class ClientService implements ClientAppService {
     }
 
     public ClientDto register(ClientDto clientDto) throws BusinessException {
-        Client client = ClientMapper.getMapper().entitie(clientDto);
+        Client client = clientMapper.entitie(clientDto);
+        initializeClientCollections(client);
         if (!checkIfClientExist(client.getEmail())) {
             if (Objects.equals(client.getReference(), "") || client.getReference() == null) {
                 client.setReference(GeneralUtils.generateReference());
@@ -98,7 +103,7 @@ public class ClientService implements ClientAppService {
             clientRepository.save(client);
             log.info("Client {} is created ", client.getReference());
             sendInscriptionMail(client);
-            return ClientMapper.getMapper().dto(client);
+            return clientMapper.dto(client);
         } else {
             throw new BusinessException(
                     String.format("Client with email %s is already exist on database", client.getEmail()), OTHER);
@@ -168,7 +173,7 @@ public class ClientService implements ClientAppService {
     }
 
     public ClientDto getClientByReference(String reference) throws BusinessException {
-        return ClientMapper.getMapper().dto(this.getClientFromDatabase(reference));
+        return clientMapper.dto(this.getClientFromDatabase(reference));
     }
 
     public Client getClientByEmail(String email) {
@@ -177,11 +182,12 @@ public class ClientService implements ClientAppService {
 
     public ClientDto update(ClientDto clientDto, String reference) throws BusinessException {
         Client client = this.getClientFromDatabase(reference);
-        Client clientUpdate = ClientMapper.getMapper().entitie(clientDto);
-        ClientMapper.getMapper().update(client, clientUpdate);
+        Client clientUpdate = clientMapper.entitie(clientDto);
+        initializeClientCollections(clientUpdate);
+        clientMapper.update(client, clientUpdate);
         clientRepository.save(client);
         log.info("Client {} is update ", reference);
-        return ClientMapper.getMapper().dto(clientUpdate);
+        return clientMapper.dto(clientUpdate);
     }
 
     public void delete(String reference) throws BusinessException {
@@ -213,9 +219,10 @@ public class ClientService implements ClientAppService {
         clientRepository.save(client);
     }
 
+    @Override
     public List<ClientDto> searchLocatairesByName(String name) {
         return clientRepository.searchLocatairesByName(name).stream()
-                .map(ClientMapper.getMapper()::dto)
+                .map(clientMapper::dto)
                 .collect(Collectors.toList());
     }
 
@@ -223,6 +230,20 @@ public class ClientService implements ClientAppService {
 
     private boolean checkIfClientExist(String email) {
         return clientRepository.findByEmail(email) != null;
+    }
+
+    private void initializeClientCollections(Client client) {
+        if (client != null) {
+            if (client.getRoles() == null) {
+                client.setRoles(new HashSet<>());
+            }
+            if (client.getLogements() == null) {
+                client.setLogements(new HashSet<>());
+            }
+            if (client.getBaux() == null) {
+                client.setBaux(new HashSet<>());
+            }
+        }
     }
 
 }
