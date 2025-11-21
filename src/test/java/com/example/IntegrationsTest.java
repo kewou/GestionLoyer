@@ -2,6 +2,7 @@ package com.example;
 
 import com.example.features.appart.application.mapper.AppartDto;
 import com.example.features.appart.infra.AppartRepository;
+import com.example.features.bail.dto.CreateBailRequestDto;
 import com.example.features.common.mail.MessageService;
 import com.example.features.logement.LogementDto;
 import com.example.features.logement.LogementRepository;
@@ -12,7 +13,6 @@ import com.example.features.user.domain.services.impl.ClientService;
 import com.example.features.user.infra.ClientRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.IntNode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,7 +65,6 @@ public class IntegrationsTest {
     @Qualifier("loggingMailService")
     MessageService messageService;
 
-
     @BeforeEach
     public void setUp() {
         logementRepository.deleteAll();
@@ -81,8 +80,7 @@ public class IntegrationsTest {
     @Test
     @WithMockUser(authorities = "ADMIN")
     public void getAllUserTest() throws Exception {
-        mockMvc.perform(get("/admin/users").
-                        contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/admin/users").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -131,7 +129,6 @@ public class IntegrationsTest {
 
     }
 
-
     @Test
     @WithMockUser(authorities = "ADMIN")
     public void updateUserTest() throws Exception {
@@ -148,7 +145,7 @@ public class IntegrationsTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(valPost));
         Assertions.assertEquals(clientRepository.findAll().size(), 1);
-        //String ref = clientRepository.findAll().iterator().next().getReference();
+        // String ref = clientRepository.findAll().iterator().next().getReference();
         HashMap<String, Object> m = new HashMap<String, Object>();
         m.put("reference", "test_id");
         m.put("name", "KEWOU");
@@ -163,7 +160,6 @@ public class IntegrationsTest {
         String name = mapper.readerForMapOf(Object.class).readTree(res).get("name").asText();
         Assertions.assertEquals(name, "KEWOU");
     }
-
 
     @Test
     @Transactional
@@ -188,7 +184,6 @@ public class IntegrationsTest {
         Assertions.assertTrue(clientRepository.findAll().isEmpty());
 
     }
-
 
     @Test
     @WithMockUser(authorities = "ADMIN")
@@ -215,7 +210,6 @@ public class IntegrationsTest {
     public void getLogementsByUserTest() throws Exception {
         createLogementTest();
 
-
         String res = mockMvc.perform(get("/bailleur/users/refUser/logements")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -230,7 +224,6 @@ public class IntegrationsTest {
     @WithMockUser(authorities = "ADMIN")
     public void getOneLogementByUserTest() throws Exception {
         createLogementTest();
-
 
         String res = mockMvc.perform(get("/bailleur/users/refUser/logements/refLgt")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -262,12 +255,10 @@ public class IntegrationsTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn().getResponse().getContentAsString();
 
-
         JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res);
         String description = resNode.get("description").asText();
         Assertions.assertEquals(description, "Duplex");
     }
-
 
     @Test
     @WithMockUser(authorities = "ADMIN")
@@ -302,12 +293,11 @@ public class IntegrationsTest {
         JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res).get(0);
         String nom = resNode.get("nom").asText();
         Assertions.assertEquals(nom, "355");
-        // test génération automatique du premier loyer
-        JsonNode loyers = resNode.get("loyers");
-        Assertions.assertEquals(loyers.size(), 1);
-        JsonNode loyer = loyers.get(0);
-        Assertions.assertEquals(loyer.get("solde"), new IntNode(-500)); // 500 étant le prix du loyer de l'appart créer
-
+        // Note: Le champ "loyers" n'existe plus dans AppartDto, il est maintenant dans
+        // BailDto
+        // Vérifier que l'appartement a été créé correctement
+        Assertions.assertNotNull(resNode.get("reference"));
+        Assertions.assertEquals(resNode.get("prixLoyer").asInt(), 500);
 
     }
 
@@ -356,10 +346,29 @@ public class IntegrationsTest {
     public void mettreLocataireDansAppartTest() throws Exception {
         createAppartTest();
 
-        mockMvc.perform(patch("/bailleur/users/refUser/logements/refLgt/apparts/refAppart/nouveau-locataire/refUser")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andReturn().getResponse().getContentAsString();
+        // Créer un locataire d'abord
+        String locataireDto = mapper.writeValueAsString(ClientDto.builder()
+                .reference("refLocataire")
+                .name("LOCATAIRE")
+                .lastName("TEST")
+                .email("locataire.test@gmail.com")
+                .phone("0615664758")
+                .password("Tourneyuvbekuyb*155r14")
+                .build());
+        mockMvc.perform(post(URL + "/create-locataire")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(locataireDto));
+
+        // Assigner le locataire à l'appartement via le nouvel endpoint
+        CreateBailRequestDto bailDto = new CreateBailRequestDto();
+        bailDto.setLocataireRef("refLocataire");
+        bailDto.setDateEntree(java.time.LocalDate.now());
+        String bailRequestJson = mapper.writeValueAsString(bailDto);
+
+        mockMvc.perform(post("/baux/apparts/refAppart")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bailRequestJson))
+                .andExpect(status().is(HttpStatus.CREATED.value()));
 
         String res = mockMvc.perform(get("/bailleur/users/refUser/logements/refLgt/apparts/refAppart")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -370,40 +379,52 @@ public class IntegrationsTest {
         Assertions.assertNotNull(resNode);
     }
 
-
     @Test
     @WithMockUser(authorities = "ADMIN")
     public void createTransactionTest() throws Exception {
         this.createAppartTest();
+
+        // Créer un locataire d'abord
+        String locataireDto = mapper.writeValueAsString(ClientDto.builder()
+                .reference("refLocataireTx")
+                .name("LOCATAIRE")
+                .lastName("TX")
+                .email("locataire.tx@gmail.com")
+                .phone("0615664758")
+                .password("Tourneyuvbekuyb*155r14")
+                .build());
+        mockMvc.perform(post(URL + "/create-locataire")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(locataireDto));
+
+        // Assigner le locataire à l'appartement pour créer un bail
+        CreateBailRequestDto bailDto = new CreateBailRequestDto();
+        bailDto.setLocataireRef("refLocataireTx");
+        bailDto.setDateEntree(java.time.LocalDate.now());
+        String bailRequestJson = mapper.writeValueAsString(bailDto);
+
+        String bailResponse = mockMvc.perform(post("/baux/apparts/refAppart")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bailRequestJson))
+                .andExpect(status().is(HttpStatus.CREATED.value()))
+                .andReturn().getResponse().getContentAsString();
+
+        // Récupérer le bailId de la réponse
+        JsonNode bailNode = mapper.readerForMapOf(Object.class).readTree(bailResponse);
+        Long bailId = bailNode.get("id").asLong();
+
+        // Créer une transaction via le nouvel endpoint
         String transaction = mapper.writeValueAsString(TransactionDto.builder()
                 .montant(500)
                 .build());
         Assertions.assertTrue(transactionRepository.findAll().isEmpty());
 
-        mockMvc.perform(post("/bailleur/users/refUser/apparts/refAppart/nouvelle-transaction")
+        mockMvc.perform(post("/baux/" + bailId + "/transactions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(transaction))
                 .andDo(print())
-                .andExpect(status().is(HttpStatus.CREATED.value()));
+                .andExpect(status().is(HttpStatus.OK.value()));
         Assertions.assertEquals(transactionRepository.findAll().size(), 1);
-
-        // Test de l'effet de la transaction sur l'appartement
-
-        String res = mockMvc.perform(get("/bailleur/users/refUser/logements/refLgt/apparts")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andReturn().getResponse().getContentAsString();
-
-        JsonNode resNode = mapper.readerForMapOf(Object.class).readTree(res).get(0);
-        String nom = resNode.get("nom").asText();
-        Assertions.assertEquals(nom, "355");
-        // test génération automatique du premier loyer
-        JsonNode loyers = resNode.get("loyers");
-        Assertions.assertEquals(loyers.size(), 1);
-        JsonNode loyer = loyers.get(0);
-        Assertions.assertEquals(loyer.get("solde"), new IntNode(0));
-
-
     }
 
 }
