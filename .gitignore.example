@@ -1,0 +1,22 @@
+# Fichiers de configuration locale
+.env
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# Système d'exploitation
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Données de test
+*.sql.backup
+backup.sql
+

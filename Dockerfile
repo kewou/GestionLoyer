@@ -15,11 +15,13 @@ RUN mvn clean package -DskipTests && \
 # Nouvelle étape pour l'image finale
 FROM adoptopenjdk/openjdk11:alpine-jre
 
+WORKDIR /app
+
 # Copier le jar depuis l'image de construction
 COPY --from=build /app/myapp.jar /app/myapp.jar
 
 # Exposition
-EXPOSE 8092
+EXPOSE 8090
 
-# java -jar /usr/local/runme/app.jar
-ENTRYPOINT ["java","-jar","/app/myapp.jar","--spring.profiles.active=dev"]
+# Lancer l'application Spring Boot (le profil sera défini par la variable d'environnement)
+ENTRYPOINT ["java","-jar","/app/myapp.jar"]
