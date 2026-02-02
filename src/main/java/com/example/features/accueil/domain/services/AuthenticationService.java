@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URLDecoder;
 
@@ -33,6 +34,7 @@ public class AuthenticationService implements UserDetailsService {
 
 
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Client client = clientAppService.getClientByEmail(URLDecoder.decode(username));
         if (client != null) {
