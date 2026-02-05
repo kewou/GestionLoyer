@@ -30,4 +30,11 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
             "AND 'LOCATAIRE' MEMBER OF c.roles")
     List<Client> searchLocatairesByName(@Param("name") String name);
 
+    @Query("SELECT DISTINCT c FROM Client c " +
+            "LEFT JOIN FETCH c.baux b " +
+            "LEFT JOIN FETCH b.appart a " +
+            "LEFT JOIN FETCH a.logement " +
+            "WHERE c.reference = :reference")
+    Optional<Client> findByReferenceWithBaux(@Param("reference") String reference);
+
 }

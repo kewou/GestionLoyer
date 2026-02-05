@@ -62,7 +62,7 @@ public class LocataireController {
 
         log.info("Récupération des informations pour le locataire: {}", reference);
 
-        Client locataire = clientService.getClientFromDatabase(reference);
+        Client locataire = clientService.getClientWithBaux(reference);
         if (locataire == null) {
             log.warn("Locataire non trouvé: {}", reference);
             return ResponseEntity.notFound().build();
@@ -103,7 +103,7 @@ public class LocataireController {
 
         log.info("Récupération des appartements pour le locataire: {}", reference);
 
-        Client locataire = clientService.getClientFromDatabase(reference);
+        Client locataire = clientService.getClientWithBaux(reference);
         if (locataire == null) {
             log.warn("Locataire non trouvé: {}", reference);
             return ResponseEntity.notFound().build();

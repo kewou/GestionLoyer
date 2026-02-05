@@ -204,6 +204,14 @@ public class ClientService implements ClientAppService {
         return client;
     }
 
+    public Client getClientWithBaux(String reference) throws BusinessException {
+        Client client = clientRepository.findByReferenceWithBaux(reference)
+                .orElseThrow(() -> new BusinessException(
+                        String.format("No user found with this reference %s", reference), NOT_FOUND));
+        log.info("Client {} is found with {} baux", reference, client.getBaux() != null ? client.getBaux().size() : 0);
+        return client;
+    }
+
     @Override
     public UserInfoDto getUserRole(UserInfoDto userInfoDto) throws BusinessException {
         Set<String> roles = getClientByEmail(userInfoDto.getEmail()).getRoles();
