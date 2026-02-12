@@ -10,6 +10,7 @@ import com.example.exceptions.ValidationException;
 import com.example.features.accueil.domain.services.AuthenticationService;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.application.mapper.ClientDto;
+import com.example.features.user.application.mapper.UpdatePasswordDto;
 import com.example.features.user.application.mapper.VerificationUserInscriptionDto;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.domain.services.impl.ClientService;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 /**
  * @author Joel NOUMIA
@@ -101,17 +103,48 @@ public class ClientController {
         return ResponseEntity.ok(clientAppService.update(ClientDto, reference));
     }
 
-    @PostMapping(path="/verify-account")
+    @PostMapping(path = "/verify-account")
     public JwtResponse verifyAccount(@RequestBody VerificationUserInscriptionDto verificationUserInscriptionDto) throws BusinessException, UnsupportedEncodingException {
         final Client client = clientAppService.getClientFromDatabase(verificationUserInscriptionDto.getReference());
-        log.warn("Token values {}-{}", client.getVerificationToken(), verificationUserInscriptionDto.getVerificationToken());
-        if (verificationUserInscriptionDto.getVerificationToken() != null
-                && !verificationUserInscriptionDto.getVerificationToken().equals(client.getVerificationToken())) {
+        verifyAndValidateAccount(client, verificationUserInscriptionDto.getVerificationToken());
+        final String token = jwtUtils.generateToken(client);
+        return new JwtResponse(token);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody String email) throws BusinessException {
+        Client client = clientAppService.getClientByEmail(email);
+        if (client == null) {
+            throw new BusinessException("Client not found");
+        }
+        clientAppService.sendResetPasswordMail(client);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/update-password")
+    public ResponseEntity<Void> updatePassword(@RequestBody UpdatePasswordDto updatePasswordDto) throws BusinessException {
+        Client client = clientAppService.getClientByEmail(updatePasswordDto.getEmail());
+        if (client == null) {
+            throw new BusinessException("Client not found");
+        }
+        verifyAndValidateAccount(client, updatePasswordDto.getVerificationToken());
+        clientAppService.updatePasswordClient(updatePasswordDto);
+        return ResponseEntity.ok().build();
+    }
+
+    private void verifyAndValidateAccount(Client client, String verificationToken) throws BusinessException {
+        if (verificationToken == null || !verificationToken.equals(client.getVerificationToken())) {
             throw new BusinessException("invalid operation");
         }
         clientAppService.validateToken(client);
-        final String token = jwtUtils.generateToken(client);
-        return new JwtResponse(token);
+    }
+
+    @GetMapping("/{reference}/search")
+    @PreAuthorize("hasAuthority('BAILLEUR') or hasAuthority('ADMIN')")
+    public ResponseEntity<List<ClientDto>> searchLocataires(
+            @RequestParam String name
+    ) {
+        return ResponseEntity.ok(clientAppService.searchLocatairesByName(name));
     }
 
 

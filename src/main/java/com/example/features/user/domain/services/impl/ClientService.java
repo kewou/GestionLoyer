@@ -6,11 +6,12 @@
 package com.example.features.user.domain.services.impl;
 
 import com.example.exceptions.BusinessException;
-import com.example.features.common.mail.application.MessageService;
-import com.example.features.common.mail.dto.MessageDto;
+import com.example.features.common.mail.MessageDto;
+import com.example.features.common.mail.MessageService;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.application.mapper.ClientDto;
 import com.example.features.user.application.mapper.ClientMapper;
+import com.example.features.user.application.mapper.UpdatePasswordDto;
 import com.example.features.user.application.mapper.UserInfoDto;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.infra.ClientRepository;
@@ -41,29 +42,35 @@ public class ClientService implements ClientAppService {
 
     private final MessageService messageService;
 
+    private final ClientMapper clientMapper;
+
     @Value("${inscription.message}")
     private String inscriptionMessage;
 
-    @Value("${inscription.validation.uri:https://beezyweb.net/login}")
+    @Value("${inscription.validation.uri:https://beezyweb.net}")
     private String uriSite;
 
     @Value("${inscription.sender}")
     private String inscriptionSender;
 
-    public ClientService(ClientRepository clientRepository, MessageService messageService) {
+    @Value("${resetPassword.message}")
+    private String resetPasswordMessage;
+
+    public ClientService(ClientRepository clientRepository, MessageService messageService, ClientMapper clientMapper) {
         this.clientRepository = clientRepository;
         this.messageService = messageService;
+        this.clientMapper = clientMapper;
     }
 
     public List<ClientDto> getAllClient() {
         return clientRepository.findAll().stream()
-                .map(ClientMapper.getMapper()::dto)
+                .map(clientMapper::dto)
                 .collect(Collectors.toList());
     }
 
-
     public ClientDto register(ClientDto clientDto, Role clientRole) throws BusinessException {
-        Client client = ClientMapper.getMapper().entitie(clientDto);
+        Client client = clientMapper.entitie(clientDto);
+        initializeClientCollections(client);
         if (!checkIfClientExist(client.getEmail())) {
             if (Objects.equals(client.getReference(), "") || client.getReference() == null) {
                 client.setReference(GeneralUtils.generateReference());
@@ -74,15 +81,17 @@ public class ClientService implements ClientAppService {
             client.setRoles(roles);
             clientRepository.save(client);
             log.info("Client {} is created ", client.getReference());
-            //sendInscriptionMail(client);
-            return ClientMapper.getMapper().dto(client);
+            // sendInscriptionMail(client);
+            return clientMapper.dto(client);
         } else {
-            throw new BusinessException(String.format("Client with email %s is already exist on database", client.getEmail()), OTHER);
+            throw new BusinessException(
+                    String.format("Client with email %s is already exist on database", client.getEmail()), OTHER);
         }
     }
 
     public ClientDto register(ClientDto clientDto) throws BusinessException {
-        Client client = ClientMapper.getMapper().entitie(clientDto);
+        Client client = clientMapper.entitie(clientDto);
+        initializeClientCollections(client);
         if (!checkIfClientExist(client.getEmail())) {
             if (Objects.equals(client.getReference(), "") || client.getReference() == null) {
                 client.setReference(GeneralUtils.generateReference());
@@ -93,21 +102,23 @@ public class ClientService implements ClientAppService {
             client.setIsEnabled(true);
             clientRepository.save(client);
             log.info("Client {} is created ", client.getReference());
-            //sendInscriptionMail(client);
-            return ClientMapper.getMapper().dto(client);
+            sendInscriptionMail(client);
+            return clientMapper.dto(client);
         } else {
-            throw new BusinessException(String.format("Client with email %s is already exist on database", client.getEmail()), OTHER);
+            throw new BusinessException(
+                    String.format("Client with email %s is already exist on database", client.getEmail()), OTHER);
         }
     }
 
-    private void sendInscriptionMail(Client client) {
-        final String verificationToken = client.getVerificationToken() != null ? client.getVerificationToken() : "token_generated";
+    public void sendInscriptionMail(Client client) {
+        final String verificationToken = client.getVerificationToken() != null ? client.getVerificationToken()
+                : "token_generated";
         final String message = inscriptionMessage != null ? String.format(inscriptionMessage,
                 String.format("%s %s", client.getName(), client.getLastName()),
-                String.format("%s#%s/%s", uriSite,
+                String.format("%s/login#%s/%s", uriSite,
                         client.getReference(),
                         verificationToken),
-                "https://beezyweb.net") : "Vous êtes bien inscrits";
+                uriSite) : "Vous êtes bien inscrits";
         log.debug("Mail {}", message);
         try {
             messageService.sendHtmlMessage(
@@ -116,30 +127,67 @@ public class ClientService implements ClientAppService {
                             .sender(inscriptionSender)
                             .recipients(List.of(client.getEmail()))
                             .message(message)
-                            .build()
-            );
+                            .build());
         } catch (MessagingException e) {
             log.error("Error sendind email", e);
         }
     }
 
+    @Override
+    public void sendResetPasswordMail(Client client) {
+        final String email = client.getEmail();
+        final String message;
+        String verificationToken = GeneralUtils.generateVerificationToken();
+        client.setVerificationToken(verificationToken);
+        if (resetPasswordMessage != null) {
+            message = String.format(resetPasswordMessage,
+                    String.format("%s %s", client.getName(), client.getLastName()),
+                    String.format("%s/password-reset?email=%s#%s", uriSite,
+                            email,
+                            verificationToken),
+                    uriSite);
+        } else {
+            message = "Mot de passe oublié";
+        }
+        try {
+            messageService.sendHtmlMessage(
+                    MessageDto.builder()
+                            .subject("BeezyWeb : Réinitialisation de mot de passe")
+                            .sender(inscriptionSender)
+                            .recipients(List.of(email))
+                            .message(message)
+                            .build());
+        } catch (MessagingException e) {
+            log.error("Error sending email", e);
+        }
+    }
+
+    @Override
+    public void updatePasswordClient(UpdatePasswordDto updatePasswordDto) throws BusinessException {
+        Client client = clientRepository.findByEmail(updatePasswordDto.getEmail());
+        if (client == null) {
+            throw new BusinessException("Client not found");
+        }
+        client.setPassword(encoder.encode(updatePasswordDto.getPassword()));
+        clientRepository.save(client);
+    }
 
     public ClientDto getClientByReference(String reference) throws BusinessException {
-        return ClientMapper.getMapper().dto(this.getClientFromDatabase(reference));
+        return clientMapper.dto(this.getClientFromDatabase(reference));
     }
 
     public Client getClientByEmail(String email) {
         return clientRepository.findByEmail(email);
     }
 
-
     public ClientDto update(ClientDto clientDto, String reference) throws BusinessException {
         Client client = this.getClientFromDatabase(reference);
-        Client clientUpdate = ClientMapper.getMapper().entitie(clientDto);
-        ClientMapper.getMapper().update(client, clientUpdate);
+        Client clientUpdate = clientMapper.entitie(clientDto);
+        initializeClientCollections(clientUpdate);
+        clientMapper.update(client, clientUpdate);
         clientRepository.save(client);
         log.info("Client {} is update ", reference);
-        return ClientMapper.getMapper().dto(clientUpdate);
+        return clientMapper.dto(clientUpdate);
     }
 
     public void delete(String reference) throws BusinessException {
@@ -150,8 +198,17 @@ public class ClientService implements ClientAppService {
 
     public Client getClientFromDatabase(String reference) throws BusinessException {
         Client client = clientRepository.findByReference(reference)
-                .orElseThrow(() -> new BusinessException(String.format("No user found with this reference %s", reference), NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(
+                        String.format("No user found with this reference %s", reference), NOT_FOUND));
         log.info("Client {} is found ", reference);
+        return client;
+    }
+
+    public Client getClientWithBaux(String reference) throws BusinessException {
+        Client client = clientRepository.findByReferenceWithBaux(reference)
+                .orElseThrow(() -> new BusinessException(
+                        String.format("No user found with this reference %s", reference), NOT_FOUND));
+        log.info("Client {} is found with {} baux", reference, client.getBaux() != null ? client.getBaux().size() : 0);
         return client;
     }
 
@@ -170,11 +227,31 @@ public class ClientService implements ClientAppService {
         clientRepository.save(client);
     }
 
+    @Override
+    public List<ClientDto> searchLocatairesByName(String name) {
+        return clientRepository.searchLocatairesByName(name).stream()
+                .map(clientMapper::dto)
+                .collect(Collectors.toList());
+    }
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     private boolean checkIfClientExist(String email) {
         return clientRepository.findByEmail(email) != null;
+    }
+
+    private void initializeClientCollections(Client client) {
+        if (client != null) {
+            if (client.getRoles() == null) {
+                client.setRoles(new HashSet<>());
+            }
+            if (client.getLogements() == null) {
+                client.setLogements(new HashSet<>());
+            }
+            if (client.getBaux() == null) {
+                client.setBaux(new HashSet<>());
+            }
+        }
     }
 
 }

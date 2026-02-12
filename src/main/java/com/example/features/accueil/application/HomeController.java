@@ -4,8 +4,8 @@ import com.example.exceptions.AuthenticationException;
 import com.example.exceptions.BusinessException;
 import com.example.features.accueil.application.dto.MessageCreateDto;
 import com.example.features.accueil.domain.services.AuthenticationService;
-import com.example.features.common.mail.application.MessageService;
-import com.example.features.common.mail.dto.MessageDto;
+import com.example.features.common.mail.MessageDto;
+import com.example.features.common.mail.MessageService;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.application.mapper.UserInfoDto;
 import com.example.features.user.domain.entities.Client;
@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,32 +47,37 @@ public class HomeController {
     @Autowired
     private MessageService messageService;
 
-
     @PostMapping("/authenticate")
     public JwtResponse authenticate(@RequestBody JwtRequest jwtRequest) throws Exception {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             jwtRequest.getUsername(),
-                            jwtRequest.getPassword()
-                    )
-            );
+                            jwtRequest.getPassword()));
         } catch (BadCredentialsException e) {
             throw new AuthenticationException("INVALID CREDENTIAL");
+        } catch (DisabledException e) {
+            // Spring Security lance cette exception si le compte est désactivé (isEnabled()
+            // = false)
+            throw new AuthenticationException("ACCOUNT_NOT_VERIFIED");
         }
 
         Client client = clientAppService.getClientByEmail(jwtRequest.getUsername());
+
+        if (client == null) {
+            throw new AuthenticationException("INVALID CREDENTIAL");
+        }
+
         final String token = jwtUtils.generateToken(client);
         return new JwtResponse(token);
     }
 
     @GetMapping("user-roles")
-    public ResponseEntity<UserInfoDto> getUserRole(@RequestBody UserInfoDto userInfoDto, Errors erros
-    ) throws BusinessException {
+    public ResponseEntity<UserInfoDto> getUserRole(@RequestBody UserInfoDto userInfoDto, Errors erros)
+            throws BusinessException {
         ResponseHelper.handle(erros);
         return ResponseEntity.ok(clientAppService.getUserRole(userInfoDto));
     }
-
 
     @GetMapping("/locataire")
     public String homePrivee() {
@@ -85,7 +91,8 @@ public class HomeController {
         MessageDto messageDto = MessageDto.builder()
                 .sender(messageCreateDto.getSenderMail())
                 .message(messageCreateDto.getMessage())
-                .subject("Beezyweb - Nouveau message via contact de l'utilisateur : " + messageCreateDto.getSenderName())
+                .subject(
+                        "Beezyweb - Nouveau message via contact de l'utilisateur : " + messageCreateDto.getSenderName())
                 .recipients(List.of("kewou.noumia@gmail.com"))
                 .build();
         messageService.sendMessage(messageDto);

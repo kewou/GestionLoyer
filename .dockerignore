@@ -1,0 +1,12 @@
+target/
+.git/
+.gitignore
+*.md
+.idea/
+.vscode/
+*.iml
+.DS_Store
+mysql/
+performance_schema/
+*.log
+

@@ -6,19 +6,16 @@ import com.example.features.appart.application.mapper.AppartDto;
 import com.example.features.appart.application.mapper.AppartMapper;
 import com.example.features.appart.domain.entities.Appart;
 import com.example.features.appart.infra.AppartRepository;
-import com.example.features.logement.application.appService.LogementAppService;
-import com.example.features.logement.domain.entities.Logement;
-import com.example.features.loyer.domain.entities.Loyer;
-import com.example.features.loyer.infra.LoyerRepository;
-import com.example.features.user.application.appService.ClientAppService;
-import com.example.features.user.domain.entities.Client;
+import com.example.features.bail.BailMapper;
+import com.example.features.bail.BailRepository;
+import com.example.features.logement.Logement;
+import com.example.features.logement.LogementAppService;
 import com.example.utils.GeneralUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,42 +28,40 @@ public class AppartService implements AppartAppService {
 
     private final LogementAppService logementAppService;
     private final AppartRepository appartRepository;
-    private final LoyerRepository loyerRepository;
-    private final ClientAppService clientAppService;
+
+    private final BailRepository bailRepository;
+    private final BailMapper bailMapper;
+    private final AppartMapper appartMapper;
+
 
     @Autowired
     public AppartService(LogementAppService logementAppService, AppartRepository appartRepository,
-                         LoyerRepository loyerRepository, ClientAppService clientAppService) {
+                         BailRepository bailRepository, BailMapper bailMapper, AppartMapper appartMapper) {
         this.logementAppService = logementAppService;
         this.appartRepository = appartRepository;
-        this.loyerRepository = loyerRepository;
-        this.clientAppService = clientAppService;
+        this.bailRepository = bailRepository;
+        this.bailMapper = bailMapper;
+        this.appartMapper = appartMapper;
     }
 
     public List<AppartDto> getAllAppartByLogement(String refLgt) throws BusinessException {
         Logement lgt = logementAppService.getLogementFromDatabase(refLgt);
         return appartRepository.findByLogement(lgt).stream()
-                .map(AppartMapper.getMapper()::dto)
+                .map(appartMapper::dto)
                 .collect(Collectors.toList());
     }
 
     public AppartDto register(String refLgt, AppartDto appartDto) throws BusinessException {
         Logement logement = logementAppService.getLogementFromDatabase(refLgt);
-        Appart appart = AppartMapper.getMapper().entitie(appartDto);
+        Appart appart = appartMapper.entitie(appartDto);
         appart.setLogement(logement);
         appart.setBailleur(logement.getClient());
-        Loyer newLoyerVide = new Loyer(appart);
-        newLoyerVide.setDateLoyer(LocalDate.now());
-        if (newLoyerVide.getReference() == "" || newLoyerVide.getReference() == null) {
-            newLoyerVide.setReference(GeneralUtils.generateReference());
-        }
         if (appart.getReference() == "" || appart.getReference() == null) {
             appart.setReference(GeneralUtils.generateReference());
         }
         appartRepository.save(appart);
-        loyerRepository.save(newLoyerVide);
         log.info(APPART_LOG + logement.getReference() + " is created");
-        return AppartMapper.getMapper().dto(appart);
+        return appartMapper.dto(appart);
     }
 
 
@@ -75,21 +70,22 @@ public class AppartService implements AppartAppService {
         Appart appart = appartRepository.findByLogementAndReference(logement, refAppart)
                 .orElseThrow(() -> new BusinessException(String.format("No appart found with this reference %s", refAppart),
                         NOT_FOUND));
-        return AppartMapper.getMapper().dto(appart);
+        AppartDto appartDto = appartMapper.dto(appart);
+        return appartDto;
     }
 
     public AppartDto getAppartByRef(String refAppart) throws BusinessException {
         Appart appart = getAppartFromDatabase(refAppart);
-        return AppartMapper.getMapper().dto(appart);
+        return appartMapper.dto(appart);
     }
 
     public AppartDto updateLogementByRef(AppartDto appartDto, String refAppart) throws BusinessException {
         Appart appart = this.getAppartFromDatabase(refAppart);
-        Appart appartUpdate = AppartMapper.getMapper().entitie(appartDto);
-        AppartMapper.getMapper().update(appart, appartUpdate);
+        Appart appartUpdate = appartMapper.entitie(appartDto);
+        appartMapper.update(appart, appartUpdate);
         appartRepository.save(appart);
         log.info(APPART_LOG + appart.getReference() + " is updated");
-        return AppartMapper.getMapper().dto(appart);
+        return appartMapper.dto(appart);
     }
 
     public void deleteByRef(String refAppart) throws BusinessException {
@@ -98,24 +94,6 @@ public class AppartService implements AppartAppService {
         log.info(APPART_LOG + appart.getReference() + " is deleted");
     }
 
-
-    public AppartDto updateAppartAssigneLocataire(String refAppart, String refUser) throws BusinessException {
-        Appart appart = this.getAppartFromDatabase(refAppart);
-        Client locataire = clientAppService.getClientFromDatabase(refUser);
-        appart.setLocataire(locataire);
-        appartRepository.save(appart);
-        log.info(APPART_LOG + appart.getReference() + " is updated");
-        return AppartMapper.getMapper().dto(appart);
-    }
-
-
-    public AppartDto updateAppartSortirLocataire(String refAppart) throws BusinessException {
-        Appart appart = this.getAppartFromDatabase(refAppart);
-        appart.setLocataire(null);
-        appartRepository.save(appart);
-        log.info(APPART_LOG + appart.getReference() + " is updated");
-        return AppartMapper.getMapper().dto(appart);
-    }
 
     public Appart getAppartFromDatabase(String refAppart) throws BusinessException {
         Appart appart = appartRepository.findByReference(refAppart).

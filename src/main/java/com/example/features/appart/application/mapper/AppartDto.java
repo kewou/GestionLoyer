@@ -1,6 +1,6 @@
 package com.example.features.appart.application.mapper;
 
-import com.example.features.loyer.domain.entities.Loyer;
+import com.example.features.bail.dto.BailDto;
 import com.example.features.user.application.mapper.ClientDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,9 +31,9 @@ public class AppartDto {
     @NotNull(message = "Entrer un montant svp")
     private Integer prixCaution;
 
-    private ClientDto locataire;
+    private ClientDto bailleur;
 
-    private Set<Loyer> loyers;
+    private Set<BailDto> baux;
 
 
 }

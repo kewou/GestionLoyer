@@ -18,12 +18,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
-
 
     @Autowired
     private AuthenticationService authenticationService;
@@ -44,7 +42,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(authenticationService).passwordEncoder(passwordEncoder());
     }
 
-
     @Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -56,15 +53,21 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable() // protocole de sécurité qui gère un token
                 .authorizeRequests()
-                .antMatchers("/assets/**", "/**/*.js", "/users/create*", "/authenticate", "/oauth2/**", "/login", "/user-roles", "/contact",
-                        "/a-propos", "/users/verify-account").permitAll()
+                .antMatchers("/assets/**", "/**/*.js", "/users/create*", "/authenticate", "/oauth2/**", "/login",
+                        "/user-roles", "/contact",
+                        "/a-propos", "/users/verify-account", "/users/reset-password", "/users/update-password",
+                        "/swagger-ui/**", "/api-docs/**", "/actuator/**")
+                .permitAll()
                 .antMatchers("/", "/index.html", "/static/**", "/js/**", "/css/**", "/images/**").permitAll()
                 .antMatchers().permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/admin/**").hasAuthority(Role.ADMIN.name())
                 .antMatchers("/bailleur/**").hasAnyAuthority(Role.ADMIN.name(), Role.BAILLEUR.name())
                 .antMatchers("/locataire/**").hasAnyAuthority(Role.ADMIN.name(), Role.LOCATAIRE.name())
-                .anyRequest().authenticated()   // toutes les requetes doivent etre authentifiées
+                .antMatchers("/locataires/**").hasAnyAuthority(Role.ADMIN.name(), Role.LOCATAIRE.name())
+                .antMatchers("/bailleur/users/**").hasAnyAuthority(Role.ADMIN.name(), Role.BAILLEUR.name())
+                .antMatchers("/admin/users/**").hasAuthority(Role.ADMIN.name())
+                .anyRequest().authenticated() // toutes les requetes doivent etre authentifiées
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
@@ -75,14 +78,16 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     /*
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring()
-                .antMatchers("/configuration/ui", "/swagger-resources", "/configuration/ui",
-                        "/swagger-resources/**", "/configuration/security", "/api-docs/swagger-config", "/swagger-ui/**", "/webjars/**",
-                        "/swagger-ui-custom.html", "/swagger-ui.html", "/api-docs", "/actuator", "/index.html")
-                .antMatchers();
-    }
-    */
+     * @Override
+     * public void configure(WebSecurity web) throws Exception {
+     * web.ignoring()
+     * .antMatchers("/configuration/ui", "/swagger-resources", "/configuration/ui",
+     * "/swagger-resources/**", "/configuration/security",
+     * "/api-docs/swagger-config", "/swagger-ui/**", "/webjars/**",
+     * "/swagger-ui-custom.html", "/swagger-ui.html", "/api-docs", "/actuator",
+     * "/index.html")
+     * .antMatchers();
+     * }
+     */
 
 }
