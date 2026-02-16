@@ -81,7 +81,7 @@ public class ClientService implements ClientAppService {
             client.setRoles(roles);
             clientRepository.save(client);
             log.info("Client {} is created ", client.getReference());
-            // sendInscriptionMail(client);
+            sendInscriptionMail(client);
             return clientMapper.dto(client);
         } else {
             throw new BusinessException(

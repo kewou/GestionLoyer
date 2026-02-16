@@ -35,10 +35,11 @@ jobs:
       # Step 3: Configuration SMTP & GOOGLE
       - name: Configuration SMTP & GOOGLE
         run: |
-          sed -i "s/spring.mail.username=.*/spring.mail.username=${{ secrets.SMTP_USERNAME }}/" src/main/resources/application.properties
-          sed -i "s/spring.mail.password=.*/spring.mail.password=${{ secrets.SMTP_PASSWORD }}/" src/main/resources/application.properties
-          sed -i "s/spring.security.oauth2.client.registration.google.client-id=.*/spring.security.oauth2.client.registration.google.client-id=${{ secrets.GOOGLE_CLIENT_ID }}/" src/main/resources/application.properties
-          sed -i "s/spring.security.oauth2.client.registration.google.client-secret=.*/spring.security.oauth2.client.registration.google.client-secret=${{ secrets.GOOGLE_CLIENT_SECRET }}/" src/main/resources/application.properties   
+          # Utiliser des délimiteurs | au lieu de / pour éviter les conflits avec les slashes dans les URLs
+          sed -i "s|spring.mail.username=.*|spring.mail.username=${{ secrets.SMTP_USERNAME }}|" src/main/resources/application.properties
+          sed -i "s|spring.mail.password=.*|spring.mail.password=${{ secrets.SMTP_PASSWORD }}|" src/main/resources/application.properties
+          sed -i "s|spring.security.oauth2.client.registration.google.client-id=.*|spring.security.oauth2.client.registration.google.client-id=${{ secrets.GOOGLE_CLIENT_ID }}|" src/main/resources/application.properties
+          sed -i "s|spring.security.oauth2.client.registration.google.client-secret=.*|spring.security.oauth2.client.registration.google.client-secret=${{ secrets.GOOGLE_CLIENT_SECRET }}|" src/main/resources/application.properties   
 
       # Step 4: Construire le projet avec Maven
       - name: Build with Maven
@@ -88,7 +89,7 @@ jobs:
       - name: Deploy to AWS EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ec2-13-37-107-47.eu-west-3.compute.amazonaws.com
+          host: ec2-15-236-209-253.eu-west-3.compute.amazonaws.com
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
