@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.example.features.user.domain.services.impl;
 
 import com.example.exceptions.BusinessException;
@@ -17,13 +12,13 @@ import com.example.features.user.domain.entities.Client;
 import com.example.features.user.infra.ClientRepository;
 import com.example.security.Role;
 import com.example.utils.GeneralUtils;
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -118,7 +113,7 @@ public class ClientService implements ClientAppService {
                 String.format("%s/login#%s/%s", uriSite,
                         client.getReference(),
                         verificationToken),
-                uriSite) : "Vous êtes bien inscrits";
+                uriSite) : "Vous Ãªtes bien inscrits";
         log.debug("Mail {}", message);
         try {
             messageService.sendHtmlMessage(
@@ -147,12 +142,12 @@ public class ClientService implements ClientAppService {
                             verificationToken),
                     uriSite);
         } else {
-            message = "Mot de passe oublié";
+            message = "Mot de passe oubliÃ©";
         }
         try {
             messageService.sendHtmlMessage(
                     MessageDto.builder()
-                            .subject("BeezyWeb : Réinitialisation de mot de passe")
+                            .subject("BeezyWeb : RÃ©initialisation de mot de passe")
                             .sender(inscriptionSender)
                             .recipients(List.of(email))
                             .message(message)
@@ -255,3 +250,5 @@ public class ClientService implements ClientAppService {
     }
 
 }
+
+

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.example.features.user.infra;
 
 import com.example.features.user.domain.entities.Client;
@@ -38,3 +33,5 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     Optional<Client> findByReferenceWithBaux(@Param("reference") String reference);
 
 }
+
+

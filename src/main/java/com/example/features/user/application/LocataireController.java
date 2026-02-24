@@ -23,12 +23,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Contrôleur pour les opérations spécifiques aux locataires
+ * ContrÃ´leur pour les opÃ©rations spÃ©cifiques aux locataires
  *
  * @author Joel NOUMIA
  */
@@ -47,24 +47,24 @@ public class LocataireController {
         this.jwtUtils = jwtUtils;
     }
 
-    @Operation(summary = "Récupère les informations d'un locataire", description = "Retourne les informations complètes d'un locataire avec ses appartements")
+    @Operation(summary = "RÃ©cupÃ¨re les informations d'un locataire", description = "Retourne les informations complÃ¨tes d'un locataire avec ses appartements")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Informations du locataire récupérées avec succès", content = @Content(schema = @Schema(implementation = LocataireInfoDto.class))),
-            @ApiResponse(responseCode = "404", description = "Locataire non trouvé", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Informations du locataire rÃ©cupÃ©rÃ©es avec succÃ¨s", content = @Content(schema = @Schema(implementation = LocataireInfoDto.class))),
+            @ApiResponse(responseCode = "404", description = "Locataire non trouvÃ©", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erreur interne du serveur", content = @Content)
     })
     @GetMapping("/{reference}")
     @PreAuthorize("hasAuthority('LOCATAIRE')")
     public ResponseEntity<LocataireInfoDto> getLocataireInfo(
-            @Parameter(description = "Référence du locataire") @NotBlank @PathVariable("reference") String reference,
+            @Parameter(description = "RÃ©fÃ©rence du locataire") @NotBlank @PathVariable("reference") String reference,
             Authentication authentication)
             throws BusinessException {
 
-        log.info("Récupération des informations pour le locataire: {}", reference);
+        log.info("RÃ©cupÃ©ration des informations pour le locataire: {}", reference);
 
         Client locataire = clientService.getClientWithBaux(reference);
         if (locataire == null) {
-            log.warn("Locataire non trouvé: {}", reference);
+            log.warn("Locataire non trouvÃ©: {}", reference);
             return ResponseEntity.notFound().build();
         }
 
@@ -74,7 +74,7 @@ public class LocataireController {
         locataireInfo.setEmail(locataire.getEmail());
         locataireInfo.setPhone(locataire.getPhone());
 
-        // Récupérer les appartements du locataire via les baux actifs
+        // RÃ©cupÃ©rer les appartements du locataire via les baux actifs
         List<LocataireAppartementDto> appartements = locataire.getBauxActifs()
                 .stream()
                 .map(this::mapBailToAppartementDto)
@@ -82,30 +82,30 @@ public class LocataireController {
 
         locataireInfo.setAppartements(appartements);
 
-        log.info("Informations récupérées pour le locataire {}: {} appartement(s)",
+        log.info("Informations rÃ©cupÃ©rÃ©es pour le locataire {}: {} appartement(s)",
                 reference, appartements.size());
 
         return ResponseEntity.ok(locataireInfo);
     }
 
-    @Operation(summary = "Récupère les appartements d'un locataire", description = "Retourne la liste des appartements assignés à un locataire")
+    @Operation(summary = "RÃ©cupÃ¨re les appartements d'un locataire", description = "Retourne la liste des appartements assignÃ©s Ã  un locataire")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Liste des appartements récupérée avec succès"),
-            @ApiResponse(responseCode = "404", description = "Locataire non trouvé", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Liste des appartements rÃ©cupÃ©rÃ©e avec succÃ¨s"),
+            @ApiResponse(responseCode = "404", description = "Locataire non trouvÃ©", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erreur interne du serveur", content = @Content)
     })
     @GetMapping("/{reference}/appartements")
     @PreAuthorize("hasAuthority('LOCATAIRE')")
     public ResponseEntity<List<LocataireAppartementDto>> getLocataireAppartements(
-            @Parameter(description = "Référence du locataire") @NotBlank @PathVariable("reference") String reference,
+            @Parameter(description = "RÃ©fÃ©rence du locataire") @NotBlank @PathVariable("reference") String reference,
             Authentication authentication)
             throws BusinessException {
 
-        log.info("Récupération des appartements pour le locataire: {}", reference);
+        log.info("RÃ©cupÃ©ration des appartements pour le locataire: {}", reference);
 
         Client locataire = clientService.getClientWithBaux(reference);
         if (locataire == null) {
-            log.warn("Locataire non trouvé: {}", reference);
+            log.warn("Locataire non trouvÃ©: {}", reference);
             return ResponseEntity.notFound().build();
         }
 
@@ -114,7 +114,7 @@ public class LocataireController {
                 .map(this::mapBailToAppartementDto)
                 .collect(Collectors.toList());
 
-        log.info("{} appartement(s) trouvé(s) pour le locataire {}", appartements.size(), reference);
+        log.info("{} appartement(s) trouvÃ©(s) pour le locataire {}", appartements.size(), reference);
 
         return ResponseEntity.ok(appartements);
     }
@@ -151,7 +151,7 @@ public class LocataireController {
         return dto;
     }
 
-    // DTOs pour la réponse
+    // DTOs pour la rÃ©ponse
     public static class LocataireInfoDto {
         private String reference;
         private String name;
@@ -348,3 +348,5 @@ public class LocataireController {
         }
     }
 }
+
+

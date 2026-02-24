@@ -21,3 +21,5 @@ public class ClientLocataireController extends ClientController {
         super(clientAppService, authenticationService, jwtUtils);
     }
 }
+
+

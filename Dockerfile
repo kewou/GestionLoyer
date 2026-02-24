@@ -1,5 +1,5 @@
 # Utiliser une image Maven pour la phase de build
-FROM maven:3.8.6-openjdk-11 AS build
+FROM maven:3.9-eclipse-temurin-17 AS build
 
 COPY . /app
 
@@ -13,7 +13,7 @@ RUN mvn clean package -DskipTests && \
 
 
 # Nouvelle étape pour l'image finale
-FROM adoptopenjdk/openjdk11:alpine-jre
+FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 

@@ -44,21 +44,21 @@ public class TransactionRepositoryIT {
         logement.setDescription("Immeuble Paris 15");
         logement.setClient(client);
         logement = logementRepository.save(logement);
-        // Création d'un appart
+        // CrÃ©ation d'un appart
         Appart appart = new Appart();
         appart.setReference("APP-1001");
         appart.setId(1L);
         appart.setLogement(logement);
         appart = appartRepository.save(appart);
 
-        // Création transaction liée à l'appart
+        // CrÃ©ation transaction liÃ©e Ã  l'appart
         Transaction tx = new Transaction();
         tx.setMontant(250);
-        // tx.setBail(bail); // TODO: Créer un bail si nécessaire
+        // tx.setBail(bail); // TODO: CrÃ©er un bail si nÃ©cessaire
 
         transactionRepository.save(tx);
 
-        // Vérification avec findByAppart
+        // VÃ©rification avec findByAppart
         /*
          * List<Transaction> results = transactionRepository.findByAppart(appart);
          *
@@ -67,3 +67,4 @@ public class TransactionRepositoryIT {
          */
     }
 }
+

@@ -4,10 +4,10 @@ import com.example.features.bail.Bail;
 import com.example.features.logement.Logement;
 import com.example.features.user.domain.entities.Client;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -63,3 +63,5 @@ public class Appart {
 
 
 }
+
+

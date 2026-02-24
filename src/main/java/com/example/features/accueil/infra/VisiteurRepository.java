@@ -9,3 +9,5 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 public interface VisiteurRepository extends JpaRepository<Visiteur, Long>, JpaSpecificationExecutor<Visiteur> {
 
 }
+
+

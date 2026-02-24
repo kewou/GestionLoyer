@@ -14,3 +14,5 @@ public interface TransactionMapper {
 
     void update(@MappingTarget Transaction entity, Transaction updateEntity);
 }
+
+

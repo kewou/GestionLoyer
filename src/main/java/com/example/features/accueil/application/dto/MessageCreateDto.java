@@ -3,9 +3,9 @@ package com.example.features.accueil.application.dto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @AllArgsConstructor
 @Builder
@@ -21,7 +21,9 @@ public class MessageCreateDto {
     @Email(message = "Entrer une adresse email valide")
     @Size(max = 150)
     String senderMail;
-    @NotBlank(message = "Un message doit être fourni")
+    @NotBlank(message = "Un message doit Ãªtre fourni")
     @Size(min = 10)
     String message;
 }
+
+

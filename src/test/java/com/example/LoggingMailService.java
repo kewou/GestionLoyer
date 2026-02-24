@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 @Slf4j
 @Profile("test")
@@ -22,3 +22,4 @@ public class LoggingMailService implements MessageService {
 
     }
 }
+

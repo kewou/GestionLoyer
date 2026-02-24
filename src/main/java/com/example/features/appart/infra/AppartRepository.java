@@ -22,3 +22,5 @@ public interface AppartRepository extends JpaRepository<Appart, Long> {
 
     void deleteByReference(String reference);
 }
+
+

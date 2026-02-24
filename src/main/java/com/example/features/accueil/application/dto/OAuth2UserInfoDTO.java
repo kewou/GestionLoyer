@@ -17,3 +17,5 @@ public class OAuth2UserInfoDTO {
     private String provider;
     private String pictureUrl;
 }
+
+

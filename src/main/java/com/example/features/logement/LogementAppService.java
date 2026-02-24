@@ -21,3 +21,5 @@ public interface LogementAppService {
     public void deleteByReference(String refLgt) throws BusinessException;
 
 }
+
+

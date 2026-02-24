@@ -3,16 +3,18 @@ package com.example.utils;
 import com.example.features.user.domain.entities.UserDetailsCustom;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,10 +25,18 @@ public class JWTUtils implements Serializable {
 
     private static final long serialVersionUID = 234234523523L;
 
-    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60; // 5 minnutes
+    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60; // 5 heures
 
     @Value("${jwt.secret}")
-    private String secretKey;
+    private String secret;
+
+    private SecretKey secretKey;
+
+    @PostConstruct
+    public void init() {
+        byte[] keyBytes = Base64.getDecoder().decode(secret);
+        this.secretKey = Keys.hmacShaKeyFor(keyBytes);
+    }
 
     // retrieve username from jwt token
     public String getUsernameFromToken(String token) {
@@ -50,7 +60,7 @@ public class JWTUtils implements Serializable {
 
     // for retrieving any information from token we will need the secret key
     private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
     }
 
     // check if the token has expired
@@ -60,7 +70,7 @@ public class JWTUtils implements Serializable {
     }
 
     // generate token for user
-    public String generateToken(UserDetailsCustom userDetails) throws UnsupportedEncodingException {
+    public String generateToken(UserDetailsCustom userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("reference", userDetails.getReference());
         claims.put("roles", userDetails.getAuthorities());
@@ -69,16 +79,22 @@ public class JWTUtils implements Serializable {
 
     // while creating the token -
     // 1. Define claims of the token, like Issuer, Expiration, Subject, and the ID
-    // 2. Sign the JWT using the HS512 algorithm and secret key.
+    // 2. Sign the JWT using the secret key.
     private String doGenerateToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
-                .signWith(SignatureAlgorithm.HS512, secretKey).compact();
+        return Jwts.builder()
+                .claims(claims)
+                .subject(subject)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+                .signWith(secretKey)
+                .compact();
     }
 
     // validate token
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = URLDecoder.decode(getUsernameFromToken(token));
+        final String username = URLDecoder.decode(getUsernameFromToken(token), StandardCharsets.UTF_8);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 }
+
+

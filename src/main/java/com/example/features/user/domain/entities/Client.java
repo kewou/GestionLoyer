@@ -1,13 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.example.features.user.domain.entities;
 
 import com.example.features.bail.Bail;
 import com.example.features.logement.Logement;
 import com.example.utils.GeneralUtils;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +11,6 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import javax.persistence.*;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -110,7 +105,7 @@ public class Client implements UserDetailsCustom {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
 
-        // Ajoutez les rôles de l'utilisateur en tant qu'objets GrantedAuthority
+        // Ajoutez les rÃ´les de l'utilisateur en tant qu'objets GrantedAuthority
         if (this.getRoles() != null) {
             for (String role : this.getRoles()) {
                 authorities.add(new SimpleGrantedAuthority(role));
@@ -138,7 +133,7 @@ public class Client implements UserDetailsCustom {
     }
 
     /**
-     * Récupère les baux actifs du locataire
+     * RÃ©cupÃ¨re les baux actifs du locataire
      *
      * @return Liste des baux actifs
      */
@@ -151,3 +146,5 @@ public class Client implements UserDetailsCustom {
                 .collect(Collectors.toList());
     }
 }
+
+
