@@ -18,7 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -81,8 +81,8 @@ class ClientServiceTest {
 
         // Then
         verify(clientRepository, times(1)).save(any(Client.class));
-        // Note: sendInscriptionMail est commenté dans register(ClientDto, Role), donc
-        // on ne vérifie pas l'envoi d'email
+        // Note: sendInscriptionMail est commentÃ© dans register(ClientDto, Role), donc
+        // on ne vÃ©rifie pas l'envoi d'email
         // verify(messageService, times(1)).sendHtmlMessage(any(MessageDto.class));
         Assertions.assertNotNull(clientRegistered.getReference());
         Assertions.assertNotEquals(password, clientRegistered.getPassword());

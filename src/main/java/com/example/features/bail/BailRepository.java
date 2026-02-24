@@ -18,3 +18,5 @@ public interface BailRepository extends JpaRepository<Bail, Long> {
     List<Bail> findByLocataire(Client locataire);
 
 }
+
+

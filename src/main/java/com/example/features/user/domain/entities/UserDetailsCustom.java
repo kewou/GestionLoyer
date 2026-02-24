@@ -7,3 +7,5 @@ public interface UserDetailsCustom extends UserDetails {
     public String getReference();
 
 }
+
+

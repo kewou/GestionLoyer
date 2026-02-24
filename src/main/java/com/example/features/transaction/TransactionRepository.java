@@ -20,3 +20,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findByBailAndDateBetween(Bail bail, LocalDate start, LocalDate end);
 }
+
+

@@ -54,3 +54,4 @@ public class ClientControllerIT {
                 .andExpect(jsonPath("$[1].name").value("Durand"));
     }
 }
+

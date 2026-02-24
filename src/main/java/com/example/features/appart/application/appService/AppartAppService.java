@@ -23,3 +23,5 @@ public interface AppartAppService {
     public Appart getAppartFromDatabase(String refAppart) throws BusinessException;
 
 }
+
+

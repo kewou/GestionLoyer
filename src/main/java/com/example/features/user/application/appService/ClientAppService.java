@@ -39,3 +39,5 @@ public interface ClientAppService {
 
     List<ClientDto> searchLocatairesByName(String name);
 }
+
+

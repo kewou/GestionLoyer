@@ -18,3 +18,5 @@ public interface LogementMapper {
 
     void update(@MappingTarget Logement entity, Logement updateEntity);
 }
+
+

@@ -19,3 +19,5 @@ public interface LogementRepository extends JpaRepository<Logement, Long> {
     void deleteByReference(String reference);
 
 }
+
+

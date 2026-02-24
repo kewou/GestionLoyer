@@ -1,6 +1,6 @@
 package com.example.features.common.mail;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 public interface MessageService {
 
@@ -8,3 +8,5 @@ public interface MessageService {
 
     void sendHtmlMessage(MessageDto messageDto) throws MessagingException;
 }
+
+

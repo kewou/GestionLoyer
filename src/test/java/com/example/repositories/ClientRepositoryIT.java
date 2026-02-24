@@ -61,3 +61,4 @@ public class ClientRepositoryIT {
         assertThat(found).isEmpty();
     }
 }
+

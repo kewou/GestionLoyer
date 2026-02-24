@@ -18,3 +18,5 @@ public interface BailMapper {
     @Mapping(target = "transactions", ignore = true)
     Bail toEntity(BailDto bailDto);
 }
+
+

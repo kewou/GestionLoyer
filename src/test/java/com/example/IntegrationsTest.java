@@ -25,8 +25,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.HashMap;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -191,7 +191,7 @@ public class IntegrationsTest {
         this.createUserTest();
         String logement = mapper.writeValueAsString(LogementDto.builder()
                 .quartier("Nkomkana")
-                .ville("Yaoundé")
+                .ville("Yaounde")
                 .description("immeuble")
                 .reference("refLgt")
                 .build());
@@ -295,7 +295,7 @@ public class IntegrationsTest {
         Assertions.assertEquals(nom, "355");
         // Note: Le champ "loyers" n'existe plus dans AppartDto, il est maintenant dans
         // BailDto
-        // Vérifier que l'appartement a été créé correctement
+        // VÃ©rifier que l'appartement a Ã©tÃ© crÃ©Ã© correctement
         Assertions.assertNotNull(resNode.get("reference"));
         Assertions.assertEquals(resNode.get("prixLoyer").asInt(), 500);
 
@@ -322,16 +322,16 @@ public class IntegrationsTest {
         createAppartTest();
 
         HashMap<String, Object> m = new HashMap<String, Object>();
-        m.put("nom", 400);
+        m.put("nom", "400");
         String valPut = mapper.writeValueAsString(m);
 
-        mockMvc.perform(put("/bailleur//users/refUser/logements/refLgt/apparts/refAppart")
+        mockMvc.perform(put("/bailleur/users/refUser/logements/refLgt/apparts/refAppart")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(valPut))
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn().getResponse().getContentAsString();
 
-        String res = mockMvc.perform(get("/bailleur//users/refUser/logements/refLgt/apparts/refAppart")
+        String res = mockMvc.perform(get("/bailleur/users/refUser/logements/refLgt/apparts/refAppart")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn().getResponse().getContentAsString();
@@ -346,7 +346,7 @@ public class IntegrationsTest {
     public void mettreLocataireDansAppartTest() throws Exception {
         createAppartTest();
 
-        // Créer un locataire d'abord
+        // CrÃ©er un locataire d'abord
         String locataireDto = mapper.writeValueAsString(ClientDto.builder()
                 .reference("refLocataire")
                 .name("LOCATAIRE")
@@ -359,7 +359,7 @@ public class IntegrationsTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(locataireDto));
 
-        // Assigner le locataire à l'appartement via le nouvel endpoint
+        // Assigner le locataire Ã  l'appartement via le nouvel endpoint
         CreateBailRequestDto bailDto = new CreateBailRequestDto();
         bailDto.setLocataireRef("refLocataire");
         bailDto.setDateEntree(java.time.LocalDate.now());
@@ -384,7 +384,7 @@ public class IntegrationsTest {
     public void createTransactionTest() throws Exception {
         this.createAppartTest();
 
-        // Créer un locataire d'abord
+        // CrÃ©er un locataire d'abord
         String locataireDto = mapper.writeValueAsString(ClientDto.builder()
                 .reference("refLocataireTx")
                 .name("LOCATAIRE")
@@ -397,7 +397,7 @@ public class IntegrationsTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(locataireDto));
 
-        // Assigner le locataire à l'appartement pour créer un bail
+        // Assigner le locataire Ã  l'appartement pour crÃ©er un bail
         CreateBailRequestDto bailDto = new CreateBailRequestDto();
         bailDto.setLocataireRef("refLocataireTx");
         bailDto.setDateEntree(java.time.LocalDate.now());
@@ -409,11 +409,11 @@ public class IntegrationsTest {
                 .andExpect(status().is(HttpStatus.CREATED.value()))
                 .andReturn().getResponse().getContentAsString();
 
-        // Récupérer le bailId de la réponse
+        // RÃ©cupÃ©rer le bailId de la rÃ©ponse
         JsonNode bailNode = mapper.readerForMapOf(Object.class).readTree(bailResponse);
         Long bailId = bailNode.get("id").asLong();
 
-        // Créer une transaction via le nouvel endpoint
+        // CrÃ©er une transaction via le nouvel endpoint
         String transaction = mapper.writeValueAsString(TransactionDto.builder()
                 .montant(500)
                 .build());
@@ -428,3 +428,4 @@ public class IntegrationsTest {
     }
 
 }
+

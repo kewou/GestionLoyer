@@ -21,3 +21,5 @@ public interface AppartMapper {
     void update(@MappingTarget Appart entity, Appart updateEntity);
 
 }
+
+

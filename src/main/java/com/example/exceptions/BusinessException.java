@@ -40,3 +40,5 @@ public class BusinessException extends Exception {
         return type == BusinessErrorType.INTERNAL_SERVER_ERROR;
     }
 }
+
+
