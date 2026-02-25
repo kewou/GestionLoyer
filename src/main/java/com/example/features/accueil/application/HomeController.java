@@ -13,6 +13,7 @@ import com.example.helper.ResponseHelper;
 import com.example.utils.JWTUtils;
 import com.example.utils.jwt.JwtRequest;
 import com.example.utils.jwt.JwtResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -57,7 +57,7 @@ public class HomeController {
         } catch (BadCredentialsException e) {
             throw new AuthenticationException("INVALID CREDENTIAL");
         } catch (DisabledException e) {
-            // Spring Security lance cette exception si le compte est désactivé (isEnabled()
+            // Spring Security lance cette exception si le compte est dÃ©sactivÃ© (isEnabled()
             // = false)
             throw new AuthenticationException("ACCOUNT_NOT_VERIFIED");
         }
@@ -87,7 +87,7 @@ public class HomeController {
     @PostMapping("/contact")
     public void contact(@Valid @RequestBody MessageCreateDto messageCreateDto, Errors errors) {
         ResponseHelper.handle(errors);
-        log.info("Message envoyé {} - {}", messageCreateDto.getSenderName(), messageCreateDto.getMessage());
+        log.info("Message envoyÃ© {} - {}", messageCreateDto.getSenderName(), messageCreateDto.getMessage());
         MessageDto messageDto = MessageDto.builder()
                 .sender(messageCreateDto.getSenderMail())
                 .message(messageCreateDto.getMessage())
@@ -98,3 +98,5 @@ public class HomeController {
         messageService.sendMessage(messageDto);
     }
 }
+
+

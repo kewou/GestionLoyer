@@ -15,7 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -66,7 +66,7 @@ public class GetTokenForAuthTest {
 
     @Test
     public void authenticationTest() throws Exception {
-        // Créer un utilisateur pour le test d'authentification
+        // CrÃ©er un utilisateur pour le test d'authentification
         String val = mapper.writeValueAsString(ClientDto.builder()
                 .reference("test_auth_id")
                 .name("AUTH")
@@ -91,7 +91,7 @@ public class GetTokenForAuthTest {
                 .password("Tourneyuvbekuyb*155r14")
                 .build());
 
-        // Requête POST en JSON
+        // RequÃªte POST en JSON
         mockMvc.perform(post("/authenticate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
@@ -99,3 +99,4 @@ public class GetTokenForAuthTest {
     }
 
 }
+

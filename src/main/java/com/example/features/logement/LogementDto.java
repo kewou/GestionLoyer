@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 @Data
 @Builder
@@ -24,3 +24,5 @@ public class LogementDto {
     @NotBlank(message = "Entrer une description svp")
     private String description;
 }
+
+

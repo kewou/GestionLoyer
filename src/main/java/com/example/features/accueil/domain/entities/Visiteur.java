@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Getter
 @Setter(value = AccessLevel.NONE)
@@ -18,4 +18,6 @@ public class Visiteur {
     @Column(name = "nbTotal")
     private Long nbTotal;
 }
+
+
 

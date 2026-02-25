@@ -30,8 +30,10 @@ public class OAuth2Service {
 
     private OAuth2Provider getProvider(String name) {
         OAuth2Provider provider = providers.get(name.toLowerCase());
-        if (provider == null) throw new IllegalArgumentException("Provider non supporté : " + name);
+        if (provider == null) throw new IllegalArgumentException("Provider non supportÃ© : " + name);
         return provider;
     }
 
 }
+
+

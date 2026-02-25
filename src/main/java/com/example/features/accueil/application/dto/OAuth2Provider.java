@@ -10,3 +10,5 @@ public interface OAuth2Provider {
 
     String getName();
 }
+
+

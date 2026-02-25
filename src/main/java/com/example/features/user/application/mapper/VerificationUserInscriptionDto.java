@@ -14,3 +14,5 @@ public class VerificationUserInscriptionDto {
     String reference;
     String verificationToken;
 }
+
+

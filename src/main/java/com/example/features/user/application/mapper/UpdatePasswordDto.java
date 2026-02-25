@@ -12,3 +12,5 @@ public class UpdatePasswordDto {
     String password;
     String verificationToken;
 }
+
+

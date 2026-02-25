@@ -20,3 +20,5 @@ public class BailDto {
     private LocalDate dateSortie;
     private Boolean actif;
 }
+
+
