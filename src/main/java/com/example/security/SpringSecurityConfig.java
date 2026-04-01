@@ -55,7 +55,7 @@ public class SpringSecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/assets/**", "/**/*.js", "/users/create*", "/authenticate", "/oauth2/**", "/login",
+                        .requestMatchers("/assets/**", "/users/create*", "/authenticate", "/oauth2/**", "/login",
                                 "/user-roles", "/contact",
                                 "/a-propos", "/users/verify-account", "/users/reset-password", "/users/update-password",
                                 "/swagger-ui/**", "/api-docs/**", "/actuator/**")
