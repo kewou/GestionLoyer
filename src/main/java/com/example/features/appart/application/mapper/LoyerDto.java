@@ -16,6 +16,7 @@ public class LoyerDto {
     private int montantVerse;
     private boolean ok;
     private boolean courant;
+    private int retardCumul;
 }
 
 
