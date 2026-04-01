@@ -22,8 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.example.exceptions.BusinessException.BusinessErrorType.NOT_FOUND;
-import static com.example.exceptions.BusinessException.BusinessErrorType.OTHER;
+import static com.example.exceptions.BusinessException.BusinessErrorType.*;
 
 /**
  * @author kewou
@@ -39,16 +38,16 @@ public class ClientService implements ClientAppService {
 
     private final ClientMapper clientMapper;
 
-    @Value("${inscription.message}")
+    @Value("${inscription.message:}")
     private String inscriptionMessage;
 
     @Value("${inscription.validation.uri:https://beezyweb.net}")
     private String uriSite;
 
-    @Value("${inscription.sender}")
+    @Value("${inscription.sender:}")
     private String inscriptionSender;
 
-    @Value("${resetPassword.message}")
+    @Value("${resetPassword.message:}")
     private String resetPasswordMessage;
 
     public ClientService(ClientRepository clientRepository, MessageService messageService, ClientMapper clientMapper) {
@@ -108,18 +107,29 @@ public class ClientService implements ClientAppService {
     public void sendInscriptionMail(Client client) {
         final String verificationToken = client.getVerificationToken() != null ? client.getVerificationToken()
                 : "token_generated";
-        final String message = inscriptionMessage != null ? String.format(inscriptionMessage,
-                String.format("%s %s", client.getName(), client.getLastName()),
-                String.format("%s/login#%s/%s", uriSite,
-                        client.getReference(),
-                        verificationToken),
-                uriSite) : "Vous Ãªtes bien inscrits";
+        String message;
+        if (inscriptionMessage != null && !inscriptionMessage.isBlank()) {
+            String activationLink = String.format("%s/login#%s/%s", uriSite, client.getReference(), verificationToken);
+            try {
+                message = String.format(
+                        inscriptionMessage,
+                        String.format("%s %s", client.getName(), client.getLastName()),
+                        activationLink,
+                        uriSite
+                );
+            } catch (IllegalFormatException ex) {
+                log.warn("Invalid inscription.message template, using fallback message", ex);
+                message = "Votre compte a ete cree. Veuillez contacter le support en cas de probleme d'activation.";
+            }
+        } else {
+            message = "Votre compte a ete cree.";
+        }
         log.debug("Mail {}", message);
         try {
             messageService.sendHtmlMessage(
                     MessageDto.builder()
                             .subject("Beezyweb : Validation de votre compte")
-                            .sender(inscriptionSender)
+                            .sender(inscriptionSender != null && !inscriptionSender.isBlank() ? inscriptionSender : "noreply@beezyweb.net")
                             .recipients(List.of(client.getEmail()))
                             .message(message)
                             .build());
@@ -129,31 +139,42 @@ public class ClientService implements ClientAppService {
     }
 
     @Override
-    public void sendResetPasswordMail(Client client) {
+    public void sendResetPasswordMail(Client client) throws BusinessException {
         final String email = client.getEmail();
         final String message;
         String verificationToken = GeneralUtils.generateVerificationToken();
+        String resetLink = String.format("%s/password-reset?email=%s#%s", uriSite, email, verificationToken);
         client.setVerificationToken(verificationToken);
-        if (resetPasswordMessage != null) {
-            message = String.format(resetPasswordMessage,
-                    String.format("%s %s", client.getName(), client.getLastName()),
-                    String.format("%s/password-reset?email=%s#%s", uriSite,
-                            email,
-                            verificationToken),
-                    uriSite);
+        if (resetPasswordMessage != null && !resetPasswordMessage.isBlank()) {
+            try {
+                message = String.format(
+                        resetPasswordMessage,
+                        String.format("%s %s", client.getName(), client.getLastName()),
+                        resetLink,
+                        resetLink,
+                        uriSite
+                );
+            } catch (IllegalFormatException ex) {
+                log.warn("Invalid resetPassword.message template, using fallback message", ex);
+                throw new BusinessException(
+                        "Cette fonctionnalite ne fonctionne pas pour le moment. Veuillez reessayer plus tard.",
+                        INTERNAL_SERVER_ERROR
+                );
+            }
         } else {
-            message = "Mot de passe oubliÃ©";
+            message = "Demande de reinitialisation de mot de passe";
         }
         try {
             messageService.sendHtmlMessage(
                     MessageDto.builder()
-                            .subject("BeezyWeb : RÃ©initialisation de mot de passe")
-                            .sender(inscriptionSender)
+                            .subject("BeezyWeb : Reinitialisation de mot de passe")
+                            .sender(inscriptionSender != null && !inscriptionSender.isBlank() ? inscriptionSender : "noreply@beezyweb.net")
                             .recipients(List.of(email))
                             .message(message)
                             .build());
-        } catch (MessagingException e) {
-            log.error("Error sending email", e);
+        } catch (MessagingException | RuntimeException e) {
+            log.error("Error sending reset password email", e);
+            throw new BusinessException("Impossible d'envoyer l'email de reinitialisation pour le moment.", INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -161,7 +182,7 @@ public class ClientService implements ClientAppService {
     public void updatePasswordClient(UpdatePasswordDto updatePasswordDto) throws BusinessException {
         Client client = clientRepository.findByEmail(updatePasswordDto.getEmail());
         if (client == null) {
-            throw new BusinessException("Client not found");
+            throw new BusinessException("Cette fonctionnalite ne fonctionne pas pour le moment. Veuillez reessayer plus tard.");
         }
         client.setPassword(encoder.encode(updatePasswordDto.getPassword()));
         clientRepository.save(client);
@@ -250,5 +271,3 @@ public class ClientService implements ClientAppService {
     }
 
 }
-
-

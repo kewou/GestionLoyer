@@ -82,6 +82,7 @@ public class BailService {
 
         int montantLoyer = bail.getAppart().getPrixLoyer();
         LocalDate current = start;
+        int retardCumul = 0;
 
         // Distribuer les loyers jusqu'Ã  la fin du bail ou jusqu'Ã  ce qu'on dÃ©passe
         // aujourd'hui
@@ -103,12 +104,15 @@ public class BailService {
                 totalVerse = 0;
             }
 
+            retardCumul += (montantAttendu - montantVerse);
+
             loyers.add(LoyerDto.builder()
                     .mois(current)
                     .montantAttendu(montantAttendu)
                     .montantVerse(montantVerse)
                     .ok(ok)
                     .courant(current.equals(LocalDate.now().withDayOfMonth(1)))
+                    .retardCumul(retardCumul)
                     .build());
 
             current = current.plusMonths(1);
@@ -135,7 +139,7 @@ public class BailService {
         Appart appart = appartRepository.findByReference(refAppart)
                 .orElseThrow(() -> new BusinessException("Appartement introuvable"));
 
-        // VÃ©rifie quâ€™il nâ€™y a pas dÃ©jÃ  un bail actif
+
         Optional<Bail> actif = bailRepository.findByAppartAndDateSortieIsNull(appart);
         if (actif.isPresent()) {
             throw new BusinessException("Cet appartement a dÃ©jÃ  un locataire actif");
@@ -190,5 +194,4 @@ public class BailService {
     }
 
 }
-
 

@@ -3,9 +3,9 @@ package com.example.features.user.application;
 import com.example.exceptions.BusinessException;
 import com.example.features.appart.domain.entities.Appart;
 import com.example.features.bail.Bail;
+import com.example.security.SecurityRule;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.domain.services.impl.ClientService;
-import com.example.utils.JWTUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,12 +38,10 @@ import java.util.stream.Collectors;
 public class LocataireController {
 
     private final ClientService clientService;
-    private final JWTUtils jwtUtils;
 
     @Autowired
-    public LocataireController(ClientService clientService, JWTUtils jwtUtils) {
+    public LocataireController(ClientService clientService) {
         this.clientService = clientService;
-        this.jwtUtils = jwtUtils;
     }
 
     @Operation(summary = "RÃ©cupÃ¨re les informations d'un locataire", description = "Retourne les informations complÃ¨tes d'un locataire avec ses appartements")
@@ -54,19 +51,14 @@ public class LocataireController {
             @ApiResponse(responseCode = "500", description = "Erreur interne du serveur", content = @Content)
     })
     @GetMapping("/{reference}")
-    @PreAuthorize("hasAuthority('LOCATAIRE')")
+    @PreAuthorize(SecurityRule.CONNECTED_OR_ADMIN)
     public ResponseEntity<LocataireInfoDto> getLocataireInfo(
-            @Parameter(description = "RÃ©fÃ©rence du locataire") @NotBlank @PathVariable("reference") String reference,
-            Authentication authentication)
+            @Parameter(description = "RÃ©fÃ©rence du locataire") @NotBlank @PathVariable("reference") String reference)
             throws BusinessException {
 
-        log.info("RÃ©cupÃ©ration des informations pour le locataire: {}", reference);
+        log.info("Recuperation des informations pour le locataire: {}", reference);
 
         Client locataire = clientService.getClientWithBaux(reference);
-        if (locataire == null) {
-            log.warn("Locataire non trouvÃ©: {}", reference);
-            return ResponseEntity.notFound().build();
-        }
 
         LocataireInfoDto locataireInfo = new LocataireInfoDto();
         locataireInfo.setReference(locataire.getReference());
@@ -77,12 +69,13 @@ public class LocataireController {
         // RÃ©cupÃ©rer les appartements du locataire via les baux actifs
         List<LocataireAppartementDto> appartements = locataire.getBauxActifs()
                 .stream()
+                .filter(this::isBailDataComplete)
                 .map(this::mapBailToAppartementDto)
                 .collect(Collectors.toList());
 
         locataireInfo.setAppartements(appartements);
 
-        log.info("Informations rÃ©cupÃ©rÃ©es pour le locataire {}: {} appartement(s)",
+        log.info("Informations recuperees pour le locataire {}: {} appartement(s)",
                 reference, appartements.size());
 
         return ResponseEntity.ok(locataireInfo);
@@ -95,26 +88,22 @@ public class LocataireController {
             @ApiResponse(responseCode = "500", description = "Erreur interne du serveur", content = @Content)
     })
     @GetMapping("/{reference}/appartements")
-    @PreAuthorize("hasAuthority('LOCATAIRE')")
+    @PreAuthorize(SecurityRule.CONNECTED_OR_ADMIN)
     public ResponseEntity<List<LocataireAppartementDto>> getLocataireAppartements(
-            @Parameter(description = "RÃ©fÃ©rence du locataire") @NotBlank @PathVariable("reference") String reference,
-            Authentication authentication)
+            @Parameter(description = "RÃ©fÃ©rence du locataire") @NotBlank @PathVariable("reference") String reference)
             throws BusinessException {
 
-        log.info("RÃ©cupÃ©ration des appartements pour le locataire: {}", reference);
+        log.info("Recuperation des appartements pour le locataire: {}", reference);
 
         Client locataire = clientService.getClientWithBaux(reference);
-        if (locataire == null) {
-            log.warn("Locataire non trouvÃ©: {}", reference);
-            return ResponseEntity.notFound().build();
-        }
 
         List<LocataireAppartementDto> appartements = locataire.getBauxActifs()
                 .stream()
+                .filter(this::isBailDataComplete)
                 .map(this::mapBailToAppartementDto)
                 .collect(Collectors.toList());
 
-        log.info("{} appartement(s) trouvÃ©(s) pour le locataire {}", appartements.size(), reference);
+        log.info("{} appartement(s) trouve(s) pour le locataire {}", appartements.size(), reference);
 
         return ResponseEntity.ok(appartements);
     }
@@ -149,6 +138,17 @@ public class LocataireController {
         dto.setBail(bailInfo);
 
         return dto;
+    }
+
+    /**
+     * Ignore les baux incomplets pour eviter des erreurs 500 dans la reponse.
+     */
+    private boolean isBailDataComplete(Bail bail) {
+        if (bail == null || bail.getAppart() == null || bail.getAppart().getLogement() == null) {
+            log.warn("Bail incomplet detecte pour le locataire, element ignore dans la reponse");
+            return false;
+        }
+        return true;
     }
 
     // DTOs pour la rÃ©ponse

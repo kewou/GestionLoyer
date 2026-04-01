@@ -5,6 +5,7 @@ import com.example.exceptions.ValidationException;
 import com.example.features.accueil.domain.services.AuthenticationService;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.application.mapper.ClientDto;
+import com.example.features.user.application.mapper.ResetPasswordRequestDto;
 import com.example.features.user.application.mapper.UpdatePasswordDto;
 import com.example.features.user.application.mapper.VerificationUserInscriptionDto;
 import com.example.features.user.domain.entities.Client;
@@ -31,6 +32,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+
+import static com.example.exceptions.BusinessException.BusinessErrorType.NOT_FOUND;
 
 /**
  * @author Joel NOUMIA
@@ -107,20 +110,21 @@ public class ClientController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<Void> resetPassword(@RequestBody String email) throws BusinessException {
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequestDto request) throws BusinessException {
+        final String email = request.getEmail().trim();
         Client client = clientAppService.getClientByEmail(email);
         if (client == null) {
-            throw new BusinessException("Client not found");
+            throw new BusinessException("Aucun compte n'est associé à cet e-mail.", NOT_FOUND);
         }
         clientAppService.sendResetPasswordMail(client);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/update-password")
-    public ResponseEntity<Void> updatePassword(@RequestBody UpdatePasswordDto updatePasswordDto) throws BusinessException {
+    public ResponseEntity<Void> updatePassword(@Valid @RequestBody UpdatePasswordDto updatePasswordDto) throws BusinessException {
         Client client = clientAppService.getClientByEmail(updatePasswordDto.getEmail());
         if (client == null) {
-            throw new BusinessException("Client not found");
+            throw new BusinessException("Aucun compte n'est associé à cet e-mail.", NOT_FOUND);
         }
         verifyAndValidateAccount(client, updatePasswordDto.getVerificationToken());
         clientAppService.updatePasswordClient(updatePasswordDto);
@@ -129,7 +133,7 @@ public class ClientController {
 
     private void verifyAndValidateAccount(Client client, String verificationToken) throws BusinessException {
         if (verificationToken == null || !verificationToken.equals(client.getVerificationToken())) {
-            throw new BusinessException("invalid operation");
+            throw new BusinessException("Le lien de vérification est invalide ou expiré.");
         }
         clientAppService.validateToken(client);
     }
@@ -144,5 +148,4 @@ public class ClientController {
 
 
 }
-
 
