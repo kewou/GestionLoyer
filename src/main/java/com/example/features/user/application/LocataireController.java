@@ -3,9 +3,9 @@ package com.example.features.user.application;
 import com.example.exceptions.BusinessException;
 import com.example.features.appart.domain.entities.Appart;
 import com.example.features.bail.Bail;
+import com.example.security.SecurityRule;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.domain.services.impl.ClientService;
-import com.example.utils.JWTUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,19 +16,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Contrôleur pour les opérations spécifiques aux locataires
+ * ContrÃ´leur pour les opÃ©rations spÃ©cifiques aux locataires
  *
  * @author Joel NOUMIA
  */
@@ -39,34 +38,27 @@ import java.util.stream.Collectors;
 public class LocataireController {
 
     private final ClientService clientService;
-    private final JWTUtils jwtUtils;
 
     @Autowired
-    public LocataireController(ClientService clientService, JWTUtils jwtUtils) {
+    public LocataireController(ClientService clientService) {
         this.clientService = clientService;
-        this.jwtUtils = jwtUtils;
     }
 
-    @Operation(summary = "Récupère les informations d'un locataire", description = "Retourne les informations complètes d'un locataire avec ses appartements")
+    @Operation(summary = "RÃ©cupÃ¨re les informations d'un locataire", description = "Retourne les informations complÃ¨tes d'un locataire avec ses appartements")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Informations du locataire récupérées avec succès", content = @Content(schema = @Schema(implementation = LocataireInfoDto.class))),
-            @ApiResponse(responseCode = "404", description = "Locataire non trouvé", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Informations du locataire rÃ©cupÃ©rÃ©es avec succÃ¨s", content = @Content(schema = @Schema(implementation = LocataireInfoDto.class))),
+            @ApiResponse(responseCode = "404", description = "Locataire non trouvÃ©", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erreur interne du serveur", content = @Content)
     })
     @GetMapping("/{reference}")
-    @PreAuthorize("hasAuthority('LOCATAIRE')")
+    @PreAuthorize(SecurityRule.CONNECTED_OR_ADMIN)
     public ResponseEntity<LocataireInfoDto> getLocataireInfo(
-            @Parameter(description = "Référence du locataire") @NotBlank @PathVariable("reference") String reference,
-            Authentication authentication)
+            @Parameter(description = "RÃ©fÃ©rence du locataire") @NotBlank @PathVariable("reference") String reference)
             throws BusinessException {
 
-        log.info("Récupération des informations pour le locataire: {}", reference);
+        log.info("Recuperation des informations pour le locataire: {}", reference);
 
         Client locataire = clientService.getClientWithBaux(reference);
-        if (locataire == null) {
-            log.warn("Locataire non trouvé: {}", reference);
-            return ResponseEntity.notFound().build();
-        }
 
         LocataireInfoDto locataireInfo = new LocataireInfoDto();
         locataireInfo.setReference(locataire.getReference());
@@ -74,47 +66,44 @@ public class LocataireController {
         locataireInfo.setEmail(locataire.getEmail());
         locataireInfo.setPhone(locataire.getPhone());
 
-        // Récupérer les appartements du locataire via les baux actifs
+        // RÃ©cupÃ©rer les appartements du locataire via les baux actifs
         List<LocataireAppartementDto> appartements = locataire.getBauxActifs()
                 .stream()
+                .filter(this::isBailDataComplete)
                 .map(this::mapBailToAppartementDto)
                 .collect(Collectors.toList());
 
         locataireInfo.setAppartements(appartements);
 
-        log.info("Informations récupérées pour le locataire {}: {} appartement(s)",
+        log.info("Informations recuperees pour le locataire {}: {} appartement(s)",
                 reference, appartements.size());
 
         return ResponseEntity.ok(locataireInfo);
     }
 
-    @Operation(summary = "Récupère les appartements d'un locataire", description = "Retourne la liste des appartements assignés à un locataire")
+    @Operation(summary = "RÃ©cupÃ¨re les appartements d'un locataire", description = "Retourne la liste des appartements assignÃ©s Ã  un locataire")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Liste des appartements récupérée avec succès"),
-            @ApiResponse(responseCode = "404", description = "Locataire non trouvé", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Liste des appartements rÃ©cupÃ©rÃ©e avec succÃ¨s"),
+            @ApiResponse(responseCode = "404", description = "Locataire non trouvÃ©", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erreur interne du serveur", content = @Content)
     })
     @GetMapping("/{reference}/appartements")
-    @PreAuthorize("hasAuthority('LOCATAIRE')")
+    @PreAuthorize(SecurityRule.CONNECTED_OR_ADMIN)
     public ResponseEntity<List<LocataireAppartementDto>> getLocataireAppartements(
-            @Parameter(description = "Référence du locataire") @NotBlank @PathVariable("reference") String reference,
-            Authentication authentication)
+            @Parameter(description = "RÃ©fÃ©rence du locataire") @NotBlank @PathVariable("reference") String reference)
             throws BusinessException {
 
-        log.info("Récupération des appartements pour le locataire: {}", reference);
+        log.info("Recuperation des appartements pour le locataire: {}", reference);
 
         Client locataire = clientService.getClientWithBaux(reference);
-        if (locataire == null) {
-            log.warn("Locataire non trouvé: {}", reference);
-            return ResponseEntity.notFound().build();
-        }
 
         List<LocataireAppartementDto> appartements = locataire.getBauxActifs()
                 .stream()
+                .filter(this::isBailDataComplete)
                 .map(this::mapBailToAppartementDto)
                 .collect(Collectors.toList());
 
-        log.info("{} appartement(s) trouvé(s) pour le locataire {}", appartements.size(), reference);
+        log.info("{} appartement(s) trouve(s) pour le locataire {}", appartements.size(), reference);
 
         return ResponseEntity.ok(appartements);
     }
@@ -151,7 +140,18 @@ public class LocataireController {
         return dto;
     }
 
-    // DTOs pour la réponse
+    /**
+     * Ignore les baux incomplets pour eviter des erreurs 500 dans la reponse.
+     */
+    private boolean isBailDataComplete(Bail bail) {
+        if (bail == null || bail.getAppart() == null || bail.getAppart().getLogement() == null) {
+            log.warn("Bail incomplet detecte pour le locataire, element ignore dans la reponse");
+            return false;
+        }
+        return true;
+    }
+
+    // DTOs pour la rÃ©ponse
     public static class LocataireInfoDto {
         private String reference;
         private String name;
@@ -348,3 +348,5 @@ public class LocataireController {
         }
     }
 }
+
+

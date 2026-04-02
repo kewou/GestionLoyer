@@ -6,3 +6,5 @@ public class AuthenticationException extends Exception {
         super(detail);
     }
 }
+
+

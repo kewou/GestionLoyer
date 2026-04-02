@@ -4,7 +4,7 @@ import com.example.features.bail.Bail;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -28,3 +28,5 @@ public class Transaction {
 
 
 }
+
+

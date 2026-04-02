@@ -8,6 +8,7 @@ import com.example.features.user.application.mapper.ClientMapper;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.infra.ClientRepository;
 import com.example.security.Role;
+import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import javax.mail.MessagingException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -81,8 +80,8 @@ class ClientServiceTest {
 
         // Then
         verify(clientRepository, times(1)).save(any(Client.class));
-        // Note: sendInscriptionMail est commenté dans register(ClientDto, Role), donc
-        // on ne vérifie pas l'envoi d'email
+        // Note: sendInscriptionMail est commentÃ© dans register(ClientDto, Role), donc
+        // on ne vÃ©rifie pas l'envoi d'email
         // verify(messageService, times(1)).sendHtmlMessage(any(MessageDto.class));
         Assertions.assertNotNull(clientRegistered.getReference());
         Assertions.assertNotEquals(password, clientRegistered.getPassword());
@@ -90,7 +89,7 @@ class ClientServiceTest {
     }
 
     @Test
-    void should_send_reset_password_mail_when_client_really_exists() throws MessagingException {
+    void should_send_reset_password_mail_when_client_really_exists() throws MessagingException, BusinessException {
         // Given
         String mail = "test@client.fr";
         Client client = Client.builder()
@@ -108,7 +107,7 @@ class ClientServiceTest {
     }
 
     @Test
-    void should_send_reset_password_mail_with_this_exact_message() throws MessagingException {
+    void should_send_reset_password_mail_with_this_exact_message() throws MessagingException, BusinessException {
         // Given
         String mail = "test@client.fr";
         Client client = Client.builder()

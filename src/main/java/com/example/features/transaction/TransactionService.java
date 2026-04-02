@@ -3,12 +3,11 @@ package com.example.features.transaction;
 import com.example.exceptions.BusinessException;
 import com.example.features.appart.application.appService.AppartAppService;
 import com.example.features.appart.domain.entities.Appart;
-import com.example.features.user.application.appService.ClientAppService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +21,7 @@ public class TransactionService {
     private final TransactionMapper transactionMapper;
 
     @Autowired
-    public TransactionService(ClientAppService clientAppService, TransactionRepository transactionRepository,
+    public TransactionService(TransactionRepository transactionRepository,
                               AppartAppService appartAppService, TransactionMapper transactionMapper) {
         this.appartAppService = appartAppService;
         this.transactionRepository = transactionRepository;
@@ -35,5 +34,7 @@ public class TransactionService {
                 .map(transactionMapper::dto)
                 .collect(Collectors.toList());
     }
-    
+
 }
+
+

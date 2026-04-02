@@ -39,3 +39,5 @@ public interface ClientMapper {
     @Mapping(target = "verificationToken", ignore = true)
     void update(@MappingTarget Client entity, Client updateEntity);
 }
+
+

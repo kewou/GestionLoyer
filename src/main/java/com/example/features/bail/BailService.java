@@ -72,18 +72,19 @@ public class BailService {
         LocalDate end = bail.getDateSortie() != null ? bail.getDateSortie().withDayOfMonth(1)
                 : LocalDate.now().withDayOfMonth(1);
 
-        // Récupère toutes les transactions
+        // RÃ©cupÃ¨re toutes les transactions
         List<Transaction> transactions = transactionRepository.findByBail(bail);
 
-        // Somme totale versée
+        // Somme totale versÃ©e
         int totalVerse = transactions.stream()
                 .mapToInt(Transaction::getMontant)
                 .sum();
 
         int montantLoyer = bail.getAppart().getPrixLoyer();
         LocalDate current = start;
+        int retardCumul = 0;
 
-        // Distribuer les loyers jusqu'à la fin du bail ou jusqu'à ce qu'on dépasse
+        // Distribuer les loyers jusqu'Ã  la fin du bail ou jusqu'Ã  ce qu'on dÃ©passe
         // aujourd'hui
         while (!current.isAfter(end) || totalVerse >= montantLoyer) {
             int montantAttendu = montantLoyer;
@@ -92,16 +93,18 @@ public class BailService {
             boolean ok;
 
             if (totalVerse >= montantAttendu) {
-                // Loyer payé (ou en avance)
+                // Loyer payÃ© (ou en avance)
                 montantVerse = montantAttendu;
                 ok = true;
                 totalVerse -= montantAttendu;
             } else {
-                // Partiellement payé ou pas payé
+                // Partiellement payÃ© ou pas payÃ©
                 montantVerse = totalVerse;
                 ok = montantVerse >= montantAttendu;
                 totalVerse = 0;
             }
+
+            retardCumul += (montantAttendu - montantVerse);
 
             loyers.add(LoyerDto.builder()
                     .mois(current)
@@ -109,11 +112,12 @@ public class BailService {
                     .montantVerse(montantVerse)
                     .ok(ok)
                     .courant(current.equals(LocalDate.now().withDayOfMonth(1)))
+                    .retardCumul(retardCumul)
                     .build());
 
             current = current.plusMonths(1);
 
-            // Si plus de versement et on a dépassé la date courante → on s'arrête
+            // Si plus de versement et on a dÃ©passÃ© la date courante â†’ on s'arrÃªte
             if (totalVerse == 0 && current.isAfter(LocalDate.now().withDayOfMonth(1))) {
                 break;
             }
@@ -135,17 +139,17 @@ public class BailService {
         Appart appart = appartRepository.findByReference(refAppart)
                 .orElseThrow(() -> new BusinessException("Appartement introuvable"));
 
-        // Vérifie qu’il n’y a pas déjà un bail actif
+
         Optional<Bail> actif = bailRepository.findByAppartAndDateSortieIsNull(appart);
         if (actif.isPresent()) {
-            throw new BusinessException("Cet appartement a déjà un locataire actif");
+            throw new BusinessException("Cet appartement a dÃ©jÃ  un locataire actif");
         }
 
-        // Récupère le locataire
+        // RÃ©cupÃ¨re le locataire
         Client locataire = clientRepository.findByReference(request.getLocataireRef())
                 .orElseThrow(() -> new BusinessException("Locataire introuvable"));
 
-        // Crée le bail
+        // CrÃ©e le bail
         Bail bail = new Bail();
         bail.setAppart(appart);
         bail.setLocataire(locataire);
@@ -163,17 +167,17 @@ public class BailService {
                 .orElseThrow(() -> new IllegalArgumentException("Bail introuvable"));
 
         if (montant % montant != 0) {
-            throw new IllegalArgumentException("Le montant doit être un multiple du loyer (" + montant + ")");
+            throw new IllegalArgumentException("Le montant doit Ãªtre un multiple du loyer (" + montant + ")");
         }
 
-        // 1. Créer et sauvegarder la transaction
+        // 1. CrÃ©er et sauvegarder la transaction
         Transaction tx = new Transaction();
         tx.setBail(bail);
         tx.setMontant(montant);
         tx.setDate(LocalDate.now()); // ou LocalDateTime.now()
         transactionRepository.save(tx);
 
-        // 2. Retourner l’historique mis à jour
+        // 2. Retourner lâ€™historique mis Ã  jour
         return getHistoriqueLoyers(bailId);
     }
 
@@ -190,3 +194,4 @@ public class BailService {
     }
 
 }
+

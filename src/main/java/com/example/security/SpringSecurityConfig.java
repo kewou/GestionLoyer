@@ -8,20 +8,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableMethodSecurity
+public class SpringSecurityConfig {
 
     @Autowired
     private AuthenticationService authenticationService;
@@ -37,57 +37,45 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(authenticationService).passwordEncoder(passwordEncoder());
-    }
-
-    @Override
     @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(authenticationService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable() // protocole de sécurité qui gère un token
-                .authorizeRequests()
-                .antMatchers("/assets/**", "/**/*.js", "/users/create*", "/authenticate", "/oauth2/**", "/login",
-                        "/user-roles", "/contact",
-                        "/a-propos", "/users/verify-account", "/users/reset-password", "/users/update-password",
-                        "/swagger-ui/**", "/api-docs/**", "/actuator/**")
-                .permitAll()
-                .antMatchers("/", "/index.html", "/static/**", "/js/**", "/css/**", "/images/**").permitAll()
-                .antMatchers().permitAll()
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/admin/**").hasAuthority(Role.ADMIN.name())
-                .antMatchers("/bailleur/**").hasAnyAuthority(Role.ADMIN.name(), Role.BAILLEUR.name())
-                .antMatchers("/locataire/**").hasAnyAuthority(Role.ADMIN.name(), Role.LOCATAIRE.name())
-                .antMatchers("/locataires/**").hasAnyAuthority(Role.ADMIN.name(), Role.LOCATAIRE.name())
-                .antMatchers("/bailleur/users/**").hasAnyAuthority(Role.ADMIN.name(), Role.BAILLEUR.name())
-                .antMatchers("/admin/users/**").hasAuthority(Role.ADMIN.name())
-                .anyRequest().authenticated() // toutes les requetes doivent etre authentifiées
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/assets/**", "/users/create*", "/authenticate", "/oauth2/**", "/login",
+                                "/user-roles", "/contact",
+                                "/a-propos", "/users/verify-account", "/users/reset-password", "/users/update-password",
+                                "/swagger-ui/**", "/api-docs/**", "/actuator/**")
+                        .permitAll()
+                        .requestMatchers("/", "/index.html", "/static/**", "/js/**", "/css/**", "/images/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/admin/**").hasAuthority(Role.ADMIN.name())
+                        .requestMatchers("/bailleur/**").hasAnyAuthority(Role.ADMIN.name(), Role.BAILLEUR.name())
+                        .requestMatchers("/locataire/**").hasAnyAuthority(Role.ADMIN.name(), Role.LOCATAIRE.name())
+                        .requestMatchers("/locataires/**").hasAnyAuthority(Role.ADMIN.name(), Role.LOCATAIRE.name())
+                        .requestMatchers("/bailleur/users/**").hasAnyAuthority(Role.ADMIN.name(), Role.BAILLEUR.name())
+                        .requestMatchers("/admin/users/**").hasAuthority(Role.ADMIN.name())
+                        .anyRequest().authenticated()
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(clientPreFilter, JwtFilter.class);
 
-        ;
-
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Ajout du Filtre
-        http.addFilterAfter(clientPreFilter, JwtFilter.class);
+        return http.build();
     }
-
-    /*
-     * @Override
-     * public void configure(WebSecurity web) throws Exception {
-     * web.ignoring()
-     * .antMatchers("/configuration/ui", "/swagger-resources", "/configuration/ui",
-     * "/swagger-resources/**", "/configuration/security",
-     * "/api-docs/swagger-config", "/swagger-ui/**", "/webjars/**",
-     * "/swagger-ui-custom.html", "/swagger-ui.html", "/api-docs", "/actuator",
-     * "/index.html")
-     * .antMatchers();
-     * }
-     */
 
 }
