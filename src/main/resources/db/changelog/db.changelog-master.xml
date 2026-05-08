@@ -8,4 +8,53 @@
             <column name="nbTotal" type="bigint"></column>
         </addColumn>
     </changeSet>
+
+    <!-- v2.3.0 – Intégration Campay / Orange Money -->
+
+    <changeSet author="noumia" id="2026041201-client-solde-phoneom">
+        <addColumn tableName="client">
+            <column name="solde" type="DECIMAL(15,2)" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_om" type="VARCHAR(20)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="noumia" id="2026041202-transaction-type-campayref">
+        <addColumn tableName="transaction">
+            <column name="type" type="VARCHAR(30)" defaultValue="MANUEL">
+                <constraints nullable="false"/>
+            </column>
+            <column name="campay_reference" type="VARCHAR(100)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="noumia" id="2026041203-create-campay-transaction">
+        <createTable tableName="campay_transaction">
+            <column name="campay_reference" type="VARCHAR(100)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="external_reference" type="VARCHAR(100)"/>
+            <column name="amount" type="DECIMAL(15,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_number" type="VARCHAR(20)"/>
+            <column name="type" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="client_reference" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bailleur_reference" type="VARCHAR(100)"/>
+            <column name="bail_id" type="BIGINT"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
+
+

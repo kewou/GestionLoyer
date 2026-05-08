@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
 
 @Data
 @Builder
@@ -18,7 +19,7 @@ public class ClientDto {
 
     private String reference;
 
-    @NotBlank(message = "Entrer un prÃ©nom svp")
+    @NotBlank(message = "Entrer un prénom svp")
     @Size(min = 2, max = 50)
     private String name;
 
@@ -32,8 +33,14 @@ public class ClientDto {
 
     private String phone;
 
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}$", message = "Le mot de passe doit contenir au moins 8 caractÃ¨res, dont une majuscule, un chiffre et un caractÃ¨re spÃ©cial")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}$", message = "Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, un chiffre et un caractère spécial")
     private String password;
+
+    private BigDecimal solde;
+
+    private String phoneOm;
+
+    private Integer loyersEnRetard;
 
     public ClientDto(String name, String lastName, String email, String phone) {
         this.name = name;
@@ -41,7 +48,6 @@ public class ClientDto {
         this.phone = phone;
         this.email = email;
     }
-
 
 }
 

@@ -3,16 +3,16 @@ package com.example.filter;
 import com.example.exceptions.BusinessException;
 import com.example.features.logement.LogementAppService;
 import com.example.features.user.application.appService.ClientAppService;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
@@ -41,6 +41,7 @@ public class ClientPreFilter extends OncePerRequestFilter {
                 clientAppService.getClientByReference(reference);
             } catch (BusinessException e) {
                 sendErrorResponse(httpServletResponse, e.getMessage());
+                return;
             }
         }
 
@@ -54,6 +55,7 @@ public class ClientPreFilter extends OncePerRequestFilter {
                 logementAppService.getLogementByReference(logementRef);
             } catch (BusinessException e) {
                 sendErrorResponse(httpServletResponse, e.getMessage());
+                return;
             }
         }
         filterChain.doFilter(httpServletRequest, httpServletResponse);

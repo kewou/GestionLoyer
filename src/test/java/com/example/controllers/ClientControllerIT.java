@@ -38,8 +38,8 @@ public class ClientControllerIT {
     @WithMockUser(authorities = "ADMIN")
     void searchLocataires_returnsListOfClients() throws Exception {
         // given
-        ClientDto locataire1 = new ClientDto("ref1", "Dupont", "test", "dupont@mail.com", "3", "pass1");
-        ClientDto locataire2 = new ClientDto("ref2", "Durand", "test2", "durand@mail.com", "4", "pass2");
+        ClientDto locataire1 = ClientDto.builder().reference("ref1").name("Dupont").lastName("test").email("dupont@mail.com").phone("3").password("pass1").build();
+        ClientDto locataire2 = ClientDto.builder().reference("ref2").name("Durand").lastName("test2").email("durand@mail.com").phone("4").password("pass2").build();
 
         Mockito.when(clientService.searchLocatairesByName(anyString()))
                 .thenReturn(List.of(locataire1, locataire2));

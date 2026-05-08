@@ -26,6 +26,13 @@ public class Transaction {
     @JoinColumn(name = "bail_id")
     private Bail bail;
 
+    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
+    private TransactionType type = TransactionType.MANUEL;
+
+    @Column(name = "campay_reference")
+    private String campayReference;
+
 
 }
 

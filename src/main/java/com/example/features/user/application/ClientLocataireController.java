@@ -2,6 +2,7 @@ package com.example.features.user.application;
 
 
 import com.example.features.accueil.domain.services.AuthenticationService;
+import com.example.features.bail.BailService;
 import com.example.features.user.domain.services.impl.ClientService;
 import com.example.utils.JWTUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ClientLocataireController extends ClientController {
 
     @Autowired
-    public ClientLocataireController
-            (ClientService clientAppService, AuthenticationService authenticationService, JWTUtils jwtUtils) {
-        super(clientAppService, authenticationService, jwtUtils);
+    public ClientLocataireController(ClientService clientAppService, AuthenticationService authenticationService, JWTUtils jwtUtils, BailService bailService) {
+        super(clientAppService, authenticationService, jwtUtils, bailService);
     }
 }
 

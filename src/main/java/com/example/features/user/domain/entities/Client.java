@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -53,6 +54,12 @@ public class Client implements UserDetailsCustom {
     private Boolean isEnabled;
 
     private String verificationToken;
+
+    @Column(name = "solde", precision = 15, scale = 2)
+    private BigDecimal solde = BigDecimal.ZERO;
+
+    @Column(name = "phone_om")
+    private String phoneOm;
 
     @PostPersist
     private void generateVerificationToken() {
