@@ -2,6 +2,7 @@ package com.example.features.user.domain.entities;
 
 import com.example.features.bail.Bail;
 import com.example.features.logement.Logement;
+import com.example.features.payment.enums.ModeEncaissement;
 import com.example.utils.GeneralUtils;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -60,6 +61,10 @@ public class Client implements UserDetailsCustom {
 
     @Column(name = "phone_om")
     private String phoneOm;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "mode_encaissement", nullable = false)
+    private ModeEncaissement modeEncaissement = ModeEncaissement.DEUX_ETAPES;
 
     @PostPersist
     private void generateVerificationToken() {

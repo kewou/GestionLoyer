@@ -3,6 +3,7 @@ package com.example.features.user.domain.services.impl;
 import com.example.exceptions.BusinessException;
 import com.example.features.common.mail.MessageDto;
 import com.example.features.common.mail.MessageService;
+import com.example.features.payment.enums.ModeEncaissement;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.application.mapper.ClientDto;
 import com.example.features.user.application.mapper.ClientMapper;
@@ -268,6 +269,18 @@ public class ClientService implements ClientAppService {
                 client.setBaux(new HashSet<>());
             }
         }
+    }
+
+    public ModeEncaissement getModeEncaissement(String reference) throws BusinessException {
+        Client client = getClientFromDatabase(reference);
+        return client.getModeEncaissement() != null ? client.getModeEncaissement() : ModeEncaissement.DEUX_ETAPES;
+    }
+
+    public void updateModeEncaissement(String reference, ModeEncaissement mode) throws BusinessException {
+        Client client = getClientFromDatabase(reference);
+        client.setModeEncaissement(mode);
+        clientRepository.save(client);
+        log.info("Mode encaissement du bailleur {} mis à jour : {}", reference, mode);
     }
 
 }

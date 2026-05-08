@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import com.example.features.payment.enums.ModeEncaissement;
 
 @Data
 @Builder
@@ -41,6 +42,8 @@ public class ClientDto {
     private String phoneOm;
 
     private Integer loyersEnRetard;
+
+    private ModeEncaissement modeEncaissement;
 
     public ClientDto(String name, String lastName, String email, String phone) {
         this.name = name;
