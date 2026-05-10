@@ -1,6 +1,7 @@
 package com.example.features.transaction;
 
 import com.example.features.bail.Bail;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,6 +27,10 @@ public class Transaction {
     @JoinColumn(name = "bail_id")
     private Bail bail;
 
+    @JsonIgnore
+    public Bail getBail() {
+        return this.bail;
+    }
 
 }
 

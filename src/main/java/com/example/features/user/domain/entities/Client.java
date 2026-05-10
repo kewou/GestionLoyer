@@ -3,6 +3,7 @@ package com.example.features.user.domain.entities;
 import com.example.features.bail.Bail;
 import com.example.features.logement.Logement;
 import com.example.utils.GeneralUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -126,6 +127,16 @@ public class Client implements UserDetailsCustom {
     @Override
     public String getReference() {
         return this.reference;
+    }
+
+    @JsonIgnore
+    public Set<Logement> getLogements() {
+        return this.logements;
+    }
+
+    @JsonIgnore
+    public Set<Bail> getBaux() {
+        return this.baux;
     }
 
     public void setEnabled(Boolean enabled) {

@@ -48,6 +48,11 @@ public class Bail {
         return this.appart;
     }
 
+    @JsonIgnore
+    public Client getLocataire() {
+        return this.locataire;
+    }
+
 }
 
 
