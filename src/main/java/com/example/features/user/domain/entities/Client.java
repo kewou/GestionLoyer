@@ -63,7 +63,7 @@ public class Client implements UserDetailsCustom {
     private String phoneOm;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "mode_encaissement", nullable = false)
+    @Column(name = "mode_encaissement")
     private ModeEncaissement modeEncaissement = ModeEncaissement.DEUX_ETAPES;
 
     @PostPersist
