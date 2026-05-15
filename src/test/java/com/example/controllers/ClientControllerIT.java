@@ -41,7 +41,7 @@ public class ClientControllerIT {
         ClientDto locataire1 = new ClientDto("ref1", "Dupont", "test", "dupont@mail.com", "3", "pass1");
         ClientDto locataire2 = new ClientDto("ref2", "Durand", "test2", "durand@mail.com", "4", "pass2");
 
-        Mockito.when(clientService.searchLocatairesByName(anyString()))
+        Mockito.when(clientService.searchLocatairesByName(anyString(), Mockito.nullable(String.class)))
                 .thenReturn(List.of(locataire1, locataire2));
 
         // when/then

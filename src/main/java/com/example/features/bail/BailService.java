@@ -1,6 +1,7 @@
 package com.example.features.bail;
 
 import com.example.exceptions.BusinessException;
+import com.example.features.accueil.domain.services.AuthenticationService;
 import com.example.features.appart.application.mapper.LoyerDto;
 import com.example.features.appart.domain.entities.Appart;
 import com.example.features.appart.infra.AppartRepository;
@@ -36,6 +37,9 @@ public class BailService {
 
     @Autowired
     private TransactionRepository transactionRepository;
+
+    @Autowired
+    private AuthenticationService authenticationService;
 
     private final BailMapper bailMapper;
     @Autowired
@@ -148,6 +152,15 @@ public class BailService {
         // RÃ©cupÃ¨re le locataire
         Client locataire = clientRepository.findByReference(request.getLocataireRef())
                 .orElseThrow(() -> new BusinessException("Locataire introuvable"));
+
+        if (Boolean.TRUE.equals(locataire.getIsVirtual())) {
+            String currentEmail = authenticationService.getLoggedInUsername();
+            Client currentBailleur = currentEmail != null ? clientRepository.findByEmail(currentEmail) : null;
+            if (currentBailleur == null
+                    || !currentBailleur.getReference().equals(locataire.getCreatedByBailleurRef())) {
+                throw new BusinessException("Vous n'etes pas autorise a utiliser ce locataire virtuel");
+            }
+        }
 
         // CrÃ©e le bail
         Bail bail = new Bail();

@@ -4,6 +4,8 @@ import com.example.exceptions.BusinessException;
 import com.example.exceptions.ValidationException;
 import com.example.features.accueil.domain.services.AuthenticationService;
 import com.example.features.user.application.appService.ClientAppService;
+import com.example.features.user.application.appService.VirtualLocataireAppService;
+import com.example.features.user.application.mapper.ClaimAccountDto;
 import com.example.features.user.application.mapper.ClientDto;
 import com.example.features.user.application.mapper.ResetPasswordRequestDto;
 import com.example.features.user.application.mapper.UpdatePasswordDto;
@@ -45,13 +47,18 @@ public class ClientController {
 
     protected ClientAppService clientAppService;
     protected AuthenticationService authenticationService;
+    protected VirtualLocataireAppService virtualLocataireAppService;
 
     protected JWTUtils jwtUtils;
 
     @Autowired
-    public ClientController(ClientService clientAppService, AuthenticationService authenticationService, JWTUtils jwtUtils) {
+    public ClientController(ClientService clientAppService,
+                            AuthenticationService authenticationService,
+                            VirtualLocataireAppService virtualLocataireAppService,
+                            JWTUtils jwtUtils) {
         this.clientAppService = clientAppService;
         this.authenticationService = authenticationService;
+        this.virtualLocataireAppService = virtualLocataireAppService;
         this.jwtUtils = jwtUtils;
     }
 
@@ -138,12 +145,20 @@ public class ClientController {
         clientAppService.validateToken(client);
     }
 
+    @PostMapping("/claim")
+    public ResponseEntity<ClientDto> claimVirtualAccount(@Valid @RequestBody ClaimAccountDto dto,
+                                                         Errors errors) throws BusinessException {
+        ResponseHelper.handle(errors);
+        return ResponseEntity.ok(virtualLocataireAppService.claim(dto));
+    }
+
     @GetMapping("/{reference}/search")
     @PreAuthorize("hasAuthority('BAILLEUR') or hasAuthority('ADMIN')")
     public ResponseEntity<List<ClientDto>> searchLocataires(
             @RequestParam String name
     ) {
-        return ResponseEntity.ok(clientAppService.searchLocatairesByName(name));
+        String bailleurEmail = authenticationService.getLoggedInUsername();
+        return ResponseEntity.ok(clientAppService.searchLocatairesByName(name, bailleurEmail));
     }
 
 

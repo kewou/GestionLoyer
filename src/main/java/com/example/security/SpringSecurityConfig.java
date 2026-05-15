@@ -58,6 +58,7 @@ public class SpringSecurityConfig {
                         .requestMatchers("/assets/**", "/users/create*", "/authenticate", "/oauth2/**", "/login",
                                 "/user-roles", "/contact",
                                 "/a-propos", "/users/verify-account", "/users/reset-password", "/users/update-password",
+                                "/users/claim",
                                 "/swagger-ui/**", "/api-docs/**", "/actuator/**")
                         .permitAll()
                         .requestMatchers("/", "/index.html", "/static/**", "/js/**", "/css/**", "/images/**").permitAll()

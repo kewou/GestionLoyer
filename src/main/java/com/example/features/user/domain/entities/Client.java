@@ -12,6 +12,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -44,7 +45,7 @@ public class Client implements UserDetailsCustom {
     @Column(name = "phone")
     private String phone;
 
-    @Column(name = "email", unique = true)
+    @Column(name = "email")
     private String email;
 
     @Column(name = "password")
@@ -55,8 +56,28 @@ public class Client implements UserDetailsCustom {
 
     private String verificationToken;
 
+    @Column(name = "is_virtual", nullable = false)
+    private Boolean isVirtual = Boolean.FALSE;
+
+    @Column(name = "created_by_bailleur_ref", length = 9)
+    private String createdByBailleurRef;
+
+    @Column(name = "invitation_code", length = 24)
+    private String invitationCode;
+
+    @Column(name = "invitation_code_expires_at")
+    private LocalDateTime invitationCodeExpiresAt;
+
+    @Column(name = "claimed_at")
+    private LocalDateTime claimedAt;
+
     @PostPersist
     private void generateVerificationToken() {
+        if (Boolean.TRUE.equals(isVirtual)) {
+            isEnabled = Boolean.FALSE;
+            verificationToken = null;
+            return;
+        }
         verificationToken = GeneralUtils.generateVerificationToken();
         isEnabled = Boolean.FALSE;
     }
@@ -99,7 +120,7 @@ public class Client implements UserDetailsCustom {
 
     @Override
     public boolean isEnabled() {
-        return isEnabled != null && isEnabled;
+        return isEnabled != null && isEnabled && !Boolean.TRUE.equals(isVirtual);
     }
 
     @Override

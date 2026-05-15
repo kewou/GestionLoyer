@@ -140,6 +140,9 @@ public class ClientService implements ClientAppService {
 
     @Override
     public void sendResetPasswordMail(Client client) throws BusinessException {
+        if (Boolean.TRUE.equals(client.getIsVirtual())) {
+            throw new BusinessException("Aucun compte n'est associe a cet e-mail.", NOT_FOUND);
+        }
         final String email = client.getEmail();
         final String message;
         String verificationToken = GeneralUtils.generateVerificationToken();
@@ -244,8 +247,15 @@ public class ClientService implements ClientAppService {
     }
 
     @Override
-    public List<ClientDto> searchLocatairesByName(String name) {
-        return clientRepository.searchLocatairesByName(name).stream()
+    public List<ClientDto> searchLocatairesByName(String name, String bailleurEmail) {
+        String bailleurRef = null;
+        if (bailleurEmail != null) {
+            Client bailleur = clientRepository.findByEmail(bailleurEmail);
+            if (bailleur != null) {
+                bailleurRef = bailleur.getReference();
+            }
+        }
+        return clientRepository.searchLocatairesByName(name, bailleurRef).stream()
                 .map(clientMapper::dto)
                 .collect(Collectors.toList());
     }

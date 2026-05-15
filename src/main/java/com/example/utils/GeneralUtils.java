@@ -20,6 +20,11 @@ public class GeneralUtils {
     public static String generateVerificationToken() {
         return RandomStringUtils.randomAlphanumeric(30);
     }
+
+    public static String generateInvitationCode() {
+        return "INV-" + RandomStringUtils.random(16, 0, 0, true, true, null, new SecureRandom())
+                .toUpperCase();
+    }
 }
 
 

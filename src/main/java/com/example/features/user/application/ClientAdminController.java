@@ -3,6 +3,7 @@ package com.example.features.user.application;
 
 import com.example.exceptions.BusinessException;
 import com.example.features.accueil.domain.services.AuthenticationService;
+import com.example.features.user.application.appService.VirtualLocataireAppService;
 import com.example.features.user.application.mapper.ClientDto;
 import com.example.features.user.domain.entities.Client;
 import com.example.features.user.domain.services.impl.ClientService;
@@ -30,8 +31,11 @@ import java.util.List;
 public class ClientAdminController extends ClientController {
 
     @Autowired
-    public ClientAdminController(ClientService clientAppService, AuthenticationService authenticationService, JWTUtils jwtUtils) {
-        super(clientAppService, authenticationService, jwtUtils);
+    public ClientAdminController(ClientService clientAppService,
+                                 AuthenticationService authenticationService,
+                                 VirtualLocataireAppService virtualLocataireAppService,
+                                 JWTUtils jwtUtils) {
+        super(clientAppService, authenticationService, virtualLocataireAppService, jwtUtils);
     }
 
 

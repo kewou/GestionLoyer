@@ -37,11 +37,13 @@ public class AuthenticationService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Client client = clientAppService.getClientByEmail(URLDecoder.decode(username));
-        if (client != null) {
-            return client;
-        } else {
+        if (client == null) {
             throw new UsernameNotFoundException("User " + username + " not found");
         }
+        if (Boolean.TRUE.equals(client.getIsVirtual())) {
+            throw new UsernameNotFoundException("User " + username + " not found");
+        }
+        return client;
     }
 
     public String getLoggedInUsername() {

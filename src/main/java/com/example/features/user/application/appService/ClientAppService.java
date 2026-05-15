@@ -37,5 +37,5 @@ public interface ClientAppService {
 
     void updatePasswordClient(UpdatePasswordDto updatePasswordDto) throws BusinessException;
 
-    List<ClientDto> searchLocatairesByName(String name);
+    List<ClientDto> searchLocatairesByName(String name, String bailleurEmail);
 }

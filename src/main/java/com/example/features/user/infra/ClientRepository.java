@@ -19,11 +19,26 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     Optional<Client> findByReference(String reference);
 
+    Optional<Client> findByInvitationCode(String invitationCode);
+
+    @Query("SELECT c FROM Client c WHERE c.email = :email AND (c.isVirtual IS NULL OR c.isVirtual = false)")
+    Optional<Client> findRealClientByEmail(@Param("email") String email);
+
+    @Query("SELECT c FROM Client c WHERE c.email = :email AND c.isVirtual = true AND c.createdByBailleurRef = :bailleurRef")
+    Optional<Client> findVirtualByEmailAndBailleur(@Param("email") String email,
+                                                   @Param("bailleurRef") String bailleurRef);
+
+    @Query("SELECT c FROM Client c WHERE c.isVirtual = true AND c.createdByBailleurRef = :bailleurRef " +
+            "AND 'LOCATAIRE' MEMBER OF c.roles")
+    List<Client> findVirtualLocatairesByBailleur(@Param("bailleurRef") String bailleurRef);
+
     void deleteByReference(String reference);
 
     @Query("SELECT c FROM Client c WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%')) " +
-            "AND 'LOCATAIRE' MEMBER OF c.roles")
-    List<Client> searchLocatairesByName(@Param("name") String name);
+            "AND 'LOCATAIRE' MEMBER OF c.roles " +
+            "AND (c.isVirtual IS NULL OR c.isVirtual = false OR c.createdByBailleurRef = :bailleurRef)")
+    List<Client> searchLocatairesByName(@Param("name") String name,
+                                        @Param("bailleurRef") String bailleurRef);
 
     @Query("SELECT DISTINCT c FROM Client c " +
             "LEFT JOIN FETCH c.baux b " +
