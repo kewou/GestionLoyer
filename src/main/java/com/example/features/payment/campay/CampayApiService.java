@@ -167,19 +167,43 @@ public class CampayApiService {
     public CampayWithdrawResponse withdraw(CampayWithdrawRequest request) {
         String token = getToken();
         String url = baseUrl + "/withdraw/";
+        log.info("Campay withdraw - url={}, to={}, amount={}", url, request.getTo(), request.getAmount());
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set(HttpHeaders.AUTHORIZATION, "Token " + token);
 
-            HttpEntity<CampayWithdrawRequest> httpRequest = new HttpEntity<>(request, headers);
-            ResponseEntity<CampayWithdrawResponse> responseEntity = restTemplate.postForEntity(url, httpRequest, CampayWithdrawResponse.class);
-            CampayWithdrawResponse response = responseEntity.getBody();
-            if (response == null) {
-                throw new RuntimeException("Réponse Campay withdraw vide");
+            // Sérialiser explicitement en JSON (cohérent avec collect)
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonBody;
+            try {
+                jsonBody = mapper.writeValueAsString(request);
+            } catch (JsonProcessingException jpe) {
+                log.error("Erreur de sérialisation JSON pour la requête withdraw", jpe);
+                throw new RuntimeException("Erreur lors de la préparation de la requête Campay withdraw", jpe);
             }
-            log.info("Campay withdraw initié : reference={}", response.getReference());
-            return response;
+            log.debug("Campay withdraw - payload: {}", jsonBody);
+
+            HttpEntity<String> httpRequest = new HttpEntity<>(jsonBody, headers);
+            try {
+                ResponseEntity<CampayWithdrawResponse> responseEntity = restTemplate.postForEntity(url, httpRequest, CampayWithdrawResponse.class);
+                CampayWithdrawResponse response = responseEntity.getBody();
+                if (response == null) {
+                    throw new RuntimeException("Réponse Campay withdraw vide");
+                }
+                log.info("Campay withdraw initié : reference={}", response.getReference());
+                return response;
+            } catch (HttpClientErrorException hcee) {
+                String respBody = hcee.getResponseBodyAsString();
+                log.error("Campay API error during withdraw: status={}, body={}", hcee.getStatusCode(), respBody);
+                if (hcee.getStatusCode().value() == 401) {
+                    throw new RuntimeException(
+                            "Campay 401 : token invalide ou retrait non autorisé sur ce compte. " +
+                            "Vérifiez que les retraits API sont activés dans les paramètres de votre application Campay. " +
+                            "Body: " + respBody, hcee);
+                }
+                throw new RuntimeException("Campay API error [" + hcee.getStatusCode() + "]: " + respBody, hcee);
+            }
         } catch (RestClientException e) {
             log.error("Erreur lors de l'appel Campay withdraw", e);
             throw new RuntimeException("Erreur lors de l'initiation du retrait Orange Money", e);
