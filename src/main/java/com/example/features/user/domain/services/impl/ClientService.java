@@ -278,9 +278,20 @@ public class ClientService implements ClientAppService {
 
     public void updateModeEncaissement(String reference, ModeEncaissement mode) throws BusinessException {
         Client client = getClientFromDatabase(reference);
+        if (ModeEncaissement.DIRECT.equals(mode) && (client.getPhoneOm() == null || client.getPhoneOm().isBlank())) {
+            throw new BusinessException(
+                "Vous devez enregistrer un numéro Orange Money avant d'activer l'encaissement direct.", OTHER);
+        }
         client.setModeEncaissement(mode);
         clientRepository.save(client);
         log.info("Mode encaissement du bailleur {} mis à jour : {}", reference, mode);
+    }
+
+    public void updatePhoneOm(String reference, String phoneOm) throws BusinessException {
+        Client client = getClientFromDatabase(reference);
+        client.setPhoneOm(phoneOm);
+        clientRepository.save(client);
+        log.info("Numéro Orange Money du client {} mis à jour : {}", reference, phoneOm);
     }
 
 }

@@ -3,6 +3,8 @@ package com.example.features.user.application;
 
 import com.example.exceptions.BusinessException;
 import com.example.features.accueil.domain.services.AuthenticationService;
+import com.example.features.bail.BailService;
+import com.example.features.payment.enums.ModeEncaissement;
 import com.example.features.user.domain.services.impl.ClientService;
 import com.example.security.SecurityRule;
 import com.example.utils.JWTUtils;

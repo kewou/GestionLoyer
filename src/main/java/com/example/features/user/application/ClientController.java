@@ -11,7 +11,6 @@ import com.example.features.user.application.mapper.ResetPasswordRequestDto;
 import com.example.features.user.application.mapper.UpdatePasswordDto;
 import com.example.features.user.application.mapper.VerificationUserInscriptionDto;
 import com.example.features.user.domain.entities.Client;
-import com.example.features.user.domain.services.impl.ClientService;
 import com.example.helper.ResponseHelper;
 import com.example.security.Role;
 import com.example.security.SecurityRule;
@@ -34,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 
 import static com.example.exceptions.BusinessException.BusinessErrorType.NOT_FOUND;
 
@@ -166,6 +166,21 @@ public class ClientController {
         return ResponseEntity.ok(clientAppService.searchLocatairesByName(name));
     }
 
+    /**
+     * Met à jour le numéro Orange Money d'un utilisateur.
+     */
+    @PutMapping("/{reference}/phone-om")
+    @PreAuthorize(SecurityRule.CONNECTED_OR_ADMIN)
+    public ResponseEntity<Map<String, String>> updatePhoneOm(
+            @PathVariable String reference,
+            @RequestBody Map<String, String> body) throws BusinessException {
+        String phoneOm = body.get("phoneOm");
+        if (phoneOm == null || phoneOm.isBlank()) {
+            throw new BusinessException("Le numéro Orange Money est requis.", com.example.exceptions.BusinessException.BusinessErrorType.OTHER);
+        }
+        clientService.updatePhoneOm(reference, phoneOm);
+        return ResponseEntity.ok(Map.of("phoneOm", phoneOm));
+    }
 
 }
 
