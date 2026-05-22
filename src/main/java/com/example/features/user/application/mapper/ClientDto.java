@@ -9,8 +9,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import java.math.BigDecimal;
-import com.example.features.payment.enums.ModeEncaissement;
 
 @Data
 @Builder
@@ -51,6 +49,7 @@ public class ClientDto {
         this.phone = phone;
         this.email = email;
     }
+
 
 }
 
