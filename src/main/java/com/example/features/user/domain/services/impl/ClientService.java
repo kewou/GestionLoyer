@@ -20,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -292,6 +293,27 @@ public class ClientService implements ClientAppService {
         client.setPhoneOm(phoneOm);
         clientRepository.save(client);
         log.info("Numéro Orange Money du client {} mis à jour : {}", reference, phoneOm);
+    }
+
+    /**
+     * Crée un locataire "lite" (sans email ni mot de passe).
+     * Ce compte peut être rattaché ultérieurement à un vrai compte via un code de validation.
+     */
+    public ClientDto createLiteLocataire(String name, String lastName, String phone) {
+        Client client = Client.builder()
+                .name(name)
+                .lastName(lastName)
+                .phone(phone)
+                .reference(GeneralUtils.generateReference())
+                .isEnabled(Boolean.TRUE)
+                .liteAccount(Boolean.TRUE)
+                .linkingCode(GeneralUtils.generateVerificationToken())
+                .roles(Set.of(Role.LOCATAIRE.name()))
+                .solde(BigDecimal.ZERO)
+                .build();
+        Client saved = clientRepository.save(client);
+        log.info("Locataire lite créé : ref={}, nom={} {}", saved.getReference(), name, lastName);
+        return clientMapper.dto(saved);
     }
 
 }

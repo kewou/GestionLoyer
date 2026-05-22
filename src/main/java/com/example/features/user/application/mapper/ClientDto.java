@@ -45,6 +45,8 @@ public class ClientDto {
 
     private ModeEncaissement modeEncaissement;
 
+    private Boolean liteAccount;
+
     public ClientDto(String name, String lastName, String email, String phone) {
         this.name = name;
         this.lastName = lastName;

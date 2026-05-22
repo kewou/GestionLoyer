@@ -66,6 +66,12 @@ public class Client implements UserDetailsCustom {
     @Column(name = "mode_encaissement")
     private ModeEncaissement modeEncaissement = ModeEncaissement.DEUX_ETAPES;
 
+    @Column(name = "lite_account")
+    private Boolean liteAccount = Boolean.FALSE;
+
+    @Column(name = "linking_code")
+    private String linkingCode;
+
     @PostPersist
     private void generateVerificationToken() {
         verificationToken = GeneralUtils.generateVerificationToken();

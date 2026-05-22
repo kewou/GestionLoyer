@@ -5,9 +5,12 @@ import com.example.exceptions.BusinessException;
 import com.example.features.accueil.domain.services.AuthenticationService;
 import com.example.features.bail.BailService;
 import com.example.features.payment.enums.ModeEncaissement;
+import com.example.features.user.application.mapper.ClientDto;
+import com.example.features.user.application.mapper.CreateLiteLocataireDto;
 import com.example.features.user.domain.services.impl.ClientService;
 import com.example.security.SecurityRule;
 import com.example.utils.JWTUtils;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,6 +51,17 @@ public class ClientBailleurController extends ClientController {
         ModeEncaissement mode = ModeEncaissement.valueOf(body.get("modeEncaissement"));
         clientService.updateModeEncaissement(reference, mode);
         return ResponseEntity.ok(Map.of("modeEncaissement", mode.name()));
+    }
+
+    /**
+     * Crée un locataire "lite" (sans email/mot de passe) et l'assigne directement.
+     * Le bailleur peut ultérieurement rattacher ce compte à un vrai utilisateur.
+     */
+    @PostMapping("/locataires/lite")
+    @PreAuthorize("hasAuthority('BAILLEUR') or hasAuthority('ADMIN')")
+    public ResponseEntity<ClientDto> createLiteLocataire(@Valid @RequestBody CreateLiteLocataireDto dto) {
+        ClientDto created = clientService.createLiteLocataire(dto.getName(), dto.getLastName(), dto.getPhone());
+        return ResponseEntity.ok(created);
     }
 }
 
