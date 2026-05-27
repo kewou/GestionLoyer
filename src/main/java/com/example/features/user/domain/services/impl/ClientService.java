@@ -316,4 +316,31 @@ public class ClientService implements ClientAppService {
         return clientMapper.dto(saved);
     }
 
+    /**
+     * Lie un compte lite (créé par un bailleur) au compte réel du locataire.
+     * Transfère tous les baux du compte lite vers le compte réel, puis supprime le compte lite.
+     */
+    public void linkLiteAccount(String realUserReference, String linkingCode) throws BusinessException {
+        Client realUser = getClientFromDatabase(realUserReference);
+
+        Client liteAccount = clientRepository.findByLinkingCode(linkingCode)
+                .orElseThrow(() -> new BusinessException("Code de liaison invalide ou déjà utilisé.", NOT_FOUND));
+
+        if (!Boolean.TRUE.equals(liteAccount.getLiteAccount())) {
+            throw new BusinessException("Ce code ne correspond pas à un compte virtuel.", OTHER);
+        }
+
+        // Transférer tous les baux du compte lite vers le compte réel
+        if (liteAccount.getBaux() != null) {
+            liteAccount.getBaux().forEach(bail -> bail.setLocataire(realUser));
+            realUser.getBaux().addAll(liteAccount.getBaux());
+            liteAccount.getBaux().clear();
+        }
+
+        clientRepository.save(realUser);
+        clientRepository.delete(liteAccount);
+
+        log.info("Compte lite {} lié et supprimé → compte réel {}", liteAccount.getReference(), realUserReference);
+    }
+
 }

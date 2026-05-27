@@ -47,6 +47,9 @@ public class ClientDto {
 
     private Boolean liteAccount;
 
+    private String linkingCode;
+
+
     public ClientDto(String name, String lastName, String email, String phone) {
         this.name = name;
         this.lastName = lastName;
