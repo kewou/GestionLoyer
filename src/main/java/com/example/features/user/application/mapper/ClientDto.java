@@ -49,6 +49,8 @@ public class ClientDto {
 
     private String linkingCode;
 
+    private Boolean hasBailActif;
+
 
     public ClientDto(String name, String lastName, String email, String phone) {
         this.name = name;

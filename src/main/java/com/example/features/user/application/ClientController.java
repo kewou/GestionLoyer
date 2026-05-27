@@ -105,6 +105,7 @@ public class ClientController {
                                 .count())
                         .sum();
                 dto.setLoyersEnRetard(retardCount);
+                dto.setHasBailActif(!client.getBauxActifs().isEmpty());
             }
         } catch (Exception e) {
             log.warn("Impossible de calculer les loyers en retard pour {}: {}", reference, e.getMessage());
