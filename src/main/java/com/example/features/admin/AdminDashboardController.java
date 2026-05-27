@@ -63,6 +63,7 @@ public class AdminDashboardController {
     // ===== Dashboard stats =====
 
     @GetMapping("/stats")
+    @PreAuthorize(SecurityRule.ADMIN)
     public ResponseEntity<Map<String, Object>> getStats() {
         Map<String, Object> stats = new HashMap<>();
         stats.put("totalUsers", clientService.getAllClient().size());
@@ -77,6 +78,7 @@ public class AdminDashboardController {
     // ===== Logements =====
 
     @GetMapping("/logements")
+    @PreAuthorize(SecurityRule.ADMIN)
     public ResponseEntity<List<AdminLogementDto>> getAllLogements() {
         List<Logement> logements = logementRepository.findAll();
         List<AdminLogementDto> dtos = logements.stream().map(l -> {
@@ -93,6 +95,7 @@ public class AdminDashboardController {
     }
 
     @DeleteMapping("/logements/{reference}")
+    @PreAuthorize(SecurityRule.ADMIN)
     public ResponseEntity<Void> deleteLogement(@PathVariable String reference) {
         logementRepository.deleteByReference(reference);
         return ResponseEntity.noContent().build();
@@ -101,6 +104,7 @@ public class AdminDashboardController {
     // ===== Appartements =====
 
     @GetMapping("/apparts")
+    @PreAuthorize(SecurityRule.ADMIN)
     public ResponseEntity<List<AdminAppartDto>> getAllApparts() {
         List<Appart> apparts = appartRepository.findAll();
         List<AdminAppartDto> dtos = apparts.stream().map(a -> {
@@ -119,6 +123,7 @@ public class AdminDashboardController {
     }
 
     @DeleteMapping("/apparts/{reference}")
+    @PreAuthorize(SecurityRule.ADMIN)
     public ResponseEntity<Void> deleteAppart(@PathVariable String reference) {
         appartRepository.deleteByReference(reference);
         return ResponseEntity.noContent().build();
@@ -127,6 +132,7 @@ public class AdminDashboardController {
     // ===== Baux =====
 
     @GetMapping("/baux")
+    @PreAuthorize(SecurityRule.ADMIN)
     public ResponseEntity<List<AdminBailDto>> getAllBaux() {
         List<Bail> baux = bailRepository.findAll();
         List<AdminBailDto> dtos = baux.stream().map(b -> {
@@ -148,6 +154,7 @@ public class AdminDashboardController {
     // ===== Transactions (versements) =====
 
     @GetMapping("/transactions")
+    @PreAuthorize(SecurityRule.ADMIN)
     public ResponseEntity<List<AdminTransactionDto>> getAllTransactions() {
         List<Transaction> transactions = transactionRepository.findAll();
         List<AdminTransactionDto> dtos = transactions.stream().map(t -> {
@@ -166,6 +173,7 @@ public class AdminDashboardController {
     }
 
     @DeleteMapping("/transactions/{id}")
+    @PreAuthorize(SecurityRule.ADMIN)
     public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
         transactionRepository.deleteById(id);
         return ResponseEntity.noContent().build();
@@ -174,8 +182,8 @@ public class AdminDashboardController {
     // ===== Transactions Campay =====
 
     @GetMapping("/campay-transactions")
+    @PreAuthorize(SecurityRule.ADMIN)
     public ResponseEntity<List<CampayTransaction>> getAllCampayTransactions() {
         return ResponseEntity.ok(campayTransactionRepository.findAll());
     }
 }
-
