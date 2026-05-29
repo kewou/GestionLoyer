@@ -2,7 +2,6 @@ package com.example.features.transaction;
 
 import com.example.features.bail.Bail;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,22 +27,16 @@ public class Transaction {
     @JoinColumn(name = "bail_id")
     private Bail bail;
 
-<<<<<<< HEAD
-    @JsonIgnore
-    public Bail getBail() {
-        return this.bail;
-    }
-=======
-    @JsonIgnore
-    public Bail getBail() {
-        return this.bail;
-    }
+    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
     private TransactionType type = TransactionType.MANUEL;
-}
+
+    @Column(name = "campay_reference")
     private String campayReference;
 
->>>>>>> develop
+    @JsonIgnore
+    public Bail getBail() {
+        return this.bail;
+    }
 
 }
-
-
