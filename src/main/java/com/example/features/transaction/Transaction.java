@@ -1,11 +1,10 @@
 package com.example.features.transaction;
 
 import com.example.features.bail.Bail;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -34,9 +33,5 @@ public class Transaction {
     @Column(name = "campay_reference")
     private String campayReference;
 
-    @JsonIgnore
-    public Bail getBail() {
-        return this.bail;
-    }
 
 }
