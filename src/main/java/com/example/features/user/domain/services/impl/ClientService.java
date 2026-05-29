@@ -3,6 +3,7 @@ package com.example.features.user.domain.services.impl;
 import com.example.exceptions.BusinessException;
 import com.example.features.common.mail.MessageDto;
 import com.example.features.common.mail.MessageService;
+import com.example.features.payment.enums.ModeEncaissement;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.application.mapper.ClientDto;
 import com.example.features.user.application.mapper.ClientMapper;
@@ -19,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -268,6 +270,77 @@ public class ClientService implements ClientAppService {
                 client.setBaux(new HashSet<>());
             }
         }
+    }
+
+    public ModeEncaissement getModeEncaissement(String reference) throws BusinessException {
+        Client client = getClientFromDatabase(reference);
+        return client.getModeEncaissement() != null ? client.getModeEncaissement() : ModeEncaissement.DEUX_ETAPES;
+    }
+
+    public void updateModeEncaissement(String reference, ModeEncaissement mode) throws BusinessException {
+        Client client = getClientFromDatabase(reference);
+        if (ModeEncaissement.DIRECT.equals(mode) && (client.getPhoneOm() == null || client.getPhoneOm().isBlank())) {
+            throw new BusinessException(
+                "Vous devez enregistrer un numéro Orange Money avant d'activer l'encaissement direct.", OTHER);
+        }
+        client.setModeEncaissement(mode);
+        clientRepository.save(client);
+        log.info("Mode encaissement du bailleur {} mis à jour : {}", reference, mode);
+    }
+
+    public void updatePhoneOm(String reference, String phoneOm) throws BusinessException {
+        Client client = getClientFromDatabase(reference);
+        client.setPhoneOm(phoneOm);
+        clientRepository.save(client);
+        log.info("Numéro Orange Money du client {} mis à jour : {}", reference, phoneOm);
+    }
+
+    /**
+     * Crée un locataire "lite" (sans email ni mot de passe).
+     * Ce compte peut être rattaché ultérieurement à un vrai compte via un code de validation.
+     */
+    public ClientDto createLiteLocataire(String name, String lastName, String phone) {
+        Client client = Client.builder()
+                .name(name)
+                .lastName(lastName)
+                .phone(phone)
+                .reference(GeneralUtils.generateReference())
+                .isEnabled(Boolean.TRUE)
+                .liteAccount(Boolean.TRUE)
+                .linkingCode(GeneralUtils.generateVerificationToken())
+                .roles(Set.of(Role.LOCATAIRE.name()))
+                .solde(BigDecimal.ZERO)
+                .build();
+        Client saved = clientRepository.save(client);
+        log.info("Locataire lite créé : ref={}, nom={} {}", saved.getReference(), name, lastName);
+        return clientMapper.dto(saved);
+    }
+
+    /**
+     * Lie un compte lite (créé par un bailleur) au compte réel du locataire.
+     * Transfère tous les baux du compte lite vers le compte réel, puis supprime le compte lite.
+     */
+    public void linkLiteAccount(String realUserReference, String linkingCode) throws BusinessException {
+        Client realUser = getClientFromDatabase(realUserReference);
+
+        Client liteAccount = clientRepository.findByLinkingCode(linkingCode)
+                .orElseThrow(() -> new BusinessException("Code de liaison invalide ou déjà utilisé.", NOT_FOUND));
+
+        if (!Boolean.TRUE.equals(liteAccount.getLiteAccount())) {
+            throw new BusinessException("Ce code ne correspond pas à un compte virtuel.", OTHER);
+        }
+
+        // Transférer tous les baux du compte lite vers le compte réel
+        if (liteAccount.getBaux() != null) {
+            liteAccount.getBaux().forEach(bail -> bail.setLocataire(realUser));
+            realUser.getBaux().addAll(liteAccount.getBaux());
+            liteAccount.getBaux().clear();
+        }
+
+        clientRepository.save(realUser);
+        clientRepository.delete(liteAccount);
+
+        log.info("Compte lite {} lié et supprimé → compte réel {}", liteAccount.getReference(), realUserReference);
     }
 
 }

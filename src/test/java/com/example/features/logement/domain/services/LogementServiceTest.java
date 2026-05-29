@@ -5,6 +5,7 @@ import com.example.features.logement.Logement;
 import com.example.features.logement.LogementDto;
 import com.example.features.logement.LogementRepository;
 import com.example.features.logement.LogementService;
+import com.example.features.transaction.TransactionRepository;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.domain.entities.Client;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,11 +33,14 @@ class LogementServiceTest {
     @Mock
     private ClientAppService clientAppService;
 
+    @Mock
+    private TransactionRepository transactionRepository;
+
     private LogementService logementService;
 
     @BeforeEach
     void setUp() {
-        logementService = new LogementService(logementRepository, clientAppService);
+        logementService = new LogementService(logementRepository, clientAppService, transactionRepository);
     }
 
     private Logement createLogement(String reference, String quartier, Client client) {

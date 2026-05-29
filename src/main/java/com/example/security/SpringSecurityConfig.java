@@ -27,10 +27,15 @@ public class SpringSecurityConfig {
     private AuthenticationService authenticationService;
 
     @Autowired
-    private JwtFilter jwtFilter;
+    private ClientPreFilter clientPreFilter;
 
     @Autowired
-    private ClientPreFilter clientPreFilter;
+    private com.example.utils.JWTUtils jwtUtils;
+
+    @Bean
+    public JwtFilter jwtFilter() {
+        return new JwtFilter(jwtUtils, authenticationService);
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -58,7 +63,8 @@ public class SpringSecurityConfig {
                         .requestMatchers("/assets/**", "/users/create*", "/authenticate", "/oauth2/**", "/login",
                                 "/user-roles", "/contact",
                                 "/a-propos", "/users/verify-account", "/users/reset-password", "/users/update-password",
-                                "/swagger-ui/**", "/api-docs/**", "/actuator/**")
+                                "/swagger-ui/**", "/api-docs/**", "/actuator/**",
+                                "/payment/webhook/**")  // Webhook Campay public
                         .permitAll()
                         .requestMatchers("/", "/index.html", "/static/**", "/js/**", "/css/**", "/images/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -72,7 +78,7 @@ public class SpringSecurityConfig {
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(clientPreFilter, JwtFilter.class);
 
         return http.build();

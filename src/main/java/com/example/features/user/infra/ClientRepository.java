@@ -19,6 +19,9 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     Optional<Client> findByReference(String reference);
 
+    Optional<Client> findByLinkingCode(String linkingCode);
+
+
     void deleteByReference(String reference);
 
     @Query("SELECT c FROM Client c WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%')) " +

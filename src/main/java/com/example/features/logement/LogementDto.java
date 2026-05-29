@@ -1,11 +1,10 @@
 package com.example.features.logement;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import jakarta.validation.constraints.NotBlank;
 
 @Data
 @Builder
@@ -23,6 +22,10 @@ public class LogementDto {
 
     @NotBlank(message = "Entrer une description svp")
     private String description;
+
+    private Long totalEncaisse;
+
+    private Long totalEndettement;
 }
 
 

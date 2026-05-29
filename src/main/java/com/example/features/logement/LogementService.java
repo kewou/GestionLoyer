@@ -1,6 +1,8 @@
 package com.example.features.logement;
 
 import com.example.exceptions.BusinessException;
+import com.example.features.bail.Bail;
+import com.example.features.transaction.TransactionRepository;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.domain.entities.Client;
 import com.example.utils.GeneralUtils;
@@ -9,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,17 +25,42 @@ public class LogementService implements LogementAppService {
 
     private final ClientAppService clientAppService;
     private final LogementRepository logementRepository;
+    private final TransactionRepository transactionRepository;
 
     @Autowired
-    public LogementService(LogementRepository logementRepository, ClientAppService clientAppService) {
+    public LogementService(LogementRepository logementRepository, ClientAppService clientAppService,
+                           TransactionRepository transactionRepository) {
         this.clientAppService = clientAppService;
         this.logementRepository = logementRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     public List<LogementDto> getAllLogementByUser(String reference) throws BusinessException {
         Client bailleur = clientAppService.getClientFromDatabase(reference);
         return logementRepository.findByClient(bailleur).stream()
-                .map(LogementMapper.getMapper()::dto)
+                .map(logement -> {
+                    LogementDto dto = LogementMapper.getMapper().dto(logement);
+                    // Total encaissé = somme de toutes les transactions du logement
+                    Long totalEncaisse = transactionRepository.sumMontantByLogement(logement);
+                    dto.setTotalEncaisse(totalEncaisse);
+                    // Total endettement = somme des loyers attendus - somme encaissée, pour les baux actifs
+                    long totalEndettement = 0L;
+                    for (var appart : logement.getApparts()) {
+                        for (Bail bail : appart.getBaux()) {
+                            if (Boolean.TRUE.equals(bail.getActif())) {
+                                LocalDate debut = bail.getDateEntree();
+                                LocalDate fin = LocalDate.now();
+                                long mois = ChronoUnit.MONTHS.between(debut.withDayOfMonth(1), fin.withDayOfMonth(1));
+                                long loyersAttendus = mois * (appart.getPrixLoyer() != null ? appart.getPrixLoyer() : 0);
+                                long loyerPaye = transactionRepository.sumMontantByBail(bail);
+                                long dette = loyersAttendus - loyerPaye;
+                                if (dette > 0) totalEndettement += dette;
+                            }
+                        }
+                    }
+                    dto.setTotalEndettement(totalEndettement);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 

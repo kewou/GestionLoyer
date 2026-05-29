@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="BasicApplication" type="Application" factoryName="Application" nameIsGenerated="true">
     <envs>
-      <env name="spring.mail.password" value="gsev uvxw xqfm rahx" />
+      <env name="spring.mail.password" value="oryp vhed sqah xeyv" />
       <env name="spring.mail.username" value="kewou.noumia@gmail.com" />
       <env name="Spring.profiles.active" value="dev" />
     </envs>

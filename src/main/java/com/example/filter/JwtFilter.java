@@ -2,13 +2,11 @@ package com.example.filter;
 
 import com.example.features.accueil.domain.services.AuthenticationService;
 import com.example.utils.JWTUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import jakarta.servlet.FilterChain;
@@ -16,47 +14,54 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
-@Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JWTUtils jwtUtils;
+    private final JWTUtils jwtUtils;
+    private final AuthenticationService authenticationService;
 
-    @Autowired
-    private AuthenticationService authenticationService;
+    public JwtFilter(JWTUtils jwtUtils, AuthenticationService authenticationService) {
+        this.jwtUtils = jwtUtils;
+        this.authenticationService = authenticationService;
+    }
+
+    private static final List<String> PUBLIC_PATHS = List.of(
+            "/authenticate", "/oauth2/authorize/google", "/oauth2/callback/google",
+            "/login", "/a-propos", "/user-roles", "/contact",
+            "/users/verify-account", "/users/reset-password", "/users/update-password"
+    );
+
+    private static final List<String> PUBLIC_PREFIXES = List.of(
+            "/users/create", "/locataire/users/create", "/assets/",
+            "/swagger-ui", "/api-docs", "/actuator", "/payment/webhook"
+    );
+
+    private static final List<String> PUBLIC_EXTENSIONS = List.of(
+            ".js", ".css", ".html", ".jpg", ".png"
+    );
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI().substring(request.getContextPath().length());
+
+        if (request.getMethod().equals(HttpMethod.OPTIONS.name())) return true;
+        if (path.equals("/") || path.isEmpty()) return true;
+        if (PUBLIC_PATHS.stream().anyMatch(p -> p.equalsIgnoreCase(path))) return true;
+        if (PUBLIC_PREFIXES.stream().anyMatch(path::startsWith)) return true;
+        if (PUBLIC_EXTENSIONS.stream().anyMatch(path::endsWith)) return true;
+
+        return false;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-        String path = httpServletRequest.getRequestURI();
-        if (httpServletRequest.getMethod().equals(HttpMethod.OPTIONS.name())
-                || path.equalsIgnoreCase("/beezyApi/authenticate") // Authentification
-                || path.equalsIgnoreCase("/beezyApi/oauth2/authorize/google") // Authentification
-                || path.equalsIgnoreCase("/beezyApi/oauth2/callback/google") // Authentification
-                || path.equalsIgnoreCase("/beezyApi/login") // Authentification
-                || path.equalsIgnoreCase("/beezyApi/a-propos") // Authentification
-                || path.equalsIgnoreCase("/beezyApi/user-roles") // Profil user
-                || path.equalsIgnoreCase("/beezyApi/contact") // Profil user
-                || path.equalsIgnoreCase("/beezyApi/users/verify-account") // Profil user
-                || path.equalsIgnoreCase("/beezyApi/users/reset-password") // Profil user
-                || path.equalsIgnoreCase("/beezyApi/users/update-password") // Profil user
-                || path.startsWith("/beezyApi/users/create") // Inscription
-                || path.startsWith("/beezyApi/locataire/users/create") // CrÃ©ation locataire
-                || path.equalsIgnoreCase("/beezyApi/") // Page d'accueil
-                || path.startsWith("/beezyApi/assets/")
-                || path.startsWith("/beezyApi/swagger-ui") // Swagger UI
-                || path.startsWith("/beezyApi/api-docs") // API Docs
-                || path.startsWith("/beezyApi/actuator") // Actuator
-                || path.endsWith(".js")
-                || path.endsWith(".css")
-                || path.endsWith(".html") // Fichiers HTML
-                || path.endsWith(".jpg") // Images
-                || path.endsWith(".png")) {
-            filterChain.doFilter(httpServletRequest, httpServletResponse);
-            return;
-        }
 
         String authorization = httpServletRequest.getHeader("Authorization");
+        // Fallback : query param ?token= pour EventSource (SSE) qui ne supporte pas les headers custom
+        if ((authorization == null || authorization.isBlank()) && httpServletRequest.getParameter("token") != null) {
+            authorization = "Bearer " + httpServletRequest.getParameter("token");
+        }
         String token = null;
         String userName = null;
 

@@ -3,13 +3,14 @@ package com.example.features.user.application;
 import com.example.exceptions.BusinessException;
 import com.example.exceptions.ValidationException;
 import com.example.features.accueil.domain.services.AuthenticationService;
+import com.example.features.bail.BailService;
 import com.example.features.user.application.appService.ClientAppService;
 import com.example.features.user.application.mapper.ClientDto;
+import com.example.features.user.domain.services.impl.ClientService;
 import com.example.features.user.application.mapper.ResetPasswordRequestDto;
 import com.example.features.user.application.mapper.UpdatePasswordDto;
 import com.example.features.user.application.mapper.VerificationUserInscriptionDto;
 import com.example.features.user.domain.entities.Client;
-import com.example.features.user.domain.services.impl.ClientService;
 import com.example.helper.ResponseHelper;
 import com.example.security.Role;
 import com.example.security.SecurityRule;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 
 import static com.example.exceptions.BusinessException.BusinessErrorType.NOT_FOUND;
 
@@ -45,14 +47,17 @@ public class ClientController {
 
     protected ClientAppService clientAppService;
     protected AuthenticationService authenticationService;
-
     protected JWTUtils jwtUtils;
+    protected BailService bailService;
+    protected ClientService clientService;
 
     @Autowired
-    public ClientController(ClientService clientAppService, AuthenticationService authenticationService, JWTUtils jwtUtils) {
+    public ClientController(ClientService clientAppService, AuthenticationService authenticationService, JWTUtils jwtUtils, BailService bailService) {
         this.clientAppService = clientAppService;
+        this.clientService = clientAppService;
         this.authenticationService = authenticationService;
         this.jwtUtils = jwtUtils;
+        this.bailService = bailService;
     }
 
 
@@ -89,7 +94,23 @@ public class ClientController {
     public ResponseEntity<ClientDto> getClientByReference(
             @Parameter(description = "reference of Client")
             @NotBlank @PathVariable("reference") String reference) throws BusinessException {
-        return ResponseEntity.ok(clientAppService.getClientByReference(reference));
+        ClientDto dto = clientAppService.getClientByReference(reference);
+        // Calcul du nombre de loyers en retard pour les locataires
+        try {
+            com.example.features.user.domain.entities.Client client = clientService.getClientWithBaux(reference);
+            if (client.getRoles() != null && client.getRoles().contains("LOCATAIRE")) {
+                int retardCount = client.getBauxActifs().stream()
+                        .mapToInt(bail -> (int) bailService.getHistoriqueLoyers(bail.getId()).stream()
+                                .filter(l -> !l.isOk())
+                                .count())
+                        .sum();
+                dto.setLoyersEnRetard(retardCount);
+                dto.setHasBailActif(!client.getBauxActifs().isEmpty());
+            }
+        } catch (Exception e) {
+            log.warn("Impossible de calculer les loyers en retard pour {}: {}", reference, e.getMessage());
+        }
+        return ResponseEntity.ok(dto);
     }
 
 
@@ -146,6 +167,21 @@ public class ClientController {
         return ResponseEntity.ok(clientAppService.searchLocatairesByName(name));
     }
 
+    /**
+     * Met à jour le numéro Orange Money d'un utilisateur.
+     */
+    @PutMapping("/{reference}/phone-om")
+    @PreAuthorize(SecurityRule.CONNECTED_OR_ADMIN)
+    public ResponseEntity<Map<String, String>> updatePhoneOm(
+            @PathVariable String reference,
+            @RequestBody Map<String, String> body) throws BusinessException {
+        String phoneOm = body.get("phoneOm");
+        if (phoneOm == null || phoneOm.isBlank()) {
+            throw new BusinessException("Le numéro Orange Money est requis.", com.example.exceptions.BusinessException.BusinessErrorType.OTHER);
+        }
+        clientService.updatePhoneOm(reference, phoneOm);
+        return ResponseEntity.ok(Map.of("phoneOm", phoneOm));
+    }
 
 }
 
